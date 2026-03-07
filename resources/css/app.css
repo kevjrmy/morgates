@@ -1,11 +1,107 @@
-@import 'tailwindcss';
+:root {
+  --clr-primary: #5599ff;
+  --clr-secondary: #0044aa;
+  --clr-tertiary: #d5e5ff;
+  
+  --clr-background: #f9f9f9;
+  --clr-text-dark: #232323;
+  --clr-text-medium: #565454;
+  --clr-text-light: #969faf;
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+  --max-width: 768px;
+  --line-height: 1.6;
+  --border: 0.5px solid #EBEBEB;
+  ;
+  --box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.1);
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-size-s: 0.875rem;
+}
+
+/* Global */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Set core root defaults */
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--clr-background);
+  color: var(--clr-text-dark);
+  font-family:
+    Figtree,
+    -apple-system,
+    BlinkMacSystemFont,
+    Roboto,
+    "Segoe UI",
+    Helvetica,
+    Arial,
+    sans-serif;
+  line-height: var(--line-height);
+}
+
+#laravel {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make the main content take the whole remaining screen */
+main {
+  flex: 1;
+}
+
+/* Remove list styles on ul, ol elements with a list role */
+ul:where([role="list"]),
+ol:where([role="list"]),
+ul:where([role="tab"]) {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Clear links default style */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Clear button default style */
+button {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--clr-text-medium);
+}
+
+/* Make images easier to work with */
+img,
+picture {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+
+/* Inherit fonts for inputs and buttons */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* SVG blade icons */
+svg {
+  height: 1.5rem;
+  width: 1.5rem;
+  vertical-align: middle;
 }
