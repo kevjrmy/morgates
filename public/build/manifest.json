@@ -1,0 +1,20 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-D4J6DDp9.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/css/header.css": {
+    "file": "assets/header-BiN2724h.css",
+    "src": "resources/css/header.css",
+    "isEntry": true,
+    "name": "header",
+    "names": [
+      "header.css"
+    ]
+  }
+}
