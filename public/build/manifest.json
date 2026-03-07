@@ -8,6 +8,15 @@
       "app.css"
     ]
   },
+  "resources/css/footer.css": {
+    "file": "assets/footer-C73PlB4D.css",
+    "src": "resources/css/footer.css",
+    "isEntry": true,
+    "name": "footer",
+    "names": [
+      "footer.css"
+    ]
+  },
   "resources/css/header.css": {
     "file": "assets/header-BiN2724h.css",
     "src": "resources/css/header.css",
