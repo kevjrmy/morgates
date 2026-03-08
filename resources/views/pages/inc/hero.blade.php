@@ -2,6 +2,7 @@
   <h1 id="hero-title">
     Locations & réservations pour <span class="highlight">tous</span>
   </h1>
+  <x-searchbar />
 </section>
 
 @push('scripts')
@@ -56,56 +57,59 @@
 @endpush
 
 @push('styles')
-  <style>
-    #hero {
-      padding: 2rem 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
+<style>
+  #hero {
+    margin: auto;
+    padding: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    row-gap: 2rem;
+    max-width: var(--mobile-L);
+  }
 
-    #hero h1 {
-      color: var(--clr-text-medium);
-      font-size: clamp(2.5rem, 6vw, 4rem);
-      font-weight: 700;
-      line-height: 1.2;
-    }
+  #hero h1 {
+    color: var(--clr-text-medium);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 700;
+    line-height: 1.2;
+  }
 
-    #hero h1 .word {
-      display: inline-block;
-      opacity: 0;
-      transform: translateY(12px);
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
+  #hero h1 .word {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
 
-    #hero h1 .word.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  #hero h1 .word.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
-    .highlight {
-      background: linear-gradient(90deg, var(--clr-primary), var(--clr-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      position: relative;
-      display: inline-block;
-    }
+  .highlight {
+    background: linear-gradient(90deg, var(--clr-primary), var(--clr-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    display: inline-block;
+  }
 
-    .highlight::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      bottom: -3px;
-      height: 2px;
-      width: 0%;
-      background: linear-gradient(90deg, var(--clr-primary), var(--clr-secondary));
-      transition: width 0.5s ease;
-    }
+  .highlight::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 2px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--clr-primary), var(--clr-secondary));
+    transition: width 0.5s ease;
+  }
 
-    .highlight.underlined::after {
-      width: 100%;
-    }
-  </style>
+  .highlight.underlined::after {
+    width: 100%;
+  }
+</style>
 @endpush
