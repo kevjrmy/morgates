@@ -35,7 +35,7 @@
 }
 
 .search-bar button {
-  padding: 0.6rem 0.8rem;
+  padding: 0.6rem 1.2rem;
   display: flex;
   align-items: center;
 }

@@ -15,6 +15,7 @@ return new class extends Migration {
       $table->foreignId('user_id')->constrained()->cascadeOnDelete();
       $table->enum('type', ['house', 'boat', 'garage']);
       $table->string('title');
+      $table->json('photos')->nullable();
       $table->longText('description')->nullable();
       $table->decimal('price_per_night', 8, 2);
       $table->char('currency', 3)->default('EUR');
