@@ -4,8 +4,8 @@ use Illuminate\Support\Facades\Route;
 
 /* Homepage */
 Route::get('/', function () {
-  $listings = \App\Models\Listing::latest()->get();
-  return view('pages.home', compact('listings'));
+    $listings = \App\Models\Listing::latest()->get();
+    return view('pages.home', compact('listings'));
 })->name('home');
 
 /* Search */
