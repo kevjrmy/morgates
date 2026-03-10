@@ -19,6 +19,7 @@
 @endphp
 
 <section class="tags-section">
+  <h2>Spécificités</h2>
   <div class="tags-scroll">
     @foreach($tags as $tag)
       <a href="{{ route('search', ['tag' => $tag['query']]) }}" class="tag">
@@ -33,6 +34,7 @@
   <style>
     .tags-section {
       padding: 1rem;
+      text-align: center;
     }
 
     .tags-scroll {
@@ -46,11 +48,11 @@
       box-shadow: var(--box-shadow);
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 0.5rem;
       padding: 0.4rem 0.85rem;
       border-radius: 120px;
       font-size: 0.85rem;
-      color: var(--clr-text-primary);
+      color: var(--clr-text-medium);
       transition: background-color 0.2s ease, color 0.2s ease;
     }
 

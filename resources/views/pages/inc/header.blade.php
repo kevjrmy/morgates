@@ -2,7 +2,7 @@
   <nav class="header-nav">
     @if (request()->routeIs('home'))
       <div class="header-logo">
-        <img src="{{ asset('images/logo.svg') }}" alt="Morgates logo">
+        <img src="{{ asset('images/logo.svg') }}" alt="Morgates logo" width="47" height="32">
       </div>
     @else
       <a href="{{ route('home') }}" class="header-logo">
