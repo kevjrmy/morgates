@@ -24,6 +24,7 @@ return new class extends Migration {
       $table->integer('max_nights')->nullable();
       $table->char('country', 2)->index();
       $table->string('city');
+      $table->json('tags')->nullable();
       $table->string('address')->nullable();
       $table->decimal('latitude', 10, 7)->nullable();
       $table->decimal('longitude', 10, 7)->nullable();

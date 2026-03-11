@@ -27,5 +27,6 @@ class Listing extends Model
 
     protected $casts = [
         'photos' => 'array',
+        'tags'   => 'array',
     ];
 }

@@ -4,13 +4,37 @@ use Illuminate\Support\Facades\Route;
 
 /* Homepage */
 Route::get('/', function () {
-    $listings = \App\Models\Listing::latest()->get();
-    return view('pages.home', compact('listings'));
+  $listings = \App\Models\Listing::latest()->get();
+  return view('pages.home', compact('listings'));
 })->name('home');
 
 /* Search */
 Route::get('/search', function () {
-  return view('pages.search');
+  $query = \App\Models\Listing::query();
+
+  if (request('type')) {
+    $query->where('type', request('type'));
+  }
+
+  if (request('city')) {
+    $query->where('city', request('city'));
+  }
+
+  if (request('q')) {
+    $query->where(function ($q) {
+      $q->where('title', 'like', '%' . request('q') . '%')
+        ->orWhere('description', 'like', '%' . request('q') . '%')
+        ->orWhere('city', 'like', '%' . request('q') . '%');
+    });
+  }
+
+  if (request('tag')) {
+    $query->whereJsonContains('tags', request('tag'));
+  }
+
+  $listings = $query->latest()->get();
+
+  return view('pages.search', compact('listings'));
 })->name('search');
 
 /* Legal */
