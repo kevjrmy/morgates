@@ -100,7 +100,7 @@
   }
 
   .listing-card--more {
-    border: 1px dashed var(--clr-primary);
+    border: 1px solid var(--clr-primary);
     display: flex;
     align-items: center;
     justify-content: center;

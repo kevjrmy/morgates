@@ -37,7 +37,7 @@
   <h2>Destinations tendance</h2>
   <div class="destinations-grid">
     @foreach($destinations as $destination)
-      <a href="{{ route('search', ['city' => $destination['city']]) }}" class="destination-card">
+      <a href="{{ route('listings', ['city' => $destination['city']]) }}" class="destination-card">
         <img src="{{ $destination['photo'] }}" alt="{{ $destination['city'] }}" loading="lazy">
         <div class="destination-card-overlay"></div>
         <div class="destination-card-label">

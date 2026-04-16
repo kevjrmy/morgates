@@ -6,22 +6,22 @@
     {{-- Filters --}}
     <div class="search-filters">
       <div class="filter-scroll">
-        <a href="{{ route('search', array_merge(request()->except('type'), [])) }}"
+        <a href="{{ route('listings', array_merge(request()->except('type'), [])) }}"
           class="filter-pill {{ !request('type') ? 'active' : '' }}">
           @svg('tabler-layout-grid')
           Tout
         </a>
-        <a href="{{ route('search', array_merge(request()->query(), ['type' => 'house'])) }}"
+        <a href="{{ route('listings', array_merge(request()->query(), ['type' => 'house'])) }}"
           class="filter-pill {{ request('type') === 'house' ? 'active' : '' }}">
           @svg('tabler-home')
           Maisons
         </a>
-        <a href="{{ route('search', array_merge(request()->query(), ['type' => 'boat'])) }}"
+        <a href="{{ route('listings', array_merge(request()->query(), ['type' => 'boat'])) }}"
           class="filter-pill {{ request('type') === 'boat' ? 'active' : '' }}">
           @svg('tabler-sailboat')
           Bateaux
         </a>
-        <a href="{{ route('search', array_merge(request()->query(), ['type' => 'garage'])) }}"
+        <a href="{{ route('listings', array_merge(request()->query(), ['type' => 'garage'])) }}"
           class="filter-pill {{ request('type') === 'garage' ? 'active' : '' }}">
           @svg('tabler-car-garage')
           Garages
@@ -34,7 +34,7 @@
       <div class="search-active-tag">
         @svg('tabler-tag')
         {{ request('tag') }}
-        <a href="{{ route('search', request()->except('tag')) }}" aria-label="Retirer le filtre">
+        <a href="{{ route('listings', request()->except('tag')) }}" aria-label="Retirer le filtre">
           @svg('tabler-x')
         </a>
       </div>
@@ -43,12 +43,12 @@
     {{-- Results --}}
     <div class="search-results">
       @forelse($listings as $listing)
-        <x-listing-row :listing="$listing" />
+        <x-listings.listing :listing="$listing" />
       @empty
         <div class="search-empty">
           @svg('tabler-mood-sad')
           <p>Aucun résultat trouvé.</p>
-          <a href="{{ route('search') }}">Effacer les filtres</a>
+          <a href="{{ route('listings') }}">Effacer les filtres</a>
         </div>
       @endforelse
     </div>
@@ -66,12 +66,7 @@
 
     /* Filters */
     .search-filters {
-      position: sticky;
-      top: 0;
-      background-color: var(--clr-background);
-      z-index: 10;
-      border-bottom: 1px solid var(--clr-primary);
-      padding: 0.75rem 0;
+      padding: 1rem 0;
     }
 
     .filter-scroll {
@@ -92,9 +87,8 @@
       gap: 0.35rem;
       padding: 0.4rem 0.85rem;
       border-radius: 120px;
-      border: 1px solid var(--clr-primary);
       font-size: 0.85rem;
-      color: var(--clr-text-primary);
+      color: var(--clr-text-medium);
       white-space: nowrap;
       transition: background-color 0.2s ease, color 0.2s ease;
       flex-shrink: 0;
@@ -130,7 +124,7 @@
       display: flex;
       flex-direction: column;
       gap: 1rem;
-      padding: 0 1rem 2rem;
+      padding: 1rem 1rem 2rem;
     }
 
     /* Empty */

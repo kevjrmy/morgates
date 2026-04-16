@@ -37,8 +37,8 @@
 }
 
 .header-logo img {
-  height: 2rem;
-  width: auto;
+  border: 2px solid var(--clr-primary);
+  border-radius: 50%;
 }
 
 #drawer-overlay.active {
@@ -76,7 +76,8 @@
 }
 
 .drawer-header img {
-  height: 2rem;
+  border: 2px solid var(--clr-primary);
+  border-radius: 50%;
 }
 
 .drawer-nav {

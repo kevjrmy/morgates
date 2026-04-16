@@ -22,7 +22,7 @@
   <h2>Spécificités</h2>
   <div class="tags-scroll">
     @foreach($tags as $tag)
-      <a href="{{ route('search', ['tag' => $tag['query']]) }}" class="tag">
+      <a href="{{ route('listings', ['tag' => $tag['query']]) }}" class="tag">
         @svg($tag['icon'])
         {{ $tag['label'] }}
       </a>

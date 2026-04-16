@@ -2,11 +2,11 @@
   <nav class="header-nav">
     @if (request()->routeIs('home'))
       <div class="header-logo">
-        <img src="{{ asset('images/logo.svg') }}" alt="Morgates logo" width="47" height="32">
+        <img src="{{ asset('images/logo.svg') }}" alt="Morgates logo" width="48" height="48">
       </div>
     @else
       <a href="{{ route('home') }}" class="header-logo">
-        <img src="{{ asset('images/logo.svg') }}" alt="Morgates logo">
+        <img src="{{ asset('images/logo.svg') }}" alt="Morgates logo" width="48" height="48">
       </a>
     @endif
 
@@ -22,7 +22,7 @@
 {{-- Drawer --}}
 <aside id="drawer" aria-label="Menu de navigation" aria-hidden="true">
   <div class="drawer-header">
-    <img src="{{ asset('images/logo.svg') }}" alt="Morgates logo">
+    <img src="{{ asset('images/logo.svg') }}" alt="Morgates logo" height="40" width="40">
     <button type="button" id="drawer-close" aria-label="Fermer le menu">
       @svg('tabler-x')
     </button>
@@ -33,7 +33,7 @@
       @svg('tabler-home')
       Accueil
     </a>
-    <a href="{{ route('search') }}" class="{{ request()->routeIs('search') ? 'active' : '' }}">
+    <a href="{{ route('listings') }}" class="{{ request()->routeIs('search') ? 'active' : '' }}">
       @svg('tabler-search')
       Explorer
     </a>
@@ -52,8 +52,8 @@
   </nav>
 
   <div class="drawer-footer">
-    <a href="#" class="btn-login">Connexion</a>
-    <a href="#" class="btn-signup">Inscription</a>
+    <a href="{{ route('login') }}" class="btn-login">Connexion</a>
+    <a href="{{ route('register') }}" class="btn-signup">Inscription</a>
   </div>
 </aside>
 

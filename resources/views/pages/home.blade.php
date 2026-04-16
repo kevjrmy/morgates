@@ -11,7 +11,7 @@
           @foreach($listings->where('type', 'house')->take(5) as $listing)
             <x-listing-card :listing="$listing" />
           @endforeach
-          <x-listing-card :more="route('search', ['type' => 'house'])" />
+          <x-listing-card :more="route('listings', ['type' => 'house'])" />
         </div>
       </section>
     @endif
@@ -23,7 +23,7 @@
           @foreach($listings->where('type', 'boat')->take(5) as $listing)
             <x-listing-card :listing="$listing" />
           @endforeach
-          <x-listing-card :more="route('search', ['type' => 'boat'])" />
+          <x-listing-card :more="route('listings', ['type' => 'boat'])" />
         </div>
       </section>
     @endif
@@ -35,7 +35,7 @@
           @foreach($listings->where('type', 'garage')->take(5) as $listing)
             <x-listing-card :listing="$listing" />
           @endforeach
-          <x-listing-card :more="route('search', ['type' => 'garage'])" />
+          <x-listing-card :more="route('listings', ['type' => 'garage'])" />
         </div>
       </section>
     @endif

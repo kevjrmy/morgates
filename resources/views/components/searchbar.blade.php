@@ -3,7 +3,7 @@
   'value' => null
 ])
 
-<form action="{{ route('search') }}" method="GET" role="search" {{ $attributes->merge(['class' => 'search-bar']) }}>
+<form action="{{ route('listings') }}" method="GET" role="search" {{ $attributes->merge(['class' => 'search-bar']) }}>
   <button type="submit" aria-label="Submit search">
     @svg('mdi-magnify', ['color' => 'var(--clr-primary)'])
   </button>
