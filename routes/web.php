@@ -14,7 +14,7 @@ Route::get('/', function () {
   return view('pages.home', compact('listings'));
 })->name('home');
 
-/* Annonces */
+/* Listings */
 Route::get('/annonces', function () {
   $query = \App\Models\Listing::query();
 
@@ -43,7 +43,13 @@ Route::get('/annonces', function () {
   return view('pages.listings.index', compact('listings'));
 })->name('listings');
 
-/* Légal */
+/* Listing */
+Route::get('/annonces/{listing}', function (\App\Models\Listing $listing) {
+  $listing->load('user');
+  return view('pages.listings.show', compact('listing'));
+})->name('listing');
+
+/* Legal */
 Route::get('/confidentialite', function () {
   return view('pages.legal.privacy');
 })->name('privacy');
@@ -70,7 +76,7 @@ Route::middleware('guest')->group(function () {
 Route::post('/deconnexion', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 /**
- * Compte
+ * Account
  */
 Route::get('/mon-espace', [AccountController::class, 'index'])->name('account')->middleware('auth');
 /* Onboarding */

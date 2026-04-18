@@ -1,6 +1,6 @@
 @props(['listing'])
 
-<a href="#" class="listing">
+<a href="{{ route('listing', $listing) }}" class="listing">
   <div class="listing-photo">
     <img src="{{ $listing->photos[0] }}" alt="{{ $listing->title }}" loading="lazy">
   </div>
