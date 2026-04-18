@@ -13,8 +13,8 @@ Route::get('/', function () {
   return view('pages.home', compact('listings'));
 })->name('home');
 
-/* Listings */
-Route::get('/listings', function () {
+/* Annonces */
+Route::get('/annonces', function () {
   $query = \App\Models\Listing::query();
 
   if (request('type')) {
@@ -42,16 +42,16 @@ Route::get('/listings', function () {
   return view('pages.listings.index', compact('listings'));
 })->name('listings');
 
-/* Legal */
-Route::get('/privacy', function () {
+/* Légal */
+Route::get('/confidentialite', function () {
   return view('pages.legal.privacy');
 })->name('privacy');
 
-Route::get('/terms', function () {
+Route::get('/conditions-utilisation', function () {
   return view('pages.legal.terms');
 })->name('terms');
 
-Route::get('/about', function () {
+Route::get('/a-propos', function () {
   return view('pages.legal.about');
 })->name('about');
 
@@ -59,17 +59,16 @@ Route::get('/about', function () {
  * Authentification
  */
 Route::middleware('guest')->group(function () {
-  Route::view('/login', 'auth.login')->name('login');
-  Route::post('/login', [AuthController::class, 'login']);
+  Route::view('/connexion', 'auth.login')->name('login');
+  Route::post('/connexion', [AuthController::class, 'login']);
+
+  Route::view('/inscription', 'auth.register')->name('register');
+  Route::post('/inscription', [AuthController::class, 'register']);
 });
 
-Route::get('/register', function () {
-  return view('auth.register');
-})->name('register');
-
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+Route::post('/deconnexion', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 /**
- * Account
+ * Compte
  */
 Route::get('/mon-espace', [AccountController::class, 'index'])->name('account')->middleware('auth');

@@ -23,8 +23,8 @@
 <body id="account-layout">
   <div id="laravel">
     @include('account.inc.header')
+    @include('partials.flash')
     @yield('content')
-    @include('account.inc.footer')
   </div>
 
   @stack('scripts')

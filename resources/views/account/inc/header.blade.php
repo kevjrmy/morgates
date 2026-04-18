@@ -29,7 +29,7 @@
           @csrf
           <button type="submit">
             @svg('tabler-logout')
-            Déconnexion
+            Se déconnecter
           </button>
         </form>
       </div>

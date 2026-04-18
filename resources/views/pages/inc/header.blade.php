@@ -35,7 +35,7 @@
     </a>
     <a href="{{ route('listings') }}" class="{{ request()->routeIs('search') ? 'active' : '' }}">
       @svg('tabler-search')
-      Explorer
+      Annonces
     </a>
     <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">
       @svg('tabler-info-circle')
