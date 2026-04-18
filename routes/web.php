@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\OnboardingController;
 
 /**
  * Pages
@@ -63,7 +64,7 @@ Route::middleware('guest')->group(function () {
   Route::post('/connexion', [AuthController::class, 'login']);
 
   Route::view('/inscription', 'auth.register')->name('register');
-  Route::post('/inscription', [AuthController::class, 'register']);
+  Route::post('/inscription', [AuthController::class, 'register'])->middleware('throttle:5,1');
 });
 
 Route::post('/deconnexion', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
@@ -72,3 +73,12 @@ Route::post('/deconnexion', [AuthController::class, 'logout'])->name('logout')->
  * Compte
  */
 Route::get('/mon-espace', [AccountController::class, 'index'])->name('account')->middleware('auth');
+/* Onboarding */
+Route::middleware('auth')->prefix('bienvenue')->name('onboarding.')->group(function () {
+  Route::get('/', fn() => view('account.onboarding.index'))->name('index');
+  Route::post('/nom', [OnboardingController::class, 'saveName'])->name('name');
+  Route::post('/photo', [OnboardingController::class, 'savePicture'])->name('picture');
+  Route::post('/tel', [OnboardingController::class, 'savePhone'])->name('phone');
+  Route::post('/pays', [OnboardingController::class, 'saveCountry'])->name('country');
+  Route::post('/bio', [OnboardingController::class, 'saveBio'])->name('bio');
+});

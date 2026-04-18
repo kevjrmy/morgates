@@ -28,19 +28,35 @@ class AuthController extends Controller
 
   public function register(Request $request)
   {
-    $validated = $request->validate([
+    $request->validate([
       'email' => 'required|email|unique:users,email',
-      'password' => 'required|confirmed|min:8',
+      'password' => [
+        'required',
+        'confirmed',
+        'min:8',
+        'max:72',
+        'regex:/[A-Z]/',
+        'regex:/[a-z]/',
+        'regex:/[0-9]/',
+        'regex:/[^A-Za-z0-9]/',
+      ],
+    ], [
+      'email.required' => 'L\'adresse email est obligatoire.',
+      'email.email' => 'L\'adresse email est invalide.',
+      'email.unique' => 'Cette adresse email est déjà utilisée.',
+      'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
+      'password.regex' => 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial.',
+      'password.confirmed' => 'Les mots de passe ne correspondent pas.',
     ]);
 
     $user = User::create([
-      'email' => $validated['email'],
-      'password' => Hash::make($validated['password']),
+      'email' => strtolower($request->email),
+      'password' => Hash::make($request->password),
     ]);
 
     Auth::login($user);
 
-    return redirect()->route('account');
+    return redirect()->route('account')->with('success', 'Bienvenue ! Votre compte a été créé avec succès.');
   }
 
   public function logout(Request $request)
