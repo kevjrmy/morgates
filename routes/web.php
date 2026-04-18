@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AccountController;
 
 /**
  * Pages
@@ -58,11 +59,17 @@ Route::get('/about', function () {
  * Authentification
  */
 Route::middleware('guest')->group(function () {
-  Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+  Route::view('/login', 'auth.login')->name('login');
   Route::post('/login', [AuthController::class, 'login']);
 });
+
 Route::get('/register', function () {
   return view('auth.register');
 })->name('register');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+/**
+ * Account
+ */
+Route::get('/mon-espace', [AccountController::class, 'index'])->name('account')->middleware('auth');

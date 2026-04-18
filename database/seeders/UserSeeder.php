@@ -31,7 +31,7 @@ class UserSeeder extends Seeder
         'name' => 'Kevin Jérémy',
         'email' => 'kj@morgates.com',
         'email_verified_at' => now(),
-        'password' => bcrypt('notrelogiquevousdepasse'),
+        'password' => bcrypt('123'),
         'bio' => 'À la recherche de la location idéale.',
       ],
     ];

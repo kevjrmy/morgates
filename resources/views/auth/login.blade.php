@@ -66,6 +66,19 @@
   </main>
 @endsection
 
+@push('scripts')
+  <script>
+    const toggle = document.querySelector('.password-toggle');
+    const passwordInput = document.getElementById('password');
+
+    toggle.addEventListener('click', () => {
+      const isVisible = passwordInput.type === 'text';
+      passwordInput.type = isVisible ? 'password' : 'text';
+      toggle.classList.toggle('visible', !isVisible);
+    });
+  </script>
+@endpush
+
 @push('styles')
   <style>
     #login-page {
@@ -142,7 +155,7 @@
     .form-group input {
       padding: 0.75rem 1rem;
       border-radius: 0.5rem;
-      border: 1px solid var(--clr-border);
+      border: var(--border);
       background-color: var(--clr-background);
       color: var(--clr-text-primary);
       font-size: 1rem;
@@ -247,17 +260,4 @@
       font-weight: 600;
     }
   </style>
-@endpush
-
-@push('scripts')
-  <script>
-    const toggle = document.querySelector('.password-toggle');
-    const passwordInput = document.getElementById('password');
-
-    toggle.addEventListener('click', () => {
-      const isVisible = passwordInput.type === 'text';
-      passwordInput.type = isVisible ? 'password' : 'text';
-      toggle.classList.toggle('visible', !isVisible);
-    });
-  </script>
 @endpush
