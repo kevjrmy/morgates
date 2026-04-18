@@ -8,6 +8,15 @@
       "app.css"
     ]
   },
+  "resources/css/auth.css": {
+    "file": "assets/auth-CjQjvLwi.css",
+    "src": "resources/css/auth.css",
+    "isEntry": true,
+    "name": "auth",
+    "names": [
+      "auth.css"
+    ]
+  },
   "resources/css/footer.css": {
     "file": "assets/footer-DEWkFdcg.css",
     "src": "resources/css/footer.css",
