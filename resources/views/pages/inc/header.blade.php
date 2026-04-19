@@ -70,16 +70,16 @@
       overlay.classList.add('active')
       toggle.setAttribute('aria-expanded', 'true')
       drawer.setAttribute('aria-hidden', 'false')
-      document.body.style.overflow = 'hidden'
-    };
+      document.body.classList.add('drawer-open')
+    }
 
     const closeDrawer = () => {
       drawer.classList.remove('active')
       overlay.classList.remove('active')
       toggle.setAttribute('aria-expanded', 'false')
       drawer.setAttribute('aria-hidden', 'true')
-      document.body.style.overflow = ''
-    };
+      document.body.classList.remove('drawer-open')
+    }
 
     toggle.addEventListener('click', openDrawer)
     close.addEventListener('click', closeDrawer)

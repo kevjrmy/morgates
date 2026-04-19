@@ -50,6 +50,12 @@
   padding: 2rem 1.5rem;
 }
 
+body.drawer-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
 #drawer.active {
   transform: translateX(0);
 }
