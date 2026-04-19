@@ -22,6 +22,7 @@
 
 <body>
   <div id="laravel">
+    @include('partials.flash')
     @yield('content')
   </div>
 

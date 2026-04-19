@@ -112,23 +112,23 @@
   <script>
     // Password toggle
     document.querySelectorAll('.password-toggle').forEach(toggle => {
-      const input = toggle.closest('.input-password').querySelector('input');
+      const input = toggle.closest('.input-password').querySelector('input')
       toggle.addEventListener('click', () => {
-        const isVisible = input.type === 'text';
-        input.type = isVisible ? 'password' : 'text';
-        toggle.classList.toggle('visible', !isVisible);
-      });
-    });
+        const isVisible = input.type === 'text'
+        input.type = isVisible ? 'password' : 'text'
+        toggle.classList.toggle('visible', !isVisible)
+      })
+    })
 
     // Elements
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const confirmInput = document.getElementById('password_confirmation');
-    const submitBtn = document.getElementById('btn-submit');
-    const emailError = document.getElementById('email-error');
-    const confirmError = document.getElementById('confirm-error');
-    const bars = document.querySelectorAll('.strength-bar');
-    const strengthLabel = document.querySelector('.strength-label');
+    const emailInput = document.getElementById('email')
+    const passwordInput = document.getElementById('password')
+    const confirmInput = document.getElementById('password_confirmation')
+    const submitBtn = document.getElementById('btn-submit')
+    const emailError = document.getElementById('email-error')
+    const confirmError = document.getElementById('confirm-error')
+    const bars = document.querySelectorAll('.strength-bar')
+    const strengthLabel = document.querySelector('.strength-label')
 
     // Rules
     const rules = {
@@ -137,7 +137,7 @@
       lowercase: v => /[a-z]/.test(v),
       number: v => /[0-9]/.test(v),
       special: v => /[^A-Za-z0-9]/.test(v),
-    };
+    }
 
     const strengthLevels = [
       { label: '', color: '' },
@@ -149,46 +149,46 @@
     ];
 
     function validateEmail() {
-      const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value);
-      emailError.textContent = emailInput.value && !valid ? 'Adresse email invalide.' : '';
-      return valid;
+      const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value)
+      emailError.textContent = emailInput.value && !valid ? 'Adresse email invalide.' : ''
+      return valid
     }
 
     function validatePassword() {
-      const val = passwordInput.value;
-      let score = 0;
+      const val = passwordInput.value
+      let score = 0
 
       document.querySelectorAll('.rule').forEach(el => {
-        const passes = rules[el.dataset.rule](val);
-        el.classList.toggle('passed', passes);
-        if (passes) score++;
-      });
+        const passes = rules[el.dataset.rule](val)
+        el.classList.toggle('passed', passes)
+        if (passes) score++
+      })
 
       // Strength bars
       bars.forEach((bar, i) => {
-        bar.style.backgroundColor = i < score ? strengthLevels[score].color : '';
-        bar.classList.toggle('active', i < score);
-      });
-      strengthLabel.textContent = val ? strengthLevels[score].label : '';
-      strengthLabel.style.color = strengthLevels[score].color;
+        bar.style.backgroundColor = i < score ? strengthLevels[score].color : ''
+        bar.classList.toggle('active', i < score)
+      })
+      strengthLabel.textContent = val ? strengthLevels[score].label : ''
+      strengthLabel.style.color = strengthLevels[score].color
 
-      return score === 5;
+      return score === 5
     }
 
     function validateConfirm() {
-      const match = confirmInput.value === passwordInput.value;
-      confirmError.textContent = confirmInput.value && !match ? 'Les mots de passe ne correspondent pas.' : '';
-      return match && confirmInput.value !== '';
+      const match = confirmInput.value === passwordInput.value
+      confirmError.textContent = confirmInput.value && !match ? 'Les mots de passe ne correspondent pas.' : ''
+      return match && confirmInput.value !== ''
     }
 
     function checkForm() {
-      const valid = validateEmail() && validatePassword() && validateConfirm();
-      submitBtn.disabled = !valid;
+      const valid = validateEmail() && validatePassword() && validateConfirm()
+      submitBtn.disabled = !valid
     }
 
-    emailInput.addEventListener('input', checkForm);
-    passwordInput.addEventListener('input', checkForm);
-    confirmInput.addEventListener('input', checkForm);
+    emailInput.addEventListener('input', checkForm)
+    passwordInput.addEventListener('input', checkForm)
+    confirmInput.addEventListener('input', checkForm)
   </script>
 @endpush
 

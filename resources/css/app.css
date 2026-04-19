@@ -4,6 +4,7 @@
   --clr-lightblue: #5599ff;
   --clr-softblue: #d5e5ff;
   --clr-red: #d40000;
+  --clr-transparent: rgba(255, 255, 255, 0.7);
 
   --clr-primary: var(--clr-blue);
   --clr-secondary: var(--clr-lightblue);

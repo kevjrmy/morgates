@@ -15,11 +15,11 @@ class OnboardingController extends Controller
 
   public function savePicture(Request $request)
   {
-    $request->validate(['profile_picture' => 'nullable|image|max:2048']);
-    if ($request->hasFile('profile_picture')) {
-      $path = $request->file('profile_picture')->store('avatars', 'public');
-      $request->user()->update(['profile_picture' => $path]);
-    }
+    // $request->validate(['profile_picture' => 'nullable|image|max:2048']);
+    // if ($request->hasFile('profile_picture')) {
+    //   $path = $request->file('profile_picture')->store('avatars', 'public');
+    //   $request->user()->update(['profile_picture' => $path]);
+    // }
     return redirect()->route('onboarding.index', ['step' => 3]);
   }
 

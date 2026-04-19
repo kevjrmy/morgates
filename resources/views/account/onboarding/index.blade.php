@@ -32,7 +32,7 @@
             @csrf
             <div class="form-group">
               <label for="name">Votre prénom</label>
-              <input type="text" id="name" name="name" value="{{ old('name', auth()->user()->name) }}" placeholder="Jean"
+              <input type="text" id="name" name="name" value="{{ old('name', auth()->user()->name) }}" placeholder="Prénom"
                 autocomplete="given-name" autofocus>
             </div>
             <div class="onboarding-actions">

@@ -9,9 +9,9 @@
         <h2>Maisons recommandées</h2>
         <div class="listings-scroll">
           @foreach($listings->where('type', 'house')->take(5) as $listing)
-            <x-listing-card :listing="$listing" />
+            <x-home.listing-card :listing="$listing" />
           @endforeach
-          <x-listing-card :more="route('listings', ['type' => 'house'])" />
+          <x-home.listing-card :more="route('listings', ['type' => 'house'])" />
         </div>
       </section>
     @endif
@@ -21,9 +21,9 @@
         <h2>Bateaux recommandés</h2>
         <div class="listings-scroll">
           @foreach($listings->where('type', 'boat')->take(5) as $listing)
-            <x-listing-card :listing="$listing" />
+            <x-home.listing-card :listing="$listing" />
           @endforeach
-          <x-listing-card :more="route('listings', ['type' => 'boat'])" />
+          <x-home.listing-card :more="route('listings', ['type' => 'boat'])" />
         </div>
       </section>
     @endif
@@ -33,9 +33,9 @@
         <h2>Garages recommandés</h2>
         <div class="listings-scroll">
           @foreach($listings->where('type', 'garage')->take(5) as $listing)
-            <x-listing-card :listing="$listing" />
+            <x-home.listing-card :listing="$listing" />
           @endforeach
-          <x-listing-card :more="route('listings', ['type' => 'garage'])" />
+          <x-home.listing-card :more="route('listings', ['type' => 'garage'])" />
         </div>
       </section>
     @endif

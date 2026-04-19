@@ -4,7 +4,8 @@
 @section('description', Str::limit($listing->description, 150))
 
 @section('content')
-  <main id="listing-page">
+  <main id="listing-page" style="position: relative">
+    <x-listings.nav />
 
     {{-- Gallery --}}
     <section class="listing-gallery" id="gallery">

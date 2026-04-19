@@ -11,18 +11,18 @@
     </div>
   </a>
 @else
-  <article class="listing-card">
-    <div class="listing-card-photo">
-      <img src="{{ $listing->photos[0] }}" alt="{{ $listing->title }}">
-    </div>
-    <div class="listing-card-body">
-      <span class="listing-card-city">{{ $listing->city }}</span>
-      <h3 class="listing-card-title">{{ $listing->title }}</h3>
-      <p class="listing-card-price">
-        <strong>{{ number_format($listing->price_per_night, 0, ',', ' ') }} €</strong> / nuit
-      </p>
-    </div>
-  </article>
+  <a href="{{ route('listing', $listing) }}" class="listing-card">
+  <div class="listing-card-photo">
+    <img src="{{ $listing->photos[0] }}" alt="{{ $listing->title }}">
+  </div>
+  <div class="listing-card-body">
+    <span class="listing-card-city">{{ $listing->city }}</span>
+    <h3 class="listing-card-title">{{ $listing->title }}</h3>
+    <p class="listing-card-price">
+      <strong>{{ number_format($listing->price_per_night, 0, ',', ' ') }} €</strong> / nuit
+    </p>
+  </div>
+</a>
 @endif
 
 @once
@@ -78,7 +78,7 @@
 
   .listing-card-city {
     font-size: 0.75rem;
-    color: var(--clr-text-secondary);
+    color: var(--clr-text-medium);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -86,17 +86,17 @@
   .listing-card-title {
     font-size: 0.95rem;
     font-weight: 600;
-    color: var(--clr-text-primary);
+    color: var(--clr-text-dark);
   }
 
   .listing-card-price {
     font-size: 0.9rem;
-    color: var(--clr-text-secondary);
+    color: var(--clr-text-medium);
     margin-top: 0.25rem;
   }
 
   .listing-card-price strong {
-    color: var(--clr-text-primary);
+    color: var(--clr-text-dark);
   }
 
   .listing-card--more {

@@ -59,34 +59,30 @@
 
 @push('scripts')
   <script>
-    const drawer = document.getElementById('drawer');
-    const overlay = document.getElementById('drawer-overlay');
-    const toggle = document.getElementById('drawer-toggle');
-    const close = document.getElementById('drawer-close');
-    const header = document.getElementById('header');
+    const drawer = document.getElementById('drawer')
+    const overlay = document.getElementById('drawer-overlay')
+    const toggle = document.getElementById('drawer-toggle')
+    const close = document.getElementById('drawer-close')
+    const header = document.getElementById('header')
 
     const openDrawer = () => {
-      drawer.classList.add('active');
-      overlay.classList.add('active');
-      toggle.setAttribute('aria-expanded', 'true');
-      drawer.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
+      drawer.classList.add('active')
+      overlay.classList.add('active')
+      toggle.setAttribute('aria-expanded', 'true')
+      drawer.setAttribute('aria-hidden', 'false')
+      document.body.style.overflow = 'hidden'
     };
 
     const closeDrawer = () => {
-      drawer.classList.remove('active');
-      overlay.classList.remove('active');
-      toggle.setAttribute('aria-expanded', 'false');
-      drawer.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
+      drawer.classList.remove('active')
+      overlay.classList.remove('active')
+      toggle.setAttribute('aria-expanded', 'false')
+      drawer.setAttribute('aria-hidden', 'true')
+      document.body.style.overflow = ''
     };
 
-    toggle.addEventListener('click', openDrawer);
-    close.addEventListener('click', closeDrawer);
-    overlay.addEventListener('click', closeDrawer);
-
-    window.addEventListener('scroll', () => {
-      header.classList.toggle('scrolled', window.scrollY > 10);
-    }, { passive: true });
+    toggle.addEventListener('click', openDrawer)
+    close.addEventListener('click', closeDrawer)
+    overlay.addEventListener('click', closeDrawer)
   </script>
 @endpush
