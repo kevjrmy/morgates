@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
         'name' => 'Loïs',
         'email' => 'lois@morgates.com',
         'email_verified_at' => now(),
-        'password' => bcrypt('notrelogiquevousdepasse'),
+        'password' => bcrypt('abretesesamo'),
         'bio' => 'Salut c\'est Loïs!',
       ],
       [

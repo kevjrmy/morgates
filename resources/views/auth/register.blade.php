@@ -267,10 +267,5 @@
     .rule.passed .rule-icon-fail {
       display: none;
     }
-
-    .btn-submit:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
   </style>
 @endpush

@@ -1,4 +1,13 @@
 {
+  "resources/css/account.css": {
+    "file": "assets/account-qDJH1Dgm.css",
+    "src": "resources/css/account.css",
+    "isEntry": true,
+    "name": "account",
+    "names": [
+      "account.css"
+    ]
+  },
   "resources/css/app.css": {
     "file": "assets/app-OMms63VK.css",
     "src": "resources/css/app.css",
@@ -9,7 +18,7 @@
     ]
   },
   "resources/css/auth.css": {
-    "file": "assets/auth-CjQjvLwi.css",
+    "file": "assets/auth-9BxIOomm.css",
     "src": "resources/css/auth.css",
     "isEntry": true,
     "name": "auth",

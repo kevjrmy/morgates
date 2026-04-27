@@ -68,13 +68,28 @@
 
 @push('scripts')
   <script>
-    const toggle = document.querySelector('.password-toggle');
-    const passwordInput = document.getElementById('password');
+    const toggle = document.querySelector('.password-toggle')
+    const passwordInput = document.getElementById('password')
+    const emailInput = document.getElementById('email')
+    const submitBtn = document.querySelector('.btn-submit')
+    
+    submitBtn.disabled = true
 
     toggle.addEventListener('click', () => {
-      const isVisible = passwordInput.type === 'text';
-      passwordInput.type = isVisible ? 'password' : 'text';
-      toggle.classList.toggle('visible', !isVisible);
-    });
+      const isVisible = passwordInput.type === 'text'
+      passwordInput.type = isVisible ? 'password' : 'text'
+      toggle.classList.toggle('visible', !isVisible)
+    })
+
+    function isEmailValid() {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value)
+    }
+
+    function checkForm() {
+      submitBtn.disabled = !(isEmailValid() && passwordInput.value.length > 0)
+    }
+
+    emailInput.addEventListener('input', checkForm)
+    passwordInput.addEventListener('input', checkForm)
   </script>
 @endpush
