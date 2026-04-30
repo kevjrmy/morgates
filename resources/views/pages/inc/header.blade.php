@@ -33,21 +33,13 @@
       @svg('tabler-home')
       Accueil
     </a>
+    <a href="{{ route('account') }}" class="{{ request()->routeIs('account') ? 'active' : '' }}">
+      @svg('tabler-user')
+      Mon espace
+    </a>
     <a href="{{ route('listings') }}" class="{{ request()->routeIs('search') ? 'active' : '' }}">
       @svg('tabler-search')
       Annonces
-    </a>
-    <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">
-      @svg('tabler-info-circle')
-      À propos
-    </a>
-    <a href="{{ route('privacy') }}" class="{{ request()->routeIs('privacy') ? 'active' : '' }}">
-      @svg('tabler-lock')
-      Confidentialité
-    </a>
-    <a href="{{ route('terms') }}" class="{{ request()->routeIs('terms') ? 'active' : '' }}">
-      @svg('tabler-file-text')
-      Conditions générales
     </a>
   </nav>
 

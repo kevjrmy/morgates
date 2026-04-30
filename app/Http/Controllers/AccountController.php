@@ -6,6 +6,8 @@ class AccountController extends Controller
 {
   public function index()
   {
-    return view('account.index');
+    $listings = auth()->user()->listings()->latest()->get();
+
+    return view('account.index', compact('listings'));
   }
 }
