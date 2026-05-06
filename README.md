@@ -1,3 +1,5 @@
+For AI/code agents: read `AGENTS.md` before making changes.
+
 ## If `composer.lock` file changes (add, update or remove package -> e.g., `composer require some/package`)
 ## Go to SSH and manually run
 `

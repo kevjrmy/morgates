@@ -53,7 +53,7 @@
           @svg('tabler-list-details')
           <span>Mes annonces</span>
         </a>
-        <a href="#" class="account-action">
+        <a href="{{ route('listings.create.index') }}" class="account-action">
           @svg('tabler-plus')
           <span>Publier</span>
         </a>
@@ -81,7 +81,7 @@
         <div class="account-empty">
           @svg('tabler-building-store')
           <p>Vous n'avez pas encore d'annonce.</p>
-          <a href="#" class="btn-primary">Publier ma première annonce</a>
+          <a href="{{ route('listings.create.index') }}" class="btn-primary">Publier ma première annonce</a>
         </div>
       @else
         <ul class="account-listings">

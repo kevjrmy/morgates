@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\ListingController;
 
 /**
  * Pages
@@ -79,6 +80,7 @@ Route::post('/deconnexion', [AuthController::class, 'logout'])->name('logout')->
  * Account
  */
 Route::get('/mon-espace', [AccountController::class, 'index'])->name('account')->middleware('auth');
+
 /* Onboarding */
 Route::middleware('auth')->prefix('bienvenue')->name('onboarding.')->group(function () {
   Route::get('/', fn() => view('account.onboarding.index'))->name('index');
@@ -87,4 +89,15 @@ Route::middleware('auth')->prefix('bienvenue')->name('onboarding.')->group(funct
   Route::post('/tel', [OnboardingController::class, 'savePhone'])->name('phone');
   Route::post('/pays', [OnboardingController::class, 'saveCountry'])->name('country');
   Route::post('/bio', [OnboardingController::class, 'saveBio'])->name('bio');
+});
+
+/* Listing creation */
+Route::middleware('auth')->prefix('mon-espace/publier')->name('listings.create.')->group(function () {
+  Route::get('/', [ListingController::class, 'create'])->name('index');
+  Route::post('/type', [ListingController::class, 'storeType'])->name('type');
+  Route::post('/localisation', [ListingController::class, 'storeLocation'])->name('location');
+  Route::post('/informations', [ListingController::class, 'storeBasics'])->name('basics');
+  Route::post('/details', [ListingController::class, 'storeDetails'])->name('details');
+  Route::post('/description', [ListingController::class, 'storeDescription'])->name('description');
+  Route::post('/photos', [ListingController::class, 'storePhotos'])->name('photos');
 });
