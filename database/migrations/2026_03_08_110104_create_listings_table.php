@@ -13,7 +13,7 @@ return new class extends Migration {
     Schema::create('listings', function (Blueprint $table) {
       $table->id();
       $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-      $table->enum('type', ['house', 'boat', 'garage']);
+      $table->enum('type', ['sailing', 'stay']);
       $table->string('title');
       $table->json('photos')->nullable();
       $table->longText('description')->nullable();

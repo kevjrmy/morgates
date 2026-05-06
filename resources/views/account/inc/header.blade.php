@@ -4,8 +4,10 @@
       <img src="{{ asset('images/logo.svg') }}" alt="Morgates logo" width="48" height="48">
     </a>
 
+    <a href="{{ route('home') }}" class="header-brand" aria-label="Accueil Morgates">MORGATES</a>
+
     <div class="header-user">
-      <button type="button" id="user-menu-toggle" aria-expanded="false" aria-controls="user-menu">
+      <button type="button" id="user-menu-toggle" aria-label="Ouvrir le menu du compte" aria-expanded="false" aria-controls="user-menu">
         @if(auth()->user()->profile_picture)
           <img src="{{ asset(auth()->user()->profile_picture) }}" alt="{{ auth()->user()->name }}" class="user-avatar">
         @else
@@ -19,6 +21,10 @@
         <a href="{{ route('account') }}" class="{{ request()->routeIs('account') ? 'active' : '' }}">
           @svg('tabler-user')
           Mon espace
+        </a>
+        <a href="{{ route('listings.create.index') }}" class="{{ request()->routeIs('listings.create.*') ? 'active' : '' }}">
+          @svg('tabler-circle-plus')
+          Publier une annonce
         </a>
         <a href="{{ route('home') }}">
           @svg('tabler-home')

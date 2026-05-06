@@ -34,7 +34,7 @@
 @endphp
 
 <section id="destinations">
-  <h2>Destinations tendance</h2>
+  <h2>Suggestions de destinations</h2>
   <div class="destinations-grid">
     @foreach($destinations as $destination)
       <a href="{{ route('listings', ['city' => $destination['city']]) }}" class="destination-card">

@@ -4,7 +4,7 @@
 Morgates is a French Laravel web application for publishing and browsing rental listings. The public side lets visitors discover listings, filter them, view listing details, and contact owners directly. The private side lets owners create an account, complete onboarding, manage their dashboard, and publish listings.
 
 ## People And Context
-- Loïs is the founderoriginated the idea, and will run the product.
+- Loïs is the founder, originated the idea, and will run the product.
 - Kevin is the solo developer of the project.
 - The project is currently being built as an MVP.
 - The project is in development mode, so the database can be refreshed or reset at any time.
@@ -201,7 +201,7 @@ Listings belong to a user and currently include fields for:
 
 ## Known TODOs
 - Persist the listing creation flow.
-- Implement production-ready image upload/storage. `doc.md` mentions Cloudinary as a TODO.
+- Implement production-ready image upload/storage. `TODO.md` mentions Cloudinary as a TODO.
 - Add confirmation email support.
 - Expand test coverage beyond the default/example tests.
 

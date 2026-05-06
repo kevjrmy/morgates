@@ -1,16 +1,12 @@
 <header id="header">
   <nav class="header-nav">
-    @if (request()->routeIs('home'))
-      <div class="header-logo">
-        <img src="{{ asset('images/logo.svg') }}" alt="Morgates logo" width="48" height="48">
-      </div>
-    @else
-      <a href="{{ route('home') }}" class="header-logo">
-        <img src="{{ asset('images/logo.svg') }}" alt="Morgates logo" width="48" height="48">
-      </a>
-    @endif
+    <a href="{{ route('home') }}" class="header-logo" aria-label="Accueil Morgates">
+      <img src="{{ asset('images/logo.svg') }}" alt="" width="48" height="48">
+    </a>
 
-    <button type="button" id="drawer-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+    <a href="{{ route('home') }}" class="header-brand" aria-label="Accueil Morgates">MORGATES</a>
+
+    <button type="button" id="drawer-toggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="drawer">
       @svg('tabler-menu', ['color' => 'var(--clr-primary)'])
     </button>
   </nav>
@@ -33,19 +29,37 @@
       @svg('tabler-home')
       Accueil
     </a>
+    <a href="{{ route('listings') }}" class="{{ request()->routeIs('listings', 'listing') && ! request('type') ? 'active' : '' }}">
+      @svg('tabler-search')
+      Annonces
+    </a>
+    <a href="{{ route('listings', ['type' => 'boat']) }}" class="{{ request()->routeIs('listings') && request('type') === 'boat' ? 'active' : '' }}">
+      @svg('tabler-sailboat')
+      Sorties en mer
+    </a>
+    <a href="{{ route('listings', ['type' => 'house']) }}" class="{{ request()->routeIs('listings') && request('type') === 'house' ? 'active' : '' }}">
+      @svg('tabler-home-star')
+      Séjours
+    </a>
+    <a href="{{ route('listings.create.index') }}" class="{{ request()->routeIs('listings.create.*') ? 'active' : '' }}">
+      @svg('tabler-circle-plus')
+      Publier une annonce
+    </a>
     <a href="{{ route('account') }}" class="{{ request()->routeIs('account') ? 'active' : '' }}">
       @svg('tabler-user')
       Mon espace
     </a>
-    <a href="{{ route('listings') }}" class="{{ request()->routeIs('search') ? 'active' : '' }}">
-      @svg('tabler-search')
-      Annonces
-    </a>
   </nav>
 
   <div class="drawer-footer">
-    <a href="{{ route('login') }}" class="btn-login">Connexion</a>
-    <a href="{{ route('register') }}" class="btn-signup">Inscription</a>
+    @auth
+      <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <button type="submit" class="drawer-auth-action">Déconnexion</button>
+      </form>
+    @else
+      <a href="{{ route('login') }}" class="drawer-auth-action">Connexion</a>
+    @endauth
   </div>
 </aside>
 

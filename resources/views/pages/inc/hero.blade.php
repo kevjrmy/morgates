@@ -1,6 +1,6 @@
 <section id="hero">
   <h1 id="hero-title">
-    Locations <span class="highlight">&amp;</span> réservations pour tous
+    Louez <span class="highlight">sans frais</span> intermédiaires
   </h1>
   <x-searchbar />
 </section>

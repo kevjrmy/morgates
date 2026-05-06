@@ -34,7 +34,7 @@
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    padding: 0.5rem 0 1.5rem;
+    padding: 0.5rem 1.5rem 1.5rem 0;
     scrollbar-width: none;
   }
 
@@ -49,6 +49,14 @@
     border-radius: 1rem;
     background: var(--clr-background);
     box-shadow: var(--box-shadow);
+  }
+
+  .listing-card:first-child {
+    scroll-snap-align: start;
+  }
+
+  .listing-card:last-child {
+    scroll-snap-align: end;
   }
 
   .listing-card-photo {
