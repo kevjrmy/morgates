@@ -80,6 +80,7 @@ Route::post('/deconnexion', [AuthController::class, 'logout'])->name('logout')->
  * Account
  */
 Route::get('/mon-espace', [AccountController::class, 'index'])->name('account')->middleware('auth');
+Route::get('/mon-espace/abonnements', [AccountController::class, 'subscriptions'])->name('account.subscriptions.index')->middleware('auth');
 
 /* Onboarding */
 Route::middleware('auth')->prefix('bienvenue')->name('onboarding.')->group(function () {

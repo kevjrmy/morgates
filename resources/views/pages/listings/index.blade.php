@@ -11,20 +11,15 @@
           @svg('tabler-layout-grid')
           Tout
         </a>
-        <a href="{{ route('listings', array_merge(request()->query(), ['type' => 'house'])) }}"
-          class="filter-pill {{ request('type') === 'house' ? 'active' : '' }}">
-          @svg('tabler-home')
-          Maisons
+        <a href="{{ route('listings', array_merge(request()->query(), ['type' => 'stays'])) }}"
+          class="filter-pill {{ request('type') === 'stays' ? 'active' : '' }}">
+          @svg('tabler-home-star')
+          Séjours
         </a>
-        <a href="{{ route('listings', array_merge(request()->query(), ['type' => 'boat'])) }}"
-          class="filter-pill {{ request('type') === 'boat' ? 'active' : '' }}">
+        <a href="{{ route('listings', array_merge(request()->query(), ['type' => 'sailing'])) }}"
+          class="filter-pill {{ request('type') === 'sailing' ? 'active' : '' }}">
           @svg('tabler-sailboat')
-          Bateaux
-        </a>
-        <a href="{{ route('listings', array_merge(request()->query(), ['type' => 'garage'])) }}"
-          class="filter-pill {{ request('type') === 'garage' ? 'active' : '' }}">
-          @svg('tabler-car-garage')
-          Garages
+          Sorties en mer
         </a>
       </div>
     </div>
@@ -43,7 +38,7 @@
     {{-- Results --}}
     <div class="search-results">
       @forelse($listings as $listing)
-        <x-listings.listing :listing="$listing" />
+        <x-listings.listing-card :listing="$listing" />
       @empty
         <div class="search-empty">
           @svg('tabler-mood-sad')

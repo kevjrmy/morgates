@@ -1,6 +1,6 @@
 {{--
   listings/create/step-3-basics.blade.php
-  Step 3: Title, price, currency, max guests
+  Step 3: Title, price, currency, capacity
 --}}
 @extends('layouts.listing-create')
 
@@ -39,19 +39,18 @@
 
         {{-- Price + Currency --}}
         <div class="lc-field">
-          <label class="lc-label">Prix par nuit</label>
+          <label class="lc-label">Prix indicatif</label>
           <div class="lc-price-row">
             <input
               type="number"
-              name="price_per_night"
-              id="price_per_night"
+              name="price_amount"
+              id="price_amount"
               class="lc-input lc-input-price"
-              value="{{ old('price_per_night', $listing->price_per_night ?? '') }}"
+              value="{{ old('price_amount', $listing->price_amount ?? '') }}"
               placeholder="0"
               min="1"
               max="99999"
               step="1"
-              required
             >
             <div class="lc-select-wrap lc-currency-wrap">
               <select name="currency" id="currency" class="lc-select lc-select-currency">
@@ -63,26 +62,42 @@
               @svg('tabler-chevron-down', ['class' => 'lc-select-icon'])
             </div>
           </div>
+          <p class="lc-field-hint">Le prix reste indicatif : les visiteurs vous contactent directement.</p>
         </div>
 
-        {{-- Max guests --}}
         <div class="lc-field">
-          <label class="lc-label">Nombre de voyageurs maximum</label>
+          <label for="price_unit" class="lc-label">Unité de prix</label>
+          <div class="lc-select-wrap">
+            <select name="price_unit" id="price_unit" class="lc-select">
+              <option value="night" {{ old('price_unit', $listing->price_unit ?? 'night') === 'night' ? 'selected' : '' }}>Par nuit</option>
+              <option value="day" {{ old('price_unit', $listing->price_unit ?? '') === 'day' ? 'selected' : '' }}>Par jour</option>
+              <option value="trip" {{ old('price_unit', $listing->price_unit ?? '') === 'trip' ? 'selected' : '' }}>Par sortie</option>
+              <option value="week" {{ old('price_unit', $listing->price_unit ?? '') === 'week' ? 'selected' : '' }}>Par semaine</option>
+              <option value="month" {{ old('price_unit', $listing->price_unit ?? '') === 'month' ? 'selected' : '' }}>Par mois</option>
+              <option value="contact" {{ old('price_unit', $listing->price_unit ?? '') === 'contact' ? 'selected' : '' }}>Sur demande</option>
+            </select>
+            @svg('tabler-chevron-down', ['class' => 'lc-select-icon'])
+          </div>
+        </div>
+
+        {{-- Capacity --}}
+        <div class="lc-field">
+          <label class="lc-label">Capacité maximum</label>
           <div class="lc-stepper">
-            <button type="button" class="lc-stepper-btn" data-target="max_guests" data-action="dec" aria-label="Diminuer">
+            <button type="button" class="lc-stepper-btn" data-target="capacity" data-action="dec" aria-label="Diminuer">
               @svg('tabler-minus')
             </button>
             <input
               type="number"
-              name="max_guests"
-              id="max_guests"
+              name="capacity"
+              id="capacity"
               class="lc-stepper-input"
-              value="{{ old('max_guests', $listing->max_guests ?? 2) }}"
+              value="{{ old('capacity', $listing->capacity ?? 2) }}"
               min="1"
               max="50"
               readonly
             >
-            <button type="button" class="lc-stepper-btn" data-target="max_guests" data-action="inc" aria-label="Augmenter">
+            <button type="button" class="lc-stepper-btn" data-target="capacity" data-action="inc" aria-label="Augmenter">
               @svg('tabler-plus')
             </button>
           </div>

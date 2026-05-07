@@ -8,20 +8,28 @@
     <div class="listing-top">
       <span class="listing-type">
         @switch($listing->type)
-          @case('house') @svg('tabler-home') Maison @break
-          @case('boat')  @svg('tabler-sailboat') Bateau @break
-          @case('garage') @svg('tabler-car-garage') Garage @break
+          @case('stays') @svg('tabler-home-star') Séjour @break
+          @case('sailing') @svg('tabler-sailboat') Sortie en mer @break
         @endswitch
       </span>
       <span class="listing-city">@svg('mdi-map-marker-outline', ['style' => 'width: 1rem; height: 1rem; vertical-align: sub;']){{ $listing->city }}</span>
     </div>
     <h3 class="listing-title">{{ $listing->title }}</h3>
     <p class="listing-meta">
-      {{ $listing->max_guests }} pers. · min. {{ $listing->min_nights }} nuit{{ $listing->min_nights > 1 ? 's' : '' }}
+      @if($listing->capacity)
+        {{ $listing->capacity }} pers.
+      @endif
+      @if($listing->min_duration)
+        {{ $listing->capacity ? '·' : '' }} min. {{ $listing->min_duration }} {{ $listing->durationUnitLabel() }}{{ $listing->min_duration > 1 ? 's' : '' }}
+      @endif
     </p>
     <p class="listing-price">
-      <strong>{{ number_format($listing->price_per_night, 0, ',', ' ') }} €</strong>
-      <span>/ nuit</span>
+      @if($listing->price_amount)
+        <strong>{{ number_format($listing->price_amount, 0, ',', ' ') }} {{ $listing->currency }}</strong>
+        <span>/ {{ $listing->priceUnitLabel() }}</span>
+      @else
+        <strong>Prix sur demande</strong>
+      @endif
     </p>
     @if($listing->tags)
       <div class="listing-tags">

@@ -7,35 +7,7 @@
   <main id="listing-page" style="position: relative">
     <x-listings.nav />
 
-    {{-- Gallery --}}
-    <section class="listing-gallery" id="gallery">
-      @if ($listing->photos && count($listing->photos) > 0)
-        <div class="gallery-grid">
-          <div class="gallery-main">
-            <img
-              src="{{ Str::startsWith($listing->photos[0], 'http') ? $listing->photos[0] : asset('storage/' . $listing->photos[0]) }}"
-              alt="{{ $listing->title }}">
-          </div>
-          @if (count($listing->photos) > 1)
-            <div class="gallery-thumbs">
-              @foreach (array_slice($listing->photos, 1, 4) as $i => $photo)
-                <div class="gallery-thumb {{ $i === 3 && count($listing->photos) > 5 ? 'gallery-thumb--more' : '' }}">
-                  <img src="{{ Str::startsWith($photo, 'http') ? $photo : asset('storage/' . $photo) }}"
-                    alt="{{ $listing->title }} {{ $i + 2 }}">
-                  @if ($i === 3 && count($listing->photos) > 5)
-                    <span class="gallery-more">+{{ count($listing->photos) - 5 }}</span>
-                  @endif
-                </div>
-              @endforeach
-            </div>
-          @endif
-        </div>
-      @else
-        <div class="gallery-empty">
-          @svg('tabler-photo-off', ['class' => 'icon'])
-        </div>
-      @endif
-    </section>
+    <x-listings.gallery :listing="$listing" />
 
     {{-- Content --}}
     <div class="listing-content">
@@ -44,9 +16,8 @@
       <section class="listing-header">
         <div class="listing-type">
           @switch($listing->type)
-            @case('house') @svg('tabler-home') Maison @break
-            @case('boat') @svg('tabler-sailboat') Bateau @break
-            @case('garage') @svg('tabler-car-garage') Garage @break
+            @case('stays') @svg('tabler-home-star') Séjour @break
+            @case('sailing') @svg('tabler-sailboat') Sortie en mer @break
           @endswitch
         </div>
         <h1 class="listing-title">{{ $listing->title }}</h1>
@@ -55,14 +26,20 @@
           {{ $listing->city }}, {{ $listing->country }}
         </p>
         <div class="listing-meta">
-          <span>
-            {{ $listing->max_guests }} {{ $listing->max_guests > 1 ? 'voyageurs' : 'voyageur' }}
-          </span>
-          <span aria-hidden="true">·</span>
-          <span>{{ $listing->min_nights }} nuit{{ $listing->min_nights > 1 ? 's' : '' }} min.</span>
-          @if ($listing->max_nights)
+          @if($listing->capacity)
+            <span>
+              {{ $listing->capacity }} {{ $listing->capacity > 1 ? 'personnes' : 'personne' }}
+            </span>
+          @endif
+          @if($listing->min_duration)
+            @if($listing->capacity)
+              <span aria-hidden="true">·</span>
+            @endif
+            <span>{{ $listing->min_duration }} {{ $listing->durationUnitLabel() }}{{ $listing->min_duration > 1 ? 's' : '' }} min.</span>
+          @endif
+          @if ($listing->max_duration)
             <span aria-hidden="true">·</span>
-            <span>{{ $listing->max_nights }} nuits max.</span>
+            <span>{{ $listing->max_duration }} {{ $listing->durationUnitLabel() }}{{ $listing->max_duration > 1 ? 's' : '' }} max.</span>
           @endif
         </div>
       </section>
@@ -89,10 +66,34 @@
 
       <hr class="listing-divider">
 
+      {{-- Direct contact --}}
+      <section class="listing-contact">
+        <h2>Contact direct</h2>
+        <ul class="contact-list" role="list">
+          @if($listing->contact_email)
+            <li><a href="mailto:{{ $listing->contact_email }}">Email</a></li>
+          @endif
+          @if($listing->contact_phone)
+            <li><a href="tel:{{ $listing->contact_phone }}">Téléphone</a></li>
+          @endif
+          @if($listing->contact_whatsapp)
+            <li><a href="https://wa.me/{{ preg_replace('/\D+/', '', $listing->contact_whatsapp) }}" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>
+          @endif
+          @if($listing->contact_website)
+            <li><a href="{{ $listing->contact_website }}" target="_blank" rel="noopener noreferrer">Site externe</a></li>
+          @endif
+          @unless($listing->contact_email || $listing->contact_phone || $listing->contact_whatsapp || $listing->contact_website)
+            <li><a href="mailto:{{ $listing->user->email }}">Email</a></li>
+          @endunless
+        </ul>
+      </section>
+
+      <hr class="listing-divider">
+
       {{-- Description --}}
       @if ($listing->description)
         <section class="listing-description">
-          <h2>À propos de ce logement</h2>
+          <h2>À propos de cette annonce</h2>
           <div class="description-text" id="description-text">
             {!! nl2br(e($listing->description)) !!}
           </div>
@@ -119,28 +120,26 @@
     </div>
     {{-- end listing-content --}}
 
-    {{-- Booking bar spacer --}}
-    <div class="booking-bar-spacer"></div>
+    {{-- Contact bar spacer --}}
+    <div class="contact-bar-spacer"></div>
 
   </main>
 @endsection
 
-@section('booking-bar')
-  <div class="booking-bar">
-    <div class="booking-price">
-      <span class="price-amount">{{ number_format($listing->price_per_night, 0, ',', ' ') }}
-        {{ $listing->currency }}</span>
-      <span class="price-label">/ nuit</span>
+@section('contact-bar')
+  <div class="contact-bar">
+    <div class="contact-price">
+      @if($listing->price_amount)
+        <span class="price-amount">{{ number_format($listing->price_amount, 0, ',', ' ') }}
+          {{ $listing->currency }}</span>
+        <span class="price-label">/ {{ $listing->priceUnitLabel() }}</span>
+      @else
+        <span class="price-amount">Prix sur demande</span>
+      @endif
     </div>
-    @if ($listing->booking_links && count($listing->booking_links) > 0)
-      <a href="{{ $listing->booking_links[0] }}" target="_blank" rel="noopener noreferrer" class="btn-book">
-        Réserver
-      </a>
-    @else
-      <a href="mailto:{{ $listing->user->email }}" class="btn-book">
-        Contacter l'hôte
-      </a>
-    @endif
+    <a href="{{ $listing->primaryContactUrl() }}" class="btn-contact" @if(Str::startsWith($listing->primaryContactUrl(), 'http')) target="_blank" rel="noopener noreferrer" @endif>
+      Contacter directement
+    </a>
   </div>
 @endsection
 
@@ -148,64 +147,6 @@
   <style>
     #listing-page {
       padding-bottom: 2rem;
-    }
-
-    /* Gallery */
-    .listing-gallery {
-      width: 100%;
-    }
-
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.25rem;
-    }
-
-    .gallery-main img {
-      width: 100%;
-      height: 260px;
-      object-fit: cover;
-    }
-
-    .gallery-thumbs {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0.25rem;
-    }
-
-    .gallery-thumb {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .gallery-thumb img {
-      width: 100%;
-      height: 80px;
-      object-fit: cover;
-    }
-
-    .gallery-thumb--more img {
-      filter: brightness(0.5);
-    }
-
-    .gallery-more {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 1.1rem;
-      font-weight: 700;
-    }
-
-    .gallery-empty {
-      height: 220px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: var(--clr-tertiary);
-      color: var(--clr-text-light);
     }
 
     /* Content */
@@ -357,12 +298,29 @@
       background-color: #fff;
     }
 
-    /* Booking bar */
-    .booking-bar-spacer {
+    .contact-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .contact-list a {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.55rem 0.9rem;
+      border-radius: 0.5rem;
+      background-color: var(--clr-tertiary);
+      color: var(--clr-text-dark);
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    /* Contact bar */
+    .contact-bar-spacer {
       height: 80px;
     }
 
-    .booking-bar {
+    .contact-bar {
       position: fixed;
       bottom: 0;
       left: 50%;
@@ -379,7 +337,7 @@
       z-index: 100;
     }
 
-    .booking-price {
+    .contact-price {
       display: flex;
       align-items: baseline;
       gap: 0.25rem;
@@ -396,7 +354,7 @@
       color: var(--clr-text-light);
     }
 
-    .btn-book {
+    .btn-contact {
       padding: 0.85rem 2rem;
       border-radius: 0.5rem;
       background-color: var(--clr-primary);
@@ -407,7 +365,7 @@
       white-space: nowrap;
     }
 
-    .btn-book:hover {
+    .btn-contact:hover {
       opacity: 0.9;
     }
   </style>

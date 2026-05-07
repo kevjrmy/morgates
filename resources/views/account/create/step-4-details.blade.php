@@ -1,6 +1,6 @@
 {{--
   listings/create/step-4-details.blade.php
-  Step 4: Min/max nights, tags
+  Step 4: Min/max duration, tags
 --}}
 @extends('layouts.listing-create')
 
@@ -18,60 +18,73 @@
 
       <div class="lc-fields">
 
-        {{-- Min nights --}}
+        {{-- Min duration --}}
         <div class="lc-field">
-          <label class="lc-label">Durée minimum de séjour</label>
+          <label class="lc-label">Durée minimum</label>
           <div class="lc-stepper">
-            <button type="button" class="lc-stepper-btn" data-target="min_nights" data-action="dec" aria-label="Diminuer">
+            <button type="button" class="lc-stepper-btn" data-target="min_duration" data-action="dec" aria-label="Diminuer">
               @svg('tabler-minus')
             </button>
             <div class="lc-stepper-display">
               <input
                 type="number"
-                name="min_nights"
-                id="min_nights"
+                name="min_duration"
+                id="min_duration"
                 class="lc-stepper-input"
-                value="{{ old('min_nights', $listing->min_nights ?? 1) }}"
+                value="{{ old('min_duration', $listing->min_duration ?? 1) }}"
                 min="1"
                 max="365"
                 readonly
               >
-              <span class="lc-stepper-unit">nuit(s)</span>
+              <span class="lc-stepper-unit">unité(s)</span>
             </div>
-            <button type="button" class="lc-stepper-btn" data-target="min_nights" data-action="inc" aria-label="Augmenter">
+            <button type="button" class="lc-stepper-btn" data-target="min_duration" data-action="inc" aria-label="Augmenter">
               @svg('tabler-plus')
             </button>
           </div>
         </div>
 
-        {{-- Max nights --}}
+        {{-- Max duration --}}
         <div class="lc-field">
           <label class="lc-label">
-            Durée maximum de séjour
+            Durée maximum
             <span class="lc-label-optional">optionnel</span>
           </label>
           <div class="lc-stepper">
-            <button type="button" class="lc-stepper-btn" data-target="max_nights" data-action="dec" aria-label="Diminuer">
+            <button type="button" class="lc-stepper-btn" data-target="max_duration" data-action="dec" aria-label="Diminuer">
               @svg('tabler-minus')
             </button>
             <div class="lc-stepper-display">
               <input
                 type="number"
-                name="max_nights"
-                id="max_nights"
+                name="max_duration"
+                id="max_duration"
                 class="lc-stepper-input"
-                value="{{ old('max_nights', $listing->max_nights ?? '') }}"
+                value="{{ old('max_duration', $listing->max_duration ?? '') }}"
                 min="1"
                 max="365"
                 readonly
               >
-              <span class="lc-stepper-unit" id="max-nights-label">
-                {{ old('max_nights', $listing->max_nights ?? null) ? 'nuit(s)' : 'Sans limite' }}
+              <span class="lc-stepper-unit" id="max-duration-label">
+                {{ old('max_duration', $listing->max_duration ?? null) ? 'unité(s)' : 'Sans limite' }}
               </span>
             </div>
-            <button type="button" class="lc-stepper-btn" data-target="max_nights" data-action="inc" aria-label="Augmenter">
+            <button type="button" class="lc-stepper-btn" data-target="max_duration" data-action="inc" aria-label="Augmenter">
               @svg('tabler-plus')
             </button>
+          </div>
+        </div>
+
+        <div class="lc-field">
+          <label for="duration_unit" class="lc-label">Unité de durée</label>
+          <div class="lc-select-wrap">
+            <select name="duration_unit" id="duration_unit" class="lc-select">
+              <option value="night" {{ old('duration_unit', $listing->duration_unit ?? 'night') === 'night' ? 'selected' : '' }}>Nuit</option>
+              <option value="day" {{ old('duration_unit', $listing->duration_unit ?? '') === 'day' ? 'selected' : '' }}>Jour</option>
+              <option value="week" {{ old('duration_unit', $listing->duration_unit ?? '') === 'week' ? 'selected' : '' }}>Semaine</option>
+              <option value="month" {{ old('duration_unit', $listing->duration_unit ?? '') === 'month' ? 'selected' : '' }}>Mois</option>
+            </select>
+            @svg('tabler-chevron-down', ['class' => 'lc-select-icon'])
           </div>
         </div>
 
@@ -119,11 +132,11 @@
       })
     })
 
-    // Stepper — max_nights has a "Sans limite" zero state
+    // Stepper — max_duration has a "Sans limite" zero state
     document.querySelectorAll('.lc-stepper-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const input = document.getElementById(btn.dataset.target)
-        const isMaxNights = btn.dataset.target === 'max_nights'
+        const isMaxDuration = btn.dataset.target === 'max_duration'
         const min = parseInt(input.min) || 1
         const max = parseInt(input.max) || 365
         let val = parseInt(input.value) || 0
@@ -136,13 +149,10 @@
 
         input.value = val || ''
 
-        if (isMaxNights) {
-          document.getElementById('max-nights-label').textContent = val ? 'nuit(s)' : 'Sans limite'
+        if (isMaxDuration) {
+          document.getElementById('max-duration-label').textContent = val ? 'unité(s)' : 'Sans limite'
         }
       })
     })
-
-    // Min nights stepper (no zero state)
-    // Already handled generically above — min_nights starts at 1
   </script>
 @endpush

@@ -19,7 +19,12 @@
     <span class="listing-card-city">{{ $listing->city }}</span>
     <h3 class="listing-card-title">{{ $listing->title }}</h3>
     <p class="listing-card-price">
-      <strong>{{ number_format($listing->price_per_night, 0, ',', ' ') }} €</strong> / nuit
+      @if($listing->price_amount)
+        <strong>{{ number_format($listing->price_amount, 0, ',', ' ') }} {{ $listing->currency }}</strong>
+        / {{ $listing->priceUnitLabel() }}
+      @else
+        <strong>Prix sur demande</strong>
+      @endif
     </p>
   </div>
 </a>

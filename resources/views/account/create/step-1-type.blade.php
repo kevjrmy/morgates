@@ -17,25 +17,18 @@
       @csrf
 
       <div class="lc-type-grid">
-        <label class="lc-type-card {{ old('type', $listing->type ?? '') === 'house' ? 'selected' : '' }}">
-          <input type="radio" name="type" value="house" {{ old('type', $listing->type ?? '') === 'house' ? 'checked' : '' }} required>
-          @svg('tabler-home')
-          <span class="lc-type-label">Maison</span>
-          <span class="lc-type-desc">Villa, appartement, chalet…</span>
+        <label class="lc-type-card {{ old('type', $listing->type ?? '') === 'stays' ? 'selected' : '' }}">
+          <input type="radio" name="type" value="stays" {{ old('type', $listing->type ?? '') === 'stays' ? 'checked' : '' }} required>
+          @svg('tabler-home-star')
+          <span class="lc-type-label">Séjour</span>
+          <span class="lc-type-desc">Maison, appartement, chambre, lieu insolite…</span>
         </label>
 
-        <label class="lc-type-card {{ old('type', $listing->type ?? '') === 'boat' ? 'selected' : '' }}">
-          <input type="radio" name="type" value="boat" {{ old('type', $listing->type ?? '') === 'boat' ? 'checked' : '' }} required>
+        <label class="lc-type-card {{ old('type', $listing->type ?? '') === 'sailing' ? 'selected' : '' }}">
+          <input type="radio" name="type" value="sailing" {{ old('type', $listing->type ?? '') === 'sailing' ? 'checked' : '' }} required>
           @svg('tabler-sailboat')
-          <span class="lc-type-label">Bateau</span>
-          <span class="lc-type-desc">Voilier, catamaran, yacht…</span>
-        </label>
-
-        <label class="lc-type-card {{ old('type', $listing->type ?? '') === 'garage' ? 'selected' : '' }}">
-          <input type="radio" name="type" value="garage" {{ old('type', $listing->type ?? '') === 'garage' ? 'checked' : '' }} required>
-          @svg('tabler-building-warehouse')
-          <span class="lc-type-label">Garage</span>
-          <span class="lc-type-desc">Box, parking, entrepôt…</span>
+          <span class="lc-type-label">Sortie en mer</span>
+          <span class="lc-type-desc">Voilier, catamaran, bateau moteur, balade nautique…</span>
         </label>
       </div>
 

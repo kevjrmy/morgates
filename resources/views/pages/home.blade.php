@@ -4,38 +4,26 @@
   <main>
     @include('pages.inc.hero')
 
-    @if($listings->where('type', 'house')->isNotEmpty())
+    @if($listings->where('type', 'stays')->isNotEmpty())
       <section class="listings-section">
-        <h2>Maisons recommandées</h2>
+        <h2>Hébergements récemment ajoutés</h2>
         <div class="listings-scroll">
-          @foreach($listings->where('type', 'house')->take(5) as $listing)
+          @foreach($listings->where('type', 'stays')->take(5) as $listing)
             <x-home.listing-card :listing="$listing" />
           @endforeach
-          <x-home.listing-card :more="route('listings', ['type' => 'house'])" />
+          <x-home.listing-card :more="route('listings', ['type' => 'stays'])" />
         </div>
       </section>
     @endif
 
-    @if($listings->where('type', 'boat')->isNotEmpty())
+    @if($listings->where('type', 'sailing')->isNotEmpty())
       <section class="listings-section">
-        <h2>Bateaux recommandés</h2>
+      <h2>Sorties en mer récemment ajoutées</h2>
         <div class="listings-scroll">
-          @foreach($listings->where('type', 'boat')->take(5) as $listing)
+          @foreach($listings->where('type', 'sailing')->take(5) as $listing)
             <x-home.listing-card :listing="$listing" />
           @endforeach
-          <x-home.listing-card :more="route('listings', ['type' => 'boat'])" />
-        </div>
-      </section>
-    @endif
-
-    @if($listings->where('type', 'garage')->isNotEmpty())
-      <section class="listings-section">
-        <h2>Garages recommandés</h2>
-        <div class="listings-scroll">
-          @foreach($listings->where('type', 'garage')->take(5) as $listing)
-            <x-home.listing-card :listing="$listing" />
-          @endforeach
-          <x-home.listing-card :more="route('listings', ['type' => 'garage'])" />
+          <x-home.listing-card :more="route('listings', ['type' => 'sailing'])" />
         </div>
       </section>
     @endif

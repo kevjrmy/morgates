@@ -3,7 +3,7 @@
   position: relative;
 }
 
-.header-user > button {
+.header-user>button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -16,7 +16,7 @@
   transition: background-color 0.2s ease;
 }
 
-.header-user > button:hover {
+.header-user>button:hover {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
@@ -47,7 +47,7 @@
   transition: transform 0.2s ease;
 }
 
-.header-user > button[aria-expanded="true"] .user-chevron {
+.header-user>button[aria-expanded="true"] .user-chevron {
   transform: rotate(180deg);
 }
 
@@ -285,9 +285,99 @@
   box-shadow: var(--box-shadow);
 }
 
-.account-action--disabled {
-  opacity: 0.4;
-  pointer-events: none;
+/* ── Subscription page ─────────────────────────────────────── */
+
+.account-plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--clr-background);
+  border: 0.5px solid #EBEBEB;
+  border-radius: 0.75rem;
+  box-shadow: var(--box-shadow);
+}
+
+.account-plan-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.account-plan-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--clr-text-light);
+}
+
+.account-plan-card h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--clr-text-dark);
+}
+
+.account-plan-details {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.account-plan-details div,
+.account-stat {
+  padding: 0.875rem;
+  background: #F8F8F8;
+  border-radius: 0.625rem;
+}
+
+.account-plan-details dt {
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--clr-text-medium);
+}
+
+.account-plan-details dd {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--clr-text-dark);
+}
+
+.account-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.account-stat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.125rem 0.75rem;
+}
+
+.account-stat svg {
+  grid-row: span 2;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--clr-primary);
+}
+
+.account-stat span {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--clr-text-dark);
+  line-height: 1;
+}
+
+.account-stat p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--clr-text-medium);
 }
 
 /* ── Listings list ─────────────────────────────────────────── */
@@ -424,4 +514,17 @@
 
 .btn-primary:hover {
   opacity: 0.85;
+}
+
+@media (min-width: 720px) {
+  .account-subscriptions-page {
+    max-width: 720px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .account-plan-details,
+  .account-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }

@@ -212,3 +212,7 @@ Listings belong to a user and currently include fields for:
 - Run `php artisan test` for backend changes when feasible.
 - Run `npm run build` for frontend/CSS/Blade asset changes when feasible.
 - If tests or builds cannot be run, report that clearly in the final response.
+
+## Local Development Notes
+- Kevin usually runs `php artisan serve` from the IDE terminal during development.
+- Kevin usually has the Vite dev server/build watcher running from the IDE, so agents should not run `npm run build` unless explicitly needed or requested.

@@ -33,11 +33,11 @@
       @svg('tabler-search')
       Annonces
     </a>
-    <a href="{{ route('listings', ['type' => 'boat']) }}" class="{{ request()->routeIs('listings') && request('type') === 'boat' ? 'active' : '' }}">
+    <a href="{{ route('listings', ['type' => 'sailing']) }}" class="{{ request()->routeIs('listings') && request('type') === 'sailing' ? 'active' : '' }}">
       @svg('tabler-sailboat')
       Sorties en mer
     </a>
-    <a href="{{ route('listings', ['type' => 'house']) }}" class="{{ request()->routeIs('listings') && request('type') === 'house' ? 'active' : '' }}">
+    <a href="{{ route('listings', ['type' => 'stays']) }}" class="{{ request()->routeIs('listings') && request('type') === 'stays' ? 'active' : '' }}">
       @svg('tabler-home-star')
       Séjours
     </a>

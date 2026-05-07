@@ -61,9 +61,9 @@
           @svg('tabler-user-edit')
           <span>Mon profil</span>
         </a>
-        <a href="#" class="account-action account-action--disabled" aria-disabled="true">
-          @svg('tabler-calendar')
-          <span>Réservations</span>
+        <a href="{{ route('account.subscriptions.index') }}" class="account-action">
+          @svg('tabler-credit-card-pay')
+          <span>Mes abonnements</span>
         </a>
       </div>
     </section>
@@ -88,13 +88,18 @@
           @foreach($listings->take(5) as $listing)
             <li class="account-listing">
               <div class="account-listing-info">
-                <span class="account-listing-type">{{ $listing->type }}</span>
+                <span class="account-listing-type">{{ $listing->typeLabel() }}</span>
                 <span class="account-listing-title">{{ $listing->title }}</span>
                 <span class="account-listing-location">{{ $listing->city }}</span>
               </div>
               <div class="account-listing-meta">
-                <span class="account-listing-price">{{ number_format($listing->price_per_night, 0, ',', ' ') }}
-                  {{ $listing->currency }}<small>/nuit</small></span>
+                <span class="account-listing-price">
+                  @if($listing->price_amount)
+                    {{ number_format($listing->price_amount, 0, ',', ' ') }} {{ $listing->currency }}<small>/{{ $listing->priceUnitLabel() }}</small>
+                  @else
+                    Prix sur demande
+                  @endif
+                </span>
                 <span class="account-listing-status {{ $listing->is_active ? 'active' : 'inactive' }}">
                   {{ $listing->is_active ? 'Active' : 'Inactive' }}
                 </span>
