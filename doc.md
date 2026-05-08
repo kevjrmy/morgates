@@ -4,6 +4,4 @@
 
 ## Conversation avec Loïs : 
 - Barre de recherche 2 sections: hébergement ou bateaux -> destination en auto-complexion
-- Ajout recherche avancée
-- Explorer -> entrez votre destination (suivi de 2 icones hébergement ou bateaux)
 - Enlever section "Spécificités"
