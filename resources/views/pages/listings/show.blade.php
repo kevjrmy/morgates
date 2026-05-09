@@ -17,7 +17,7 @@
         <div class="listing-type">
           @switch($listing->type)
             @case('stays') @svg('tabler-home-star') Séjour @break
-            @case('sailing') @svg('tabler-sailboat') Sortie en mer @break
+            @case('boats') @svg('tabler-sailboat') Bateau @break
           @endswitch
         </div>
         <h1 class="listing-title">{{ $listing->title }}</h1>

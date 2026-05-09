@@ -9,7 +9,7 @@
       <span class="listing-type">
         @switch($listing->type)
           @case('stays') @svg('tabler-home-star') Séjour @break
-          @case('sailing') @svg('tabler-sailboat') Sortie en mer @break
+          @case('boats') @svg('tabler-sailboat') Bateau @break
         @endswitch
       </span>
       <span class="listing-city">@svg('mdi-map-marker-outline', ['style' => 'width: 1rem; height: 1rem; vertical-align: sub;']){{ $listing->city }}</span>

@@ -16,10 +16,10 @@
           @svg('tabler-home-star')
           Séjours
         </a>
-        <a href="{{ route('listings', array_merge(request()->query(), ['type' => 'sailing'])) }}"
-          class="filter-pill {{ request('type') === 'sailing' ? 'active' : '' }}">
+        <a href="{{ route('listings', array_merge(request()->query(), ['type' => 'boats'])) }}"
+          class="filter-pill {{ request('type') === 'boats' ? 'active' : '' }}">
           @svg('tabler-sailboat')
-          Sorties en mer
+          Bateaux
         </a>
       </div>
     </div>
@@ -30,6 +30,17 @@
         @svg('tabler-tag')
         {{ request('tag') }}
         <a href="{{ route('listings', request()->except('tag')) }}" aria-label="Retirer le filtre">
+          @svg('tabler-x')
+        </a>
+      </div>
+    @endif
+
+    {{-- Active name search indicator --}}
+    @if(request('q'))
+      <div class="search-active-q">
+        @svg('tabler-search')
+        <span>Résultats pour « {{ request('q') }} »</span>
+        <a href="{{ route('listings', request()->except('q')) }}" aria-label="Effacer la recherche">
           @svg('tabler-x')
         </a>
       </div>
@@ -120,6 +131,25 @@
       flex-direction: column;
       gap: 1rem;
       padding: 1rem 1rem 2rem;
+    }
+
+    /* Active q search */
+    .search-active-q {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0 1rem;
+      padding: 0.4rem 0.85rem;
+      border-radius: 120px;
+      background-color: var(--clr-text-dark);
+      color: #fff;
+      font-size: 0.85rem;
+    }
+
+    .search-active-q a {
+      color: #fff;
+      display: flex;
+      align-items: center;
     }
 
     /* Empty */

@@ -96,7 +96,7 @@ class ListingSeeder extends Seeder
       ],
       [
         'user_id' => 1,
-        'type' => 'sailing',
+        'type' => 'boats',
         'title' => 'Sortie en voilier dans la baie de Quiberon',
         'photos' => ["https://images.unsplash.com/photo-1498623116890-37e912163d5d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHZvaWxpZXJ8ZW58MHx8MHx8fDA%3D"],
         'description' => 'Sortie côtière en petit groupe avec skipper local. Contact direct pour convenir de la date, du port et du programme.',
@@ -117,7 +117,7 @@ class ListingSeeder extends Seeder
       ],
       [
         'user_id' => 1,
-        'type' => 'sailing',
+        'type' => 'boats',
         'title' => 'Journée catamaran au départ de Marseille',
         'photos' => ["https://images.unsplash.com/photo-1581271164789-7c97932822d3?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y2F0YW1hcmFufGVufDB8fDB8fHww"],
         'description' => 'Catamaran spacieux pour une sortie vers les calanques. Les conditions se règlent directement avec l\'équipage.',
@@ -138,7 +138,7 @@ class ListingSeeder extends Seeder
       ],
       [
         'user_id' => 1,
-        'type' => 'sailing',
+        'type' => 'boats',
         'title' => 'Balade en bateau moteur sur le lac d\'Annecy',
         'photos' => ["https://images.unsplash.com/photo-1510525009512-ad7fc13eefab?w=200&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGJhdGVhdXxlbnwwfHwwfHx8MA%3D%3D"],
         'description' => 'Bateau moteur idéal pour explorer le lac avec un propriétaire local. Contact direct par téléphone.',
@@ -158,7 +158,7 @@ class ListingSeeder extends Seeder
       ],
       [
         'user_id' => 1,
-        'type' => 'sailing',
+        'type' => 'boats',
         'title' => 'Voilier habitable pour sortie à la journée',
         'photos' => ["https://images.unsplash.com/photo-1559213270-baa5ade97be6?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cCVDMyVBOW5pY2hlfGVufDB8fDB8fHww"],
         'description' => 'Voilier confortable pour découvrir la côte avec un marin expérimenté. Pas de réservation Morgates, échange direct uniquement.',

@@ -31,7 +31,10 @@ Route::get('/annonces', function () {
     $query->where(function ($q) {
       $q->where('title', 'like', '%' . request('q') . '%')
         ->orWhere('description', 'like', '%' . request('q') . '%')
-        ->orWhere('city', 'like', '%' . request('q') . '%');
+        ->orWhere('city', 'like', '%' . request('q') . '%')
+        ->orWhereHas('user', function ($u) {
+          $u->where('name', 'like', '%' . request('q') . '%');
+        });
     });
   }
 

@@ -48,7 +48,7 @@ class Listing extends Model
   public function typeLabel(): string
   {
     return match ($this->type) {
-      'sailing' => 'Sortie en mer',
+      'boats' => 'Bateau',
       'stays' => 'Séjour',
       default => 'Annonce',
     };

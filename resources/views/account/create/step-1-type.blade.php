@@ -24,10 +24,10 @@
           <span class="lc-type-desc">Maison, appartement, chambre, lieu insolite…</span>
         </label>
 
-        <label class="lc-type-card {{ old('type', $listing->type ?? '') === 'sailing' ? 'selected' : '' }}">
-          <input type="radio" name="type" value="sailing" {{ old('type', $listing->type ?? '') === 'sailing' ? 'checked' : '' }} required>
+        <label class="lc-type-card {{ old('type', $listing->type ?? '') === 'boats' ? 'selected' : '' }}">
+          <input type="radio" name="type" value="boats" {{ old('type', $listing->type ?? '') === 'boats' ? 'checked' : '' }} required>
           @svg('tabler-sailboat')
-          <span class="lc-type-label">Sortie en mer</span>
+          <span class="lc-type-label">Bateau</span>
           <span class="lc-type-desc">Voilier, catamaran, bateau moteur, balade nautique…</span>
         </label>
       </div>
