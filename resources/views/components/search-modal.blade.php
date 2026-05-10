@@ -27,9 +27,9 @@
       <!-- Stays Form -->
       <form action="{{ route('listings') }}" method="GET" id="form-stays" class="search-form active">
         <input type="hidden" name="type" value="stays">
-        <div class="form-group">
+        <div class="form-group has-autocomplete">
           <label for="city-stays">@svg('mdi-map-marker-outline') Où ?</label>
-          <input type="text" name="city" id="city-stays" placeholder="Ville ou région" value="{{ request('city') }}">
+          <input type="text" name="city" id="city-stays" placeholder="Ville ou région" value="{{ request('city') }}" autocomplete="off">
         </div>
         <button type="submit" class="submit-button">
           @svg('mdi-magnify')
@@ -40,9 +40,9 @@
       <!-- Boats Form -->
       <form action="{{ route('listings') }}" method="GET" id="form-boats" class="search-form">
         <input type="hidden" name="type" value="boats">
-        <div class="form-group">
+        <div class="form-group has-autocomplete">
           <label for="city-boats">@svg('mdi-anchor') Port de départ</label>
-          <input type="text" name="city" id="city-boats" placeholder="Ville ou port" value="{{ request('city') }}">
+          <input type="text" name="city" id="city-boats" placeholder="Ville ou port" value="{{ request('city') }}" autocomplete="off">
         </div>
         <button type="submit" class="submit-button">
           @svg('mdi-magnify')
@@ -289,6 +289,74 @@
       font-size: 0.9rem;
       line-height: 1.5;
     }
+
+    .form-group.has-autocomplete {
+      position: relative;
+    }
+
+    .autocomplete-dropdown {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      left: 0;
+      width: 100%;
+      background: white;
+      border: 1.5px solid #eee;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      z-index: 50;
+      overflow-y: auto;
+      max-height: 320px;
+      display: none;
+    }
+
+    .autocomplete-dropdown.visible {
+      display: block;
+    }
+
+    .autocomplete-item {
+      padding: 0.9rem 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.15s;
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    .autocomplete-item:last-child {
+      border-bottom: none;
+    }
+
+    .autocomplete-item:hover,
+    .autocomplete-item.highlighted {
+      background-color: var(--clr-softblue);
+    }
+
+    .autocomplete-item .item-name {
+      font-size: 1rem;
+      color: var(--clr-text-dark);
+      font-weight: 500;
+    }
+
+    .autocomplete-item .item-region {
+      font-size: 0.78rem;
+      color: var(--clr-text-light);
+      margin-top: 0.15rem;
+    }
+
+    .autocomplete-empty {
+      padding: 1.2rem 1.1rem;
+      color: var(--clr-text-light);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .autocomplete-loading {
+      padding: 1.2rem 1.1rem;
+      color: var(--clr-text-light);
+      font-size: 0.9rem;
+      text-align: center;
+    }
   </style>
 @endpush
 
@@ -324,5 +392,137 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeSearchModal();
     });
+
+    const autocompleteInstances = new Map();
+
+    function initAutocomplete(inputEl) {
+      const group = inputEl.closest('.form-group');
+      if (!group) return;
+
+      let dropdown = group.querySelector('.autocomplete-dropdown');
+      if (!dropdown) {
+        dropdown = document.createElement('div');
+        dropdown.className = 'autocomplete-dropdown';
+        group.appendChild(dropdown);
+      }
+
+      let debounceTimer = null;
+      let highlightedIndex = -1;
+      let items = [];
+
+      function showLoading() {
+        dropdown.innerHTML = '<div class="autocomplete-loading">Recherche...</div>';
+        dropdown.classList.add('visible');
+      }
+
+      function showEmpty() {
+        dropdown.innerHTML = '<div class="autocomplete-empty">Aucune destination trouvée</div>';
+        dropdown.classList.add('visible');
+        highlightedIndex = -1;
+        items = [];
+      }
+
+      function renderResults(data) {
+        if (!data || data.length === 0) {
+          showEmpty();
+          return;
+        }
+
+        highlightedIndex = -1;
+        items = data;
+
+        dropdown.innerHTML = data.map((d, i) => `
+          <div class="autocomplete-item" data-index="${i}" data-name="${d.name}">
+            <div>
+              <div class="item-name">${d.name}</div>
+              ${d.region ? `<div class="item-region">${d.region}</div>` : ''}
+            </div>
+          </div>
+        `).join('');
+
+        dropdown.classList.add('visible');
+      }
+
+      function closeDropdown() {
+        dropdown.classList.remove('visible');
+        highlightedIndex = -1;
+        items = [];
+      }
+
+      function setHighlight(idx) {
+        const allItems = dropdown.querySelectorAll('.autocomplete-item');
+        allItems.forEach((el, i) => el.classList.toggle('highlighted', i === idx));
+        highlightedIndex = idx;
+      }
+
+      inputEl.addEventListener('input', () => {
+        const val = inputEl.value.trim();
+
+        closeDropdown();
+
+        if (val.length < 2) return;
+
+        clearTimeout(debounceTimer);
+        showLoading();
+
+        debounceTimer = setTimeout(async () => {
+          try {
+            const res = await fetch(`/api/destinations?q=${encodeURIComponent(val)}`);
+            if (!res.ok) throw new Error('fetch failed');
+            const data = await res.json();
+            renderResults(data);
+          } catch {
+            closeDropdown();
+          }
+        }, 300);
+      });
+
+      inputEl.addEventListener('keydown', (e) => {
+        if (!dropdown.classList.contains('visible') || items.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          setHighlight(Math.min(highlightedIndex + 1, items.length - 1));
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          setHighlight(Math.max(highlightedIndex - 1, 0));
+        } else if (e.key === 'Enter') {
+          if (highlightedIndex >= 0) {
+            e.preventDefault();
+            const item = dropdown.querySelectorAll('.autocomplete-item')[highlightedIndex];
+            if (item) {
+              inputEl.value = item.dataset.name;
+              closeDropdown();
+            }
+          }
+        } else if (e.key === 'Escape') {
+          closeDropdown();
+        }
+      });
+
+      dropdown.addEventListener('click', (e) => {
+        const item = e.target.closest('.autocomplete-item');
+        if (item) {
+          inputEl.value = item.dataset.name;
+          closeDropdown();
+          inputEl.focus();
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!group.contains(e.target)) closeDropdown();
+      });
+    }
+
+    function attachAutocomplete() {
+      document.querySelectorAll('.form-group.has-autocomplete input').forEach(input => {
+        if (!autocompleteInstances.has(input)) {
+          initAutocomplete(input);
+          autocompleteInstances.set(input, true);
+        }
+      });
+    }
+
+    attachAutocomplete();
   </script>
 @endpush
