@@ -20,6 +20,7 @@ class Listing extends Model
     'max_duration',
     'duration_unit',
     'country',
+    'region',
     'city',
     'address',
     'latitude',

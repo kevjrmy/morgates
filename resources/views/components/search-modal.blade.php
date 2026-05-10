@@ -1,4 +1,6 @@
-<div id="search-modal" class="search-modal" aria-hidden="true">
+@props(['initialTab' => 'stays'])
+
+<div id="search-modal" class="search-modal" aria-hidden="true" data-initial-tab="{{ $initialTab }}">
   <div class="search-modal-content">
     <div class="search-modal-header">
       <button type="button" class="close-button" onclick="closeSearchModal()" aria-label="Fermer">
@@ -293,13 +295,16 @@
 @push('scripts')
   <script>
     function openSearchModal() {
-      document.getElementById('search-modal').classList.add('active');
-      document.body.style.overflow = 'hidden';
+      const modal = document.getElementById('search-modal')
+      const initialTab = modal.dataset.initialTab || 'stays'
+      modal.classList.add('active')
+      document.body.style.overflow = 'hidden'
+      switchTab(initialTab)
     }
 
     function closeSearchModal() {
-      document.getElementById('search-modal').classList.remove('active');
-      document.body.style.overflow = '';
+      document.getElementById('search-modal').classList.remove('active')
+      document.body.style.overflow = ''
     }
 
     function switchTab(tab) {

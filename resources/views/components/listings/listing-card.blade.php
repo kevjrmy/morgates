@@ -31,13 +31,7 @@
         <strong>Prix sur demande</strong>
       @endif
     </p>
-    @if($listing->tags)
-      <div class="listing-tags">
-        @foreach(array_slice($listing->tags, 0, 3) as $tag)
-          <span class="listing-tag">{{ $tag }}</span>
-        @endforeach
-      </div>
-    @endif
+
   </div>
 </a>
 
@@ -137,20 +131,7 @@
     font-size: 1rem;
   }
 
-  .listing-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
-    margin-top: 0.25rem;
-  }
 
-  .listing-tag {
-    font-size: 0.7rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 120px;
-    border: 1px solid var(--clr-primary);
-    color: var(--clr-text-secondary);
-  }
 </style>
 @endpush
 @endonce

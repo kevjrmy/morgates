@@ -27,6 +27,10 @@ Route::get('/annonces', function () {
     $query->where('city', request('city'));
   }
 
+  if (request('region')) {
+    $query->where('region', request('region'));
+  }
+
   if (request('q')) {
     $query->where(function ($q) {
       $q->where('title', 'like', '%' . request('q') . '%')
@@ -42,7 +46,25 @@ Route::get('/annonces', function () {
     $query->whereJsonContains('tags', request('tag'));
   }
 
-  $listings = $query->latest()->get();
+  if (request('price_min')) {
+    $query->where('price_amount', '>=', (float) request('price_min'));
+  }
+
+  if (request('price_max')) {
+    $query->where('price_amount', '<=', (float) request('price_max'));
+  }
+
+  if (request('capacity')) {
+    $query->where('capacity', '>=', (int) request('capacity'));
+  }
+
+  match(request('sort')) {
+    'price_asc'  => $query->orderByRaw('CASE WHEN price_amount IS NULL THEN 1 ELSE 0 END')->orderBy('price_amount'),
+    'price_desc' => $query->orderByRaw('CASE WHEN price_amount IS NULL THEN 1 ELSE 0 END')->orderByDesc('price_amount'),
+    default      => $query->latest(),
+  };
+
+  $listings = $query->get();
 
   return view('pages.listings.index', compact('listings'));
 })->name('listings');

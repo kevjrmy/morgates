@@ -23,7 +23,11 @@
         <h1 class="listing-title">{{ $listing->title }}</h1>
         <p class="listing-location">
           @svg('tabler-map-pin', ['class' => 'icon'])
-          {{ $listing->city }}, {{ $listing->country }}
+          @if($listing->region)
+            <a href="{{ route('listings', ['region' => $listing->region]) }}" class="location-link">{{ $listing->region }}</a>
+            <span aria-hidden="true">·</span>
+          @endif
+          <a href="{{ route('listings', ['city' => $listing->city]) }}" class="location-link">{{ $listing->city }}</a>
         </p>
         <div class="listing-meta">
           @if($listing->capacity)

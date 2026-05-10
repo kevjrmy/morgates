@@ -1,6 +1,7 @@
 @props([
-  'placeholder' => 'Recherche',
-  'value' => null
+  'placeholder' => 'Rechercher',
+  'value' => null,
+  'initialTab' => 'stays',
 ])
 
 <div class="search-bar-container" {{ $attributes }}>
@@ -10,7 +11,7 @@
     </span>
     <span class="search-bar-placeholder">{{ $placeholder }}</span>
   </button>
-  <x-search-modal />
+  <x-search-modal :initial-tab="$initialTab" />
 </div>
   
 @push('styles')

@@ -25,6 +25,7 @@ return new class extends Migration {
       $table->unsignedSmallInteger('max_duration')->nullable();
       $table->enum('duration_unit', ['night', 'day', 'week', 'month'])->default('night');
       $table->char('country', 2)->index();
+      $table->string('region')->nullable()->index();
       $table->string('city');
       $table->json('tags')->nullable();
       $table->string('address')->nullable();
