@@ -46,22 +46,52 @@ Route::get('/annonces', function () {
     $query->whereJsonContains('tags', request('tag'));
   }
 
-  if (request('price_min')) {
-    $query->where('price_amount', '>=', (float) request('price_min'));
+  // Store price_unit in session when filter is applied
+  if (request('price_unit')) {
+    session(['price_unit' => request('price_unit')]);
   }
+  $priceUnit = request('price_unit') ?: session('price_unit', 'night');
 
-  if (request('price_max')) {
-    $query->where('price_amount', '<=', (float) request('price_max'));
+  // Price filtering with unit normalization
+  $priceMin = request('price_min');
+  $priceMax = request('price_max');
+
+  if ($priceMin || $priceMax) {
+    // Include known-price listings in range OR trip/contact listings (they'll be sorted to bottom)
+    $query->where(function ($q) use ($priceMin, $priceMax) {
+      $q->whereNotIn('price_unit', ['trip', 'contact'])
+        ->whereRaw("CASE
+          WHEN price_unit IN ('night', 'day') THEN price_amount * 7
+          WHEN price_unit = 'week' THEN price_amount
+          WHEN price_unit = 'month' THEN price_amount / 4.33
+          ELSE price_amount
+        END BETWEEN ? AND ?", [$priceMin ?: 0, $priceMax ?: 999999]);
+    });
   }
 
   if (request('capacity')) {
     $query->where('capacity', '>=', (int) request('capacity'));
   }
 
+  // Sort: known-price listings first (sorted by normalized price), then trip/contact at bottom
   match(request('sort')) {
-    'price_asc'  => $query->orderByRaw('CASE WHEN price_amount IS NULL THEN 1 ELSE 0 END')->orderBy('price_amount'),
-    'price_desc' => $query->orderByRaw('CASE WHEN price_amount IS NULL THEN 1 ELSE 0 END')->orderByDesc('price_amount'),
-    default      => $query->latest(),
+    'price_asc' => $query
+      ->orderByRaw("CASE WHEN price_unit IN ('trip', 'contact') THEN 1 ELSE 0 END")
+      ->orderByRaw("CASE
+        WHEN price_unit IN ('night', 'day') THEN price_amount * 7
+        WHEN price_unit = 'week' THEN price_amount
+        WHEN price_unit = 'month' THEN price_amount / 4.33
+        ELSE NULL
+      END"),
+    'price_desc' => $query
+      ->orderByRaw("CASE WHEN price_unit IN ('trip', 'contact') THEN 1 ELSE 0 END")
+      ->orderByRaw("CASE
+        WHEN price_unit IN ('night', 'day') THEN price_amount * 7
+        WHEN price_unit = 'week' THEN price_amount
+        WHEN price_unit = 'month' THEN price_amount / 4.33
+        ELSE NULL
+      END DESC"),
+    default => $query->latest(),
   };
 
   $listings = $query->get();

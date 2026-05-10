@@ -49,24 +49,30 @@
         </div>
       </div>
 
-      {{-- Price range --}}
+      {{-- City --}}
+      <div class="filter-section">
+        <h3 class="filter-section-label">Ville</h3>
+        <input type="text" name="city" class="filter-text-input" placeholder="Nom de la ville" value="{{ request('city') }}">
+      </div>
+
+      {{-- Price unit --}}
       <div class="filter-section">
         <h3 class="filter-section-label">Prix</h3>
-        <div class="price-range">
-          <div class="price-input-group">
-            <label for="filter-price-min">Minimum</label>
+        <div class="price-filter-row">
+          <select name="price_unit" class="filter-select-sm" id="price-unit-select">
+            <option value="night" {{ (request('price_unit') ?: session('price_unit', 'night')) === 'night' ? 'selected' : '' }}>nuit</option>
+            <option value="day" {{ (request('price_unit') ?: session('price_unit', 'night')) === 'day' ? 'selected' : '' }}>jour</option>
+            <option value="week" {{ (request('price_unit') ?: session('price_unit', 'night')) === 'week' ? 'selected' : '' }}>semaine</option>
+            <option value="month" {{ (request('price_unit') ?: session('price_unit', 'night')) === 'month' ? 'selected' : '' }}>mois</option>
+          </select>
+          <div class="price-range">
             <div class="price-field">
-              <input type="number" name="price_min" id="filter-price-min"
-                placeholder="0" value="{{ request('price_min') }}" min="0" step="10">
+              <input type="number" name="price_min" id="price-min" placeholder="Min" value="{{ request('price_min') }}" min="0">
               <span class="price-unit">€</span>
             </div>
-          </div>
-          <div class="price-dash">—</div>
-          <div class="price-input-group">
-            <label for="filter-price-max">Maximum</label>
+            <span class="price-dash">—</span>
             <div class="price-field">
-              <input type="number" name="price_max" id="filter-price-max"
-                placeholder="∞" value="{{ request('price_max') }}" min="0" step="10">
+              <input type="number" name="price_max" id="price-max" placeholder="Max" value="{{ request('price_max') }}" min="0">
               <span class="price-unit">€</span>
             </div>
           </div>
@@ -93,10 +99,9 @@
     </form>
 
     <div class="filter-panel-footer">
-      <a href="{{ route('listings', array_filter(request()->only(['type', 'city', 'q', 'tag']))) }}"
-        class="filter-clear-btn">
+      <button type="button" class="filter-clear-btn" onclick="resetFilters()">
         Effacer
-      </a>
+      </button>
       <button type="submit" form="filter-form" class="filter-submit-btn">
         @svg('mdi-magnify')
         Voir les annonces
@@ -225,6 +230,43 @@
       box-shadow: 0 0 0 1px var(--clr-primary);
     }
 
+    /* Duration options */
+    .duration-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .duration-option {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .duration-option input[type="radio"] {
+      display: none;
+    }
+
+    .duration-option span {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 120px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: 1.5px solid #e5e5e7;
+      background-color: #fafafa;
+      color: var(--clr-text-dark);
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .duration-option:has(input:checked) span {
+      background-color: rgba(0, 68, 170, 0.06);
+      border-color: var(--clr-primary);
+      color: var(--clr-primary);
+      box-shadow: 0 0 0 1px var(--clr-primary);
+    }
+
     /* Select */
     .filter-select {
       width: 100%;
@@ -246,6 +288,102 @@
       border-color: var(--clr-primary);
       background-color: white;
       box-shadow: 0 0 0 4px rgba(0, 68, 170, 0.1);
+    }
+
+    .filter-text-input {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border: 1.5px solid #eee;
+      border-radius: 14px;
+      font-size: 1rem;
+      outline: none;
+      background-color: #fafafa;
+      transition: all 0.2s;
+    }
+
+    .filter-text-input:focus {
+      border-color: var(--clr-primary);
+      background-color: white;
+      box-shadow: 0 0 0 4px rgba(0, 68, 170, 0.1);
+    }
+
+    .filter-text-input::placeholder {
+      color: #999;
+    }
+
+    .price-filter-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .price-filter-row .filter-section-label {
+      margin-right: 0.25rem;
+    }
+
+    .filter-select-sm {
+      padding: 0.5rem 2rem 0.5rem 0.75rem;
+      border: 1.5px solid #eee;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      outline: none;
+      background-color: #fafafa;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      background-size: 1rem;
+      cursor: pointer;
+    }
+
+    .filter-select-sm:focus {
+      border-color: var(--clr-primary);
+      background-color: white;
+    }
+
+    .price-filter-row .price-range {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex: 1;
+    }
+
+    .price-filter-row .price-field {
+      position: relative;
+    }
+
+    .price-filter-row .price-field input {
+      width: 70px;
+      padding: 0.5rem 1.5rem 0.5rem 0.5rem;
+      border: 1.5px solid #eee;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      outline: none;
+      background-color: #fafafa;
+    }
+
+    .price-filter-row .price-field input::placeholder {
+      color: #bbb;
+    }
+
+    .price-filter-row .price-field input:focus {
+      border-color: var(--clr-primary);
+      background-color: white;
+    }
+
+    .price-filter-row .price-unit {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      color: var(--clr-text-medium);
+    }
+
+    .price-filter-row .price-dash {
+      color: var(--clr-text-medium);
     }
 
     /* Price range */
@@ -434,5 +572,15 @@
       capacityValue = Math.max(capacityValue - 1, 0)
       updateCapacityDisplay()
     })
+
+    function resetFilters() {
+      document.querySelector('input[name="sort"][value="latest"]').checked = true
+      document.querySelector('select[name="region"]').value = ''
+      document.getElementById('price-unit-select').value = 'night'
+      document.getElementById('price-min').value = ''
+      document.getElementById('price-max').value = ''
+      capacityValue = 0
+      updateCapacityDisplay()
+    }
   </script>
 @endpush
