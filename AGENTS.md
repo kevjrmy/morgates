@@ -37,11 +37,11 @@ The product currently has two listing categories:
 If a boat is rented as a classic overnight stay instead of for sailing/touring, it belongs to the stay rental category, not the sailing rental category.
 
 Suggested internal category names:
-- `sailing`
+- `boats`
 - `stays`
 
 Suggested French UI names:
-- `Sorties en mer`
+- `Bateaux`
 - `Séjours`
 
 These names can evolve, but keep them short and easy to translate later.

@@ -75,19 +75,64 @@
         <h2>Contact direct</h2>
         <ul class="contact-list" role="list">
           @if($listing->contact_email)
-            <li><a href="mailto:{{ $listing->contact_email }}">Email</a></li>
+            <li>
+              <button type="button" class="contact-item" data-type="email" data-value="{{ $listing->contact_email }}">
+                <span class="contact-icon">@svg('tabler-mail')</span>
+                <span class="contact-label">Email</span>
+                <span class="contact-reveal" hidden>
+                  <span class="contact-value">{{ $listing->contact_email }}</span>
+                  <span class="contact-copy" title="Copier">@svg('tabler-copy')</span>
+                </span>
+              </button>
+            </li>
           @endif
           @if($listing->contact_phone)
-            <li><a href="tel:{{ $listing->contact_phone }}">Téléphone</a></li>
+            <li>
+              <button type="button" class="contact-item" data-type="phone" data-value="{{ $listing->contact_phone }}">
+                <span class="contact-icon">@svg('tabler-phone')</span>
+                <span class="contact-label">Téléphone</span>
+                <span class="contact-reveal" hidden>
+                  <span class="contact-value">{{ $listing->contact_phone }}</span>
+                  <span class="contact-copy" title="Copier">@svg('tabler-copy')</span>
+                </span>
+              </button>
+            </li>
           @endif
           @if($listing->contact_whatsapp)
-            <li><a href="https://wa.me/{{ preg_replace('/\D+/', '', $listing->contact_whatsapp) }}" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>
+            <li>
+              <button type="button" class="contact-item" data-type="whatsapp" data-href="https://wa.me/{{ preg_replace('/\D+/', '', $listing->contact_whatsapp) }}">
+                <span class="contact-icon">@svg('tabler-brand-whatsapp')</span>
+                <span class="contact-label">WhatsApp</span>
+                <span class="contact-reveal" hidden>
+                  <span class="contact-value">wa.me/{{ preg_replace('/\D+/', '', $listing->contact_whatsapp) }}</span>
+                  <a class="contact-open" href="https://wa.me/{{ preg_replace('/\D+/', '', $listing->contact_whatsapp) }}" target="_blank" rel="noopener noreferrer" title="Ouvrir">@svg('tabler-external-link')</a>
+                </span>
+              </button>
+            </li>
           @endif
           @if($listing->contact_website)
-            <li><a href="{{ $listing->contact_website }}" target="_blank" rel="noopener noreferrer">Site externe</a></li>
+            <li>
+              <button type="button" class="contact-item" data-type="website" data-href="{{ $listing->contact_website }}">
+                <span class="contact-icon">@svg('tabler-world')</span>
+                <span class="contact-label">Web</span>
+                <span class="contact-reveal" hidden>
+                  <span class="contact-value">{{ parse_url($listing->contact_website, PHP_URL_HOST) }}</span>
+                  <a class="contact-open" href="{{ $listing->contact_website }}" target="_blank" rel="noopener noreferrer" title="Ouvrir">@svg('tabler-external-link')</a>
+                </span>
+              </button>
+            </li>
           @endif
           @unless($listing->contact_email || $listing->contact_phone || $listing->contact_whatsapp || $listing->contact_website)
-            <li><a href="mailto:{{ $listing->user->email }}">Email</a></li>
+            <li>
+              <button type="button" class="contact-item" data-type="email" data-value="{{ $listing->user->email }}">
+                <span class="contact-icon">@svg('tabler-mail')</span>
+                <span class="contact-label">Email</span>
+                <span class="contact-reveal" hidden>
+                  <span class="contact-value">{{ $listing->user->email }}</span>
+                  <span class="contact-copy" title="Copier">@svg('tabler-copy')</span>
+                </span>
+              </button>
+            </li>
           @endunless
         </ul>
       </section>
@@ -104,6 +149,12 @@
           <button class="btn-readmore" id="btn-readmore">Lire plus</button>
         </section>
 
+        <hr class="listing-divider">
+      @endif
+
+      {{-- Location --}}
+      <x-listings.map :listing="$listing" />
+      @if($listing->location_display && $listing->latitude && $listing->longitude)
         <hr class="listing-divider">
       @endif
 
@@ -148,6 +199,7 @@
 @endsection
 
 @push('styles')
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <style>
     #listing-page {
       padding-bottom: 2rem;
@@ -185,15 +237,6 @@
       font-weight: 700;
       line-height: 1.3;
       color: var(--clr-text-dark);
-      margin-bottom: 0.5rem;
-    }
-
-    .listing-location {
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      font-size: 0.9rem;
-      color: var(--clr-text-medium);
       margin-bottom: 0.5rem;
     }
 
@@ -308,15 +351,131 @@
       gap: 0.5rem;
     }
 
-    .contact-list a {
+    .contact-item {
       display: inline-flex;
       align-items: center;
-      padding: 0.55rem 0.9rem;
+      gap: 0.4rem;
+      padding: 0.5rem 0.85rem;
       border-radius: 0.5rem;
       background-color: var(--clr-tertiary);
-      color: var(--clr-text-dark);
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+      min-width: 5.5rem;
+    }
+
+    .contact-item:hover {
+      opacity: 0.8;
+    }
+
+    .contact-icon {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .contact-icon svg {
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+
+    .contact-label {
       font-size: 0.875rem;
       font-weight: 600;
+      color: var(--clr-text-dark);
+    }
+
+    .contact-reveal {
+      display: none;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .contact-item[data-state="open"] .contact-label {
+      display: none;
+    }
+
+    .contact-item[data-state="open"] .contact-reveal {
+      display: flex;
+    }
+
+.contact-value {
+      font-size: 0.8rem;
+      color: var(--clr-text-medium);
+    }
+
+    .contact-copy {
+      display: flex;
+      align-items: center;
+      padding: 0.2rem;
+      cursor: pointer;
+      color: var(--clr-primary);
+      border-radius: 0.25rem;
+      transition: opacity 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .contact-copy:hover {
+      opacity: 0.7;
+    }
+
+    .contact-copy.copied {
+      color: var(--clr-success);
+    }
+
+    .contact-copy.copied::after {
+      content: 'Copié ✓';
+      font-size: 0.7rem;
+      position: absolute;
+    }
+
+    .contact-copy {
+      display: flex;
+      align-items: center;
+      padding: 0.2rem;
+      cursor: pointer;
+      color: var(--clr-text-light);
+      border-radius: 0.25rem;
+      transition: color 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .contact-copy:hover {
+      color: var(--clr-text-dark);
+    }
+
+    .contact-copy svg {
+      width: 0.95rem;
+      height: 0.95rem;
+    }
+
+    .contact-copy.copied {
+      color: var(--clr-success);
+    }
+
+    .contact-copy.copied::after {
+      content: 'Copié ✓';
+      font-size: 0.7rem;
+      position: absolute;
+    }
+
+    .contact-open {
+      display: flex;
+      align-items: center;
+      padding: 0.2rem;
+      color: var(--clr-primary);
+      border-radius: 0.25rem;
+      transition: opacity 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .contact-open:hover {
+      opacity: 0.7;
+    }
+
+    .contact-open svg {
+      width: 0.95rem;
+      height: 0.95rem;
     }
 
     /* Contact bar */
@@ -372,17 +531,44 @@
     .btn-contact:hover {
       opacity: 0.9;
     }
-  </style>
+
+    </style>
 @endpush
 
 @push('scripts')
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script>
-    const descriptionText = document.getElementById('description-text')
-    const btnReadmore = document.getElementById('btn-readmore')
+    let openItem = null
 
-    btnReadmore?.addEventListener('click', () => {
-      const expanded = descriptionText.classList.toggle('expanded')
-      btnReadmore.textContent = expanded ? 'Lire moins' : 'Lire plus'
-    })
+document.querySelectorAll('.contact-item').forEach(item => {
+  item.addEventListener('click', e => {
+    const copyBtn = e.target.closest('.contact-copy')
+    if (copyBtn) {
+      const value = item.dataset.value
+      if (value) {
+        navigator.clipboard.writeText(value).then(() => {
+          copyBtn.classList.add('copied')
+          setTimeout(() => copyBtn.classList.remove('copied'), 2000)
+        })
+      }
+      return
+    }
+
+    if (e.target.closest('.contact-open')) return
+
+    if (openItem && openItem !== item) {
+      openItem.dataset.state = 'closed'
+    }
+    openItem = item
+    item.dataset.state = 'open'
+  })
+})
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.contact-item') && openItem) {
+    openItem.dataset.state = 'closed'
+    openItem = null
+  }
+})
   </script>
 @endpush

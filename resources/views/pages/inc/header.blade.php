@@ -29,19 +29,23 @@
       @svg('tabler-home')
       Accueil
     </a>
-    <a href="{{ route('listings') }}" class="{{ request()->routeIs('listings', 'listing') && ! request('type') ? 'active' : '' }}">
+    <a href="{{ route('listings') }}"
+      class="{{ request()->routeIs('listings', 'listing') && !request('type') ? 'active' : '' }}">
       @svg('tabler-search')
       Annonces
     </a>
-    <a href="{{ route('listings', ['type' => 'boats']) }}" class="{{ request()->routeIs('listings') && request('type') === 'boats' ? 'active' : '' }}">
+    <a href="{{ route('listings', ['type' => 'boats']) }}"
+      class="{{ request()->routeIs('listings') && request('type') === 'boats' ? 'active' : '' }}">
       @svg('tabler-sailboat')
       Bateaux
     </a>
-    <a href="{{ route('listings', ['type' => 'stays']) }}" class="{{ request()->routeIs('listings') && request('type') === 'stays' ? 'active' : '' }}">
+    <a href="{{ route('listings', ['type' => 'stays']) }}"
+      class="{{ request()->routeIs('listings') && request('type') === 'stays' ? 'active' : '' }}">
       @svg('tabler-home-star')
       Séjours
     </a>
-    <a href="{{ route('listings.create.index') }}" class="{{ request()->routeIs('listings.create.*') ? 'active' : '' }}">
+    <a href="{{ route('listings.create.index') }}"
+      class="{{ request()->routeIs('listings.create.*') ? 'active' : '' }}">
       @svg('tabler-circle-plus')
       Publier une annonce
     </a>
