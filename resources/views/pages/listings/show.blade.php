@@ -166,6 +166,28 @@
         <hr class="listing-divider">
       @endif
 
+      {{-- Gallery Grid --}}
+      @php
+        $galleryPhotos = collect($listing->photos ?? [])->filter()->values();
+      @endphp
+      @if($galleryPhotos->count() >= 3)
+        <section class="listing-gallery-grid">
+          <h2>Galerie</h2>
+          <div class="gallery-grid">
+            @foreach($galleryPhotos->take(6) as $index => $photo)
+              <button type="button" class="gallery-grid-item" data-photo-index="{{ $index }}">
+                <img
+                  src="{{ Str::startsWith($photo, 'http') ? $photo : asset('storage/' . $photo) }}"
+                  alt="{{ $listing->title }} {{ $index + 1 }}"
+                >
+              </button>
+            @endforeach
+          </div>
+        </section>
+
+        <hr class="listing-divider">
+      @endif
+
     </div>
     {{-- end listing-content --}}
 
@@ -631,6 +653,47 @@
       white-space: nowrap;
     }
 
+    /* Gallery Grid */
+    .listing-gallery-grid h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+    }
+
+    .gallery-grid-item {
+      position: relative;
+      aspect-ratio: 1;
+      padding: 0;
+      border: none;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      cursor: pointer;
+      background: none;
+    }
+
+    .gallery-grid-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.2s ease;
+    }
+
+    .gallery-grid-item:hover img {
+      transform: scale(1.05);
+    }
+
+    @media (min-width: 540px) {
+      .gallery-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
     </style>
 @endpush
 
@@ -735,5 +798,14 @@ if (btnContactOpen && contactBottomSheet) {
     }
   })
 }
+
+document.querySelectorAll('.gallery-grid-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const index = parseInt(item.dataset.photoIndex, 10)
+    if (typeof window.openGalleryModal === 'function') {
+      window.openGalleryModal(index)
+    }
+  })
+})
   </script>
 @endpush

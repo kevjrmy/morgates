@@ -2,46 +2,73 @@
 
 @php
   $photos = collect($listing->photos ?? [])->filter()->values();
+  $hasMultiple = $photos->count() > 1;
 @endphp
 
-<section class="listing-gallery" data-listing-gallery>
+<section class="listing-gallery">
   @if($photos->isEmpty())
-    <div class="listing-gallery-empty" aria-label="Aucune photo disponible">
+    <div class="listing-gallery-hero" aria-label="Aucune photo disponible">
       @svg('tabler-photo-off', ['class' => 'listing-gallery-empty-icon'])
     </div>
-  @elseif($photos->count() === 1)
-    <div class="listing-gallery-single">
+  @else
+    <div class="listing-gallery-hero">
       <img
         src="{{ Str::startsWith($photos[0], 'http') ? $photos[0] : asset('storage/' . $photos[0]) }}"
         alt="{{ $listing->title }}"
       >
+      @if($hasMultiple)
+        <button type="button" class="gallery-hero-btn" id="btn-open-gallery">
+          @svg('tabler-photo-library', ['class' => 'gallery-hero-btn-icon'])
+          <span>Voir la galerie</span>
+        </button>
+      @endif
     </div>
-  @else
-    <div class="listing-gallery-carousel">
-      <div class="listing-gallery-track" data-listing-gallery-track>
-        @foreach($photos as $index => $photo)
-          <div class="listing-gallery-slide">
-            <img
-              src="{{ Str::startsWith($photo, 'http') ? $photo : asset('storage/' . $photo) }}"
-              alt="{{ $listing->title }} {{ $index + 1 }}"
-            >
-          </div>
-        @endforeach
+  @endif
+
+  <div id="gallery-modal" class="gallery-modal" hidden aria-hidden="true">
+    <div class="gallery-modal-backdrop"></div>
+    <div class="gallery-modal-content">
+      <button type="button" class="gallery-modal-close" id="gallery-modal-close" aria-label="Fermer">
+        @svg('tabler-x')
+      </button>
+
+      <div class="gallery-modal-carousel">
+        <button type="button" class="gallery-arrow gallery-arrow-prev" id="gallery-prev" aria-label="Photo précédente">
+          @svg('tabler-chevron-left')
+        </button>
+
+        <div class="gallery-modal-track" id="gallery-track">
+          @foreach($photos as $index => $photo)
+            <div class="gallery-modal-slide">
+              <img
+                src="{{ Str::startsWith($photo, 'http') ? $photo : asset('storage/' . $photo) }}"
+                alt="{{ $listing->title }} {{ $index + 1 }}"
+              >
+            </div>
+          @endforeach
+        </div>
+
+        <button type="button" class="gallery-arrow gallery-arrow-next" id="gallery-next" aria-label="Photo suivante">
+          @svg('tabler-chevron-right')
+        </button>
       </div>
 
-      <div class="listing-gallery-dots" aria-label="Photos de l'annonce">
+      <div class="gallery-modal-dots" id="gallery-dots">
         @foreach($photos as $index => $photo)
           <button
             type="button"
-            class="listing-gallery-dot {{ $index === 0 ? 'active' : '' }}"
-            data-listing-gallery-dot="{{ $index }}"
+            class="gallery-dot {{ $index === 0 ? 'active' : '' }}"
+            data-gallery-dot="{{ $index }}"
             aria-label="Afficher la photo {{ $index + 1 }}"
-            aria-current="{{ $index === 0 ? 'true' : 'false' }}"
           ></button>
         @endforeach
       </div>
+
+      <div class="gallery-modal-counter">
+        <span id="gallery-current">1</span> / {{ $photos->count() }}
+      </div>
     </div>
-  @endif
+  </div>
 </section>
 
 @once
@@ -52,95 +79,224 @@
         background-color: var(--clr-tertiary);
       }
 
-      .listing-gallery-single,
-      .listing-gallery-carousel,
-      .listing-gallery-empty {
+      .listing-gallery-hero {
         width: 100%;
         height: 320px;
+        position: relative;
       }
 
-      .listing-gallery-single img,
-      .listing-gallery-slide img {
+      .listing-gallery-hero img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         display: block;
       }
 
-      .listing-gallery-empty {
-        display: grid;
-        place-items: center;
+      .listing-gallery-empty-icon {
+        width: 3rem;
+        height: 3rem;
+        stroke-width: 1.5;
         color: var(--clr-text-light);
       }
 
-      .listing-gallery-empty-icon {
-        width: 2.25rem;
-        height: 2.25rem;
-        stroke-width: 1.5;
+      .listing-gallery-hero:has(.listing-gallery-empty-icon) {
+        display: grid;
+        place-items: center;
       }
 
-      .listing-gallery-carousel {
+      .gallery-hero-btn {
+        position: absolute;
+        bottom: 0.75rem;
+        right: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.5rem 0.85rem;
+        border-radius: 0.5rem;
+        background-color: #fff;
+        border: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--clr-text-dark);
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        transition: background-color 0.2s ease;
+      }
+
+      .gallery-hero-btn:hover {
+        background-color: var(--clr-tertiary);
+      }
+
+      .gallery-hero-btn-icon {
+        width: 1.1rem;
+        height: 1.1rem;
+      }
+
+      .gallery-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 300;
+      }
+
+      .gallery-modal:not([hidden]) {
+        display: block;
+      }
+
+      .gallery-modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.92);
+      }
+
+      .gallery-modal-content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .gallery-modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 50%;
+        color: #fff;
+        cursor: pointer;
+        z-index: 10;
+        transition: background-color 0.2s ease;
+      }
+
+      .gallery-modal-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .gallery-modal-close svg {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+
+      .gallery-modal-carousel {
+        flex: 1;
+        display: flex;
+        align-items: center;
         position: relative;
         overflow: hidden;
       }
 
-      .listing-gallery-track {
-        height: 100%;
+      .gallery-modal-track {
         display: flex;
+        width: 100%;
+        height: 100%;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
         scroll-behavior: smooth;
         scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
       }
 
-      .listing-gallery-track::-webkit-scrollbar {
+      .gallery-modal-track::-webkit-scrollbar {
         display: none;
       }
 
-      .listing-gallery-slide {
+      .gallery-modal-slide {
         flex: 0 0 100%;
         min-width: 100%;
         height: 100%;
         scroll-snap-align: start;
-      }
-
-      .listing-gallery-dots {
-        position: absolute;
-        left: 50%;
-        bottom: 0.875rem;
-        translate: -50% 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.4rem;
-        padding: 0.35rem 0.5rem;
-        border-radius: 999px;
-        background-color: rgba(17, 24, 39, 0.32);
-        backdrop-filter: blur(8px);
+        padding: 1rem;
       }
 
-      .listing-gallery-dot {
-        width: 0.45rem;
-        height: 0.45rem;
+      .gallery-modal-slide img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+
+      .gallery-arrow {
+        position: absolute;
+        top: 50%;
+        translate: 0 -50%;
+        width: 2.75rem;
+        height: 2.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 50%;
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        z-index: 5;
+      }
+
+      .gallery-arrow:hover {
+        background: rgba(255, 255, 255, 0.25);
+      }
+
+      .gallery-arrow svg {
+        width: 1.75rem;
+        height: 1.75rem;
+      }
+
+      .gallery-arrow-prev {
+        left: 1rem;
+      }
+
+      .gallery-arrow-next {
+        right: 1rem;
+      }
+
+      .gallery-modal-dots {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 1rem;
+      }
+
+      .gallery-dot {
+        width: 0.5rem;
+        height: 0.5rem;
         padding: 0;
         border: 0;
         border-radius: 999px;
-        background-color: rgba(255, 255, 255, 0.62);
+        background-color: rgba(255, 255, 255, 0.4);
         cursor: pointer;
         transition: background-color 0.2s ease, transform 0.2s ease;
       }
 
-      .listing-gallery-dot.active {
+      .gallery-dot.active {
         background-color: #fff;
-        transform: scale(1.35);
+        transform: scale(1.4);
+      }
+
+      .gallery-modal-counter {
+        position: absolute;
+        bottom: 1rem;
+        left: 50%;
+        translate: -50% 0;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
       }
 
       @media (min-width: 720px) {
-        .listing-gallery-single,
-        .listing-gallery-carousel,
-        .listing-gallery-empty {
+        .listing-gallery-hero {
           height: 420px;
+        }
+
+        .gallery-modal-slide {
+          padding: 2rem;
         }
       }
     </style>
@@ -148,33 +304,85 @@
 
   @push('scripts')
     <script>
-      document.querySelectorAll('[data-listing-gallery]').forEach(gallery => {
-        const track = gallery.querySelector('[data-listing-gallery-track]')
-        const dots = [...gallery.querySelectorAll('[data-listing-gallery-dot]')]
+      (function() {
+        const modal = document.getElementById('gallery-modal')
+        if (!modal) return
+
+        const openBtn = document.getElementById('btn-open-gallery')
+        const closeBtn = document.getElementById('gallery-modal-close')
+        const backdrop = modal.querySelector('.gallery-modal-backdrop')
+        const track = document.getElementById('gallery-track')
+        const dots = [...document.querySelectorAll('.gallery-dot')]
+        const prevBtn = document.getElementById('gallery-prev')
+        const nextBtn = document.getElementById('gallery-next')
+        const counter = document.getElementById('gallery-current')
 
         if (!track || dots.length === 0) return
 
-        const setActiveDot = index => {
-          dots.forEach((dot, dotIndex) => {
-            const isActive = dotIndex === index
-            dot.classList.toggle('active', isActive)
-            dot.setAttribute('aria-current', isActive ? 'true' : 'false')
+        let currentIndex = 0
+
+        function updateGallery(index) {
+          currentIndex = Math.max(0, Math.min(index, dots.length - 1))
+          track.scrollTo({ left: currentIndex * track.clientWidth, behavior: 'smooth' })
+
+          dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentIndex)
           })
+
+          counter.textContent = currentIndex + 1
         }
+
+        function openModal(initialIndex = 0) {
+          modal.hidden = false
+          modal.setAttribute('aria-hidden', 'false')
+          document.body.style.overflow = 'hidden'
+          updateGallery(initialIndex)
+        }
+
+        window.openGalleryModal = openModal
+
+        function closeModal() {
+          modal.hidden = true
+          modal.setAttribute('aria-hidden', 'true')
+          document.body.style.overflow = ''
+        }
+
+        openBtn?.addEventListener('click', openModal)
+        closeBtn.addEventListener('click', closeModal)
+        backdrop.addEventListener('click', closeModal)
+
+        prevBtn.addEventListener('click', () => updateGallery(currentIndex - 1))
+        nextBtn.addEventListener('click', () => updateGallery(currentIndex + 1))
 
         dots.forEach(dot => {
           dot.addEventListener('click', () => {
-            const index = Number(dot.dataset.listingGalleryDot)
-            track.scrollTo({ left: index * track.clientWidth, behavior: 'smooth' })
-            setActiveDot(index)
+            updateGallery(Number(dot.dataset.galleryDot))
           })
         })
 
         track.addEventListener('scroll', () => {
           const index = Math.round(track.scrollLeft / track.clientWidth)
-          setActiveDot(index)
+          if (index !== currentIndex) {
+            currentIndex = index
+            dots.forEach((dot, i) => {
+              dot.classList.toggle('active', i === currentIndex)
+            })
+            counter.textContent = currentIndex + 1
+          }
         }, { passive: true })
-      })
+
+        document.addEventListener('keydown', e => {
+          if (modal.hidden) return
+
+          if (e.key === 'Escape') {
+            closeModal()
+          } else if (e.key === 'ArrowLeft') {
+            updateGallery(currentIndex - 1)
+          } else if (e.key === 'ArrowRight') {
+            updateGallery(currentIndex + 1)
+          }
+        })
+      })()
     </script>
   @endpush
 @endonce
