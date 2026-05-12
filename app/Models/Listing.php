@@ -25,8 +25,6 @@ class Listing extends Model
     'address',
     'latitude',
     'longitude',
-    'location_display',
-    'location_radius',
     'is_active',
     'tags',
     'contact_email',

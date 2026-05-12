@@ -146,15 +146,9 @@
           <div class="description-text" id="description-text">
             {!! nl2br(e($listing->description)) !!}
           </div>
-          <button class="btn-readmore" id="btn-readmore">Lire plus</button>
+          <button class="btn-readmore" id="btn-readmore" hidden>Lire plus</button>
         </section>
 
-        <hr class="listing-divider">
-      @endif
-
-      {{-- Location --}}
-      <x-listings.map :listing="$listing" />
-      @if($listing->location_display && $listing->latitude && $listing->longitude)
         <hr class="listing-divider">
       @endif
 
@@ -192,14 +186,14 @@
         <span class="price-amount">Prix sur demande</span>
       @endif
     </div>
-    <a href="{{ $listing->primaryContactUrl() }}" class="btn-contact" @if(Str::startsWith($listing->primaryContactUrl(), 'http')) target="_blank" rel="noopener noreferrer" @endif>
+    <button type="button" class="btn-contact" id="btn-contact-open">
       Contacter directement
-    </a>
+    </button>
   </div>
+  <x-listings.contact-bottom-sheet :listing="$listing" />
 @endsection
 
 @push('styles')
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <style>
     #listing-page {
       padding-bottom: 2rem;
@@ -399,9 +393,10 @@
       display: flex;
     }
 
-.contact-value {
+    .contact-value {
       font-size: 0.8rem;
-      color: var(--clr-text-medium);
+      color: var(--clr-text-dark);
+      font-weight: 600;
     }
 
     .contact-copy {
@@ -409,10 +404,10 @@
       align-items: center;
       padding: 0.2rem;
       cursor: pointer;
-      color: var(--clr-primary);
       border-radius: 0.25rem;
       transition: opacity 0.15s ease;
       flex-shrink: 0;
+      color: var(--clr-primary);
     }
 
     .contact-copy:hover {
@@ -434,14 +429,9 @@
       align-items: center;
       padding: 0.2rem;
       cursor: pointer;
-      color: var(--clr-text-light);
       border-radius: 0.25rem;
       transition: color 0.15s ease;
       flex-shrink: 0;
-    }
-
-    .contact-copy:hover {
-      color: var(--clr-text-dark);
     }
 
     .contact-copy svg {
@@ -463,7 +453,6 @@
       display: flex;
       align-items: center;
       padding: 0.2rem;
-      color: var(--clr-primary);
       border-radius: 0.25rem;
       transition: opacity 0.15s ease;
       flex-shrink: 0;
@@ -532,11 +521,120 @@
       opacity: 0.9;
     }
 
+    /* Bottom sheet */
+    .bottom-sheet-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 200;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .bottom-sheet-overlay:not([hidden]) {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .bottom-sheet-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #fff;
+      border-radius: 1rem 1rem 0 0;
+      padding: 1.5rem 1.25rem 2rem;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .bottom-sheet-overlay:not([hidden]) .bottom-sheet-panel {
+      transform: translateY(0);
+    }
+
+    .bottom-sheet-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--clr-text-light);
+      border-radius: 50%;
+      transition: background-color 0.15s ease;
+    }
+
+    .bottom-sheet-close:hover {
+      background-color: var(--clr-tertiary);
+    }
+
+    .bottom-sheet-close svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    .bottom-sheet-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--clr-text-dark);
+      margin-bottom: 1.25rem;
+      padding-right: 2rem;
+    }
+
+    .contact-list-bottom {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .contact-item-bottom {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1rem;
+      border-radius: 0.5rem;
+      background-color: var(--clr-tertiary);
+      text-decoration: none;
+      color: var(--clr-text-dark);
+      transition: opacity 0.2s ease;
+    }
+
+    .contact-item-bottom:hover {
+      opacity: 0.85;
+    }
+
+    .contact-icon-bottom {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      color: var(--clr-primary);
+    }
+
+    .contact-icon-bottom svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    .contact-value-bottom {
+      font-size: 0.95rem;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     </style>
 @endpush
 
 @push('scripts')
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script>
     let openItem = null
 
@@ -570,5 +668,72 @@ document.addEventListener('click', e => {
     openItem = null
   }
 })
+
+const descriptionText = document.getElementById('description-text')
+const btnReadmore = document.getElementById('btn-readmore')
+
+function checkReadmore() {
+  if (!descriptionText || !btnReadmore) return
+
+  const clone = descriptionText.cloneNode(true)
+  clone.style.position = 'absolute'
+  clone.style.visibility = 'hidden'
+  clone.style.width = descriptionText.offsetWidth + 'px'
+  clone.style.maxWidth = 'none'
+  clone.classList.remove('expanded')
+  descriptionText.parentNode.appendChild(clone)
+
+  const isTruncated = clone.scrollHeight > descriptionText.offsetHeight
+
+  clone.remove()
+  btnReadmore.hidden = !isTruncated
+}
+
+if (descriptionText && btnReadmore) {
+  btnReadmore.addEventListener('click', () => {
+    const isExpanded = descriptionText.classList.toggle('expanded')
+    btnReadmore.textContent = isExpanded ? 'Réduire' : 'Lire plus'
+  })
+
+  checkReadmore()
+
+  let resizeTimeout
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout)
+    resizeTimeout = setTimeout(checkReadmore, 100)
+  })
+}
+
+const btnContactOpen = document.getElementById('btn-contact-open')
+const contactBottomSheet = document.getElementById('contact-bottom-sheet')
+const bottomSheetClose = contactBottomSheet?.querySelector('.bottom-sheet-close')
+
+function openBottomSheet() {
+  contactBottomSheet.hidden = false
+  document.body.style.overflow = 'hidden'
+}
+
+function closeBottomSheet() {
+  contactBottomSheet.hidden = true
+  document.body.style.overflow = ''
+}
+
+if (btnContactOpen && contactBottomSheet) {
+  btnContactOpen.addEventListener('click', openBottomSheet)
+
+  bottomSheetClose?.addEventListener('click', closeBottomSheet)
+
+  contactBottomSheet.addEventListener('click', e => {
+    if (e.target === contactBottomSheet) {
+      closeBottomSheet()
+    }
+  })
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !contactBottomSheet.hidden) {
+      closeBottomSheet()
+    }
+  })
+}
   </script>
 @endpush
