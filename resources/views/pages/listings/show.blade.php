@@ -202,7 +202,7 @@
     <div class="contact-price">
       @if($listing->price_amount)
         <span class="price-amount">{{ number_format($listing->price_amount, 0, ',', ' ') }}
-          {{ $listing->currency }}</span>
+          {{ $listing->currencySymbol() }}</span>
         <span class="price-label">/ {{ $listing->priceUnitLabel() }}</span>
       @else
         <span class="price-amount">Prix sur demande</span>
@@ -491,7 +491,13 @@
 
     /* Contact bar */
     .contact-bar-spacer {
-      height: 80px;
+      height: 110px;
+    }
+
+    @media (min-width: 320px) {
+      .contact-bar-spacer {
+        height: 80px;
+      }
     }
 
     .contact-bar {
@@ -503,44 +509,84 @@
       max-width: var(--max-width);
       background-color: #fff;
       border-top: var(--border);
-      padding: 1rem 1.25rem;
+      padding: 0.75rem 1.25rem;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
+      gap: 0.5rem;
       z-index: 100;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
     }
 
     .contact-price {
       display: flex;
       align-items: baseline;
       gap: 0.25rem;
+      line-height: 1.2;
     }
 
     .price-amount {
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       font-weight: 700;
       color: var(--clr-text-dark);
     }
 
     .price-label {
-      font-size: 0.875rem;
+      font-size: 0.8rem;
       color: var(--clr-text-light);
     }
 
     .btn-contact {
-      padding: 0.85rem 2rem;
-      border-radius: 0.5rem;
+      width: 100%;
+      padding: 0.8rem 1.25rem;
+      border-radius: 0.75rem;
       background-color: var(--clr-primary);
       color: #fff;
-      font-size: 1rem;
-      font-weight: 600;
+      font-size: 0.95rem;
+      font-weight: 700;
       transition: opacity 0.2s ease;
       white-space: nowrap;
     }
 
     .btn-contact:hover {
       opacity: 0.9;
+    }
+
+    @media (min-width: 320px) {
+      .contact-bar {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 0.75rem;
+      }
+      .contact-price {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .btn-contact {
+        width: auto;
+      }
+    }
+
+    @media (min-width: 400px) {
+      .contact-bar {
+        padding: 1rem 1.5rem;
+        gap: 1.5rem;
+      }
+      .contact-price {
+        flex-direction: row;
+        align-items: baseline;
+        gap: 0.25rem;
+      }
+      .price-amount {
+        font-size: 1.25rem;
+      }
+      .price-label {
+        font-size: 0.875rem;
+      }
+      .btn-contact {
+        padding: 0.85rem 2rem;
+        font-size: 1rem;
+      }
     }
 
     /* Bottom sheet */

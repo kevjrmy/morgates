@@ -20,7 +20,7 @@
     <h3 class="listing-card-title">{{ $listing->title }}</h3>
     <p class="listing-card-price">
       @if($listing->price_amount)
-        <strong>{{ number_format($listing->price_amount, 0, ',', ' ') }} {{ $listing->currency }}</strong>
+        <strong>{{ number_format($listing->price_amount, 0, ',', ' ') }} {{ $listing->currencySymbol() }}</strong>
         / {{ $listing->priceUnitLabel() }}
       @else
         <strong>Prix sur demande</strong>

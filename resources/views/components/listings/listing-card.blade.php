@@ -25,7 +25,7 @@
     </p>
     <p class="listing-price">
       @if($listing->price_amount)
-        <strong>{{ number_format($listing->price_amount, 0, ',', ' ') }} {{ $listing->currency }}</strong>
+        <strong>{{ number_format($listing->price_amount, 0, ',', ' ') }} {{ $listing->currencySymbol() }}</strong>
         <span>/ {{ $listing->priceUnitLabel() }}</span>
       @else
         <strong>Prix sur demande</strong>

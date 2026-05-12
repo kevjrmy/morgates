@@ -362,167 +362,183 @@
 
 @push('scripts')
   <script>
-    function openSearchModal() {
-      const modal = document.getElementById('search-modal')
-      const initialTab = modal.dataset.initialTab || 'stays'
-      modal.classList.add('active')
-      document.body.style.overflow = 'hidden'
-      switchTab(initialTab)
-    }
+    (function() {
+      function init() {
+        // Global-ish state attached to window to avoid redeclaration errors if component is included twice
+        window.autocompleteInstances = window.autocompleteInstances || new Map();
 
-    function closeSearchModal() {
-      document.getElementById('search-modal').classList.remove('active')
-      document.body.style.overflow = ''
-    }
+        window.openSearchModal = window.openSearchModal || function() {
+          const modal = document.getElementById('search-modal');
+          if (!modal) return;
+          const initialTab = modal.dataset.initialTab || 'stays';
+          modal.classList.add('active');
+          document.body.style.overflow = 'hidden';
+          switchTab(initialTab);
+        };
 
-    function switchTab(tab) {
-      // Update buttons
-      document.querySelectorAll('.tab-button').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.tab === tab);
-        btn.setAttribute('aria-pressed', btn.dataset.tab === tab ? 'true' : 'false');
-      });
+        window.closeSearchModal = window.closeSearchModal || function() {
+          const modal = document.getElementById('search-modal');
+          if (modal) modal.classList.remove('active');
+          document.body.style.overflow = '';
+        };
 
-      // Update forms
-      document.querySelectorAll('.search-form').forEach(form => {
-        form.classList.toggle('active', form.id === `form-${tab}`);
-      });
-    }
+        window.switchTab = window.switchTab || function(tab) {
+          // Update buttons
+          document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === tab);
+            btn.setAttribute('aria-pressed', btn.dataset.tab === tab ? 'true' : 'false');
+          });
 
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeSearchModal();
-    });
+          // Update forms
+          document.querySelectorAll('.search-form').forEach(form => {
+            form.classList.toggle('active', form.id === `form-${tab}`);
+          });
+        };
 
-    const autocompleteInstances = new Map();
+        function initAutocomplete(inputEl) {
+          const group = inputEl.closest('.form-group');
+          if (!group) return;
 
-    function initAutocomplete(inputEl) {
-      const group = inputEl.closest('.form-group');
-      if (!group) return;
-
-      let dropdown = group.querySelector('.autocomplete-dropdown');
-      if (!dropdown) {
-        dropdown = document.createElement('div');
-        dropdown.className = 'autocomplete-dropdown';
-        group.appendChild(dropdown);
-      }
-
-      let debounceTimer = null;
-      let highlightedIndex = -1;
-      let items = [];
-
-      function showLoading() {
-        dropdown.innerHTML = '<div class="autocomplete-loading">Recherche...</div>';
-        dropdown.classList.add('visible');
-      }
-
-      function showEmpty() {
-        dropdown.innerHTML = '<div class="autocomplete-empty">Aucune destination trouvée</div>';
-        dropdown.classList.add('visible');
-        highlightedIndex = -1;
-        items = [];
-      }
-
-      function renderResults(data) {
-        if (!data || data.length === 0) {
-          showEmpty();
-          return;
-        }
-
-        highlightedIndex = -1;
-        items = data;
-
-        dropdown.innerHTML = data.map((d, i) => `
-          <div class="autocomplete-item" data-index="${i}" data-name="${d.name}">
-            <div>
-              <div class="item-name">${d.name}</div>
-              ${d.region ? `<div class="item-region">${d.region}</div>` : ''}
-            </div>
-          </div>
-        `).join('');
-
-        dropdown.classList.add('visible');
-      }
-
-      function closeDropdown() {
-        dropdown.classList.remove('visible');
-        highlightedIndex = -1;
-        items = [];
-      }
-
-      function setHighlight(idx) {
-        const allItems = dropdown.querySelectorAll('.autocomplete-item');
-        allItems.forEach((el, i) => el.classList.toggle('highlighted', i === idx));
-        highlightedIndex = idx;
-      }
-
-      inputEl.addEventListener('input', () => {
-        const val = inputEl.value.trim();
-
-        closeDropdown();
-
-        if (val.length < 2) return;
-
-        clearTimeout(debounceTimer);
-        showLoading();
-
-        debounceTimer = setTimeout(async () => {
-          try {
-            const res = await fetch(`/api/destinations?q=${encodeURIComponent(val)}`);
-            if (!res.ok) throw new Error('fetch failed');
-            const data = await res.json();
-            renderResults(data);
-          } catch {
-            closeDropdown();
+          let dropdown = group.querySelector('.autocomplete-dropdown');
+          if (!dropdown) {
+            dropdown = document.createElement('div');
+            dropdown.className = 'autocomplete-dropdown';
+            group.appendChild(dropdown);
           }
-        }, 300);
-      });
 
-      inputEl.addEventListener('keydown', (e) => {
-        if (!dropdown.classList.contains('visible') || items.length === 0) return;
+          let debounceTimer = null;
+          let highlightedIndex = -1;
+          let items = [];
 
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          setHighlight(Math.min(highlightedIndex + 1, items.length - 1));
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          setHighlight(Math.max(highlightedIndex - 1, 0));
-        } else if (e.key === 'Enter') {
-          if (highlightedIndex >= 0) {
-            e.preventDefault();
-            const item = dropdown.querySelectorAll('.autocomplete-item')[highlightedIndex];
+          function showLoading() {
+            dropdown.innerHTML = '<div class="autocomplete-loading">Recherche...</div>';
+            dropdown.classList.add('visible');
+          }
+
+          function showEmpty() {
+            dropdown.innerHTML = '<div class="autocomplete-empty">Aucune destination trouvée</div>';
+            dropdown.classList.add('visible');
+            highlightedIndex = -1;
+            items = [];
+          }
+
+          function renderResults(data) {
+            if (!data || data.length === 0) {
+              showEmpty();
+              return;
+            }
+
+            highlightedIndex = -1;
+            items = data;
+
+            dropdown.innerHTML = data.map((d, i) => `
+              <div class="autocomplete-item" data-index="${i}" data-name="${d.name}">
+                <div>
+                  <div class="item-name">${d.name}</div>
+                  ${d.region ? `<div class="item-region">${d.region}</div>` : ''}
+                </div>
+              </div>
+            `).join('');
+
+            dropdown.classList.add('visible');
+          }
+
+          function closeDropdown() {
+            dropdown.classList.remove('visible');
+            highlightedIndex = -1;
+            items = [];
+          }
+
+          function setHighlight(idx) {
+            const allItems = dropdown.querySelectorAll('.autocomplete-item');
+            allItems.forEach((el, i) => el.classList.toggle('highlighted', i === idx));
+            highlightedIndex = idx;
+          }
+
+          inputEl.addEventListener('input', () => {
+            const val = inputEl.value.trim();
+
+            closeDropdown();
+
+            if (val.length < 2) return;
+
+            clearTimeout(debounceTimer);
+            showLoading();
+
+            debounceTimer = setTimeout(async () => {
+              try {
+                const res = await fetch(`/api/destinations?q=${encodeURIComponent(val)}`);
+                if (!res.ok) throw new Error('fetch failed');
+                const data = await res.json();
+                renderResults(data);
+              } catch {
+                closeDropdown();
+              }
+            }, 300);
+          });
+
+          inputEl.addEventListener('keydown', (e) => {
+            if (!dropdown.classList.contains('visible') || items.length === 0) return;
+
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              setHighlight(Math.min(highlightedIndex + 1, items.length - 1));
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              setHighlight(Math.max(highlightedIndex - 1, 0));
+            } else if (e.key === 'Enter') {
+              if (highlightedIndex >= 0) {
+                e.preventDefault();
+                const item = dropdown.querySelectorAll('.autocomplete-item')[highlightedIndex];
+                if (item) {
+                  inputEl.value = item.dataset.name;
+                  closeDropdown();
+                }
+              }
+            } else if (e.key === 'Escape') {
+              closeDropdown();
+            }
+          });
+
+          dropdown.addEventListener('click', (e) => {
+            const item = e.target.closest('.autocomplete-item');
             if (item) {
               inputEl.value = item.dataset.name;
               closeDropdown();
+              inputEl.focus();
             }
-          }
-        } else if (e.key === 'Escape') {
-          closeDropdown();
+          });
+
+          document.addEventListener('click', (e) => {
+            if (!group.contains(e.target)) closeDropdown();
+          });
         }
-      });
 
-      dropdown.addEventListener('click', (e) => {
-        const item = e.target.closest('.autocomplete-item');
-        if (item) {
-          inputEl.value = item.dataset.name;
-          closeDropdown();
-          inputEl.focus();
+        function attachAutocomplete() {
+          document.querySelectorAll('.form-group.has-autocomplete input').forEach(input => {
+            if (!window.autocompleteInstances.has(input)) {
+              initAutocomplete(input);
+              window.autocompleteInstances.set(input, true);
+            }
+          });
         }
-      });
 
-      document.addEventListener('click', (e) => {
-        if (!group.contains(e.target)) closeDropdown();
-      });
-    }
-
-    function attachAutocomplete() {
-      document.querySelectorAll('.form-group.has-autocomplete input').forEach(input => {
-        if (!autocompleteInstances.has(input)) {
-          initAutocomplete(input);
-          autocompleteInstances.set(input, true);
+        // Close on Escape key (global)
+        if (!window.hasGlobalEscListener) {
+          document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') window.closeSearchModal();
+          });
+          window.hasGlobalEscListener = true;
         }
-      });
-    }
 
-    attachAutocomplete();
+        attachAutocomplete();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
   </script>
 @endpush

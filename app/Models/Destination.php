@@ -23,7 +23,8 @@ class Destination extends Model
 
     public function scopeSearch(Builder $query, string $term): Builder
     {
-        return $query->where('name', 'LIKE', '%' . $term . '%');
+        $lower = mb_strtolower($term);
+        return $query->whereRaw("LOWER(name) LIKE ?", ['%' . $lower . '%']);
     }
 
     public function scopeOrderedForSearch(Builder $query, string $term): Builder

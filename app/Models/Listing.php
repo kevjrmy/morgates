@@ -67,6 +67,16 @@ class Listing extends Model
     };
   }
 
+  public function currencySymbol(): string
+  {
+    return match ($this->currency) {
+      'EUR' => '€',
+      'USD' => '$',
+      'GBP' => '£',
+      default => $this->currency ?? '€',
+    };
+  }
+
   public function durationUnitLabel(): string
   {
     return match ($this->duration_unit) {
