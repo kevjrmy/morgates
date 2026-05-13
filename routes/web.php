@@ -74,7 +74,7 @@ Route::get('/annonces', function () {
   }
 
   // Sort: known-price listings first (sorted by normalized price), then trip/contact at bottom
-  match(request('sort')) {
+  match (request('sort')) {
     'price_asc' => $query
       ->orderByRaw("CASE WHEN price_unit IN ('trip', 'contact') THEN 1 ELSE 0 END")
       ->orderByRaw("CASE
@@ -117,6 +117,11 @@ Route::get('/conditions-utilisation', function () {
 Route::get('/a-propos', function () {
   return view('pages.legal.about');
 })->name('about');
+
+/* Contact */
+Route::get('/contact', function () {
+  return view('pages.contact');
+})->name('contact');
 
 /**
  * Authentification

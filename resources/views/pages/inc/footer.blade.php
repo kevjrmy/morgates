@@ -4,8 +4,7 @@
       <h3>Assistance</h3>
       <ul role="list">
         <li><a href="{{ route('about') }}">À propos</a></li>
-        <li><a href="#">Centre d'aide</a></li>
-        <li><a href="#">Annulation</a></li>
+        <li><a href="{{ route('contact') }}">Contactez-nous</a></li>
       </ul>
     </div>
     <div class="footer-col">

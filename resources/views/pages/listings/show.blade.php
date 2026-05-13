@@ -72,7 +72,7 @@
 
       {{-- Direct contact --}}
       <section class="listing-contact">
-        <h2>Contact direct</h2>
+        <h2>Contact rapide</h2>
         <ul class="contact-list" role="list">
           @if($listing->contact_email)
             <li>
