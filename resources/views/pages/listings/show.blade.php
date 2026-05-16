@@ -7,7 +7,7 @@
   <main id="listing-page" style="position: relative">
     <x-listings.nav />
 
-    <x-listings.gallery :listing="$listing" />
+    <x-listings.slideshow :listing="$listing" />
 
     {{-- Content --}}
     <div class="listing-content">
@@ -166,27 +166,7 @@
         <hr class="listing-divider">
       @endif
 
-      {{-- Gallery Grid --}}
-      @php
-        $galleryPhotos = collect($listing->photos ?? [])->filter()->values();
-      @endphp
-      @if($galleryPhotos->count() >= 3)
-        <section class="listing-gallery-grid">
-          <h2>Galerie</h2>
-          <div class="gallery-grid">
-            @foreach($galleryPhotos->take(6) as $index => $photo)
-              <button type="button" class="gallery-grid-item" data-photo-index="{{ $index }}">
-                <img
-                  src="{{ Str::startsWith($photo, 'http') ? $photo : asset('storage/' . $photo) }}"
-                  alt="{{ $listing->title }} {{ $index + 1 }}"
-                >
-              </button>
-            @endforeach
-          </div>
-        </section>
-
-        <hr class="listing-divider">
-      @endif
+      <x-listings.gallery :listing="$listing" />
 
     </div>
     {{-- end listing-content --}}
@@ -422,12 +402,13 @@
     }
 
     .contact-copy {
+      position: relative;
       display: flex;
       align-items: center;
       padding: 0.2rem;
       cursor: pointer;
       border-radius: 0.25rem;
-      transition: opacity 0.15s ease;
+      transition: color 0.15s ease, opacity 0.15s ease;
       flex-shrink: 0;
       color: var(--clr-primary);
     }
@@ -442,18 +423,20 @@
 
     .contact-copy.copied::after {
       content: 'Copié ✓';
-      font-size: 0.7rem;
       position: absolute;
-    }
-
-    .contact-copy {
-      display: flex;
-      align-items: center;
-      padding: 0.2rem;
-      cursor: pointer;
-      border-radius: 0.25rem;
-      transition: color 0.15s ease;
-      flex-shrink: 0;
+      right: 0;
+      bottom: calc(100% + 0.4rem);
+      padding: 0.25rem 0.45rem;
+      border-radius: 0.4rem;
+      background-color: var(--clr-text-dark);
+      box-shadow: var(--box-shadow);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      line-height: 1;
+      white-space: nowrap;
+      pointer-events: none;
+      animation: copy-bubble 2s ease forwards;
     }
 
     .contact-copy svg {
@@ -461,14 +444,22 @@
       height: 0.95rem;
     }
 
-    .contact-copy.copied {
-      color: var(--clr-success);
-    }
+    @keyframes copy-bubble {
+      0% {
+        opacity: 0;
+        transform: translateY(0.25rem) scale(0.96);
+      }
 
-    .contact-copy.copied::after {
-      content: 'Copié ✓';
-      font-size: 0.7rem;
-      position: absolute;
+      15%,
+      70% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(-0.45rem) scale(0.98);
+      }
     }
 
     .contact-open {
@@ -699,47 +690,6 @@
       white-space: nowrap;
     }
 
-    /* Gallery Grid */
-    .listing-gallery-grid h2 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 0.75rem;
-    }
-
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.5rem;
-    }
-
-    .gallery-grid-item {
-      position: relative;
-      aspect-ratio: 1;
-      padding: 0;
-      border: none;
-      border-radius: 0.5rem;
-      overflow: hidden;
-      cursor: pointer;
-      background: none;
-    }
-
-    .gallery-grid-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.2s ease;
-    }
-
-    .gallery-grid-item:hover img {
-      transform: scale(1.05);
-    }
-
-    @media (min-width: 540px) {
-      .gallery-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
     </style>
 @endpush
 
@@ -845,13 +795,5 @@ if (btnContactOpen && contactBottomSheet) {
   })
 }
 
-document.querySelectorAll('.gallery-grid-item').forEach(item => {
-  item.addEventListener('click', () => {
-    const index = parseInt(item.dataset.photoIndex, 10)
-    if (typeof window.openGalleryModal === 'function') {
-      window.openGalleryModal(index)
-    }
-  })
-})
   </script>
 @endpush

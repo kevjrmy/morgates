@@ -29,7 +29,8 @@
         <input type="hidden" name="type" value="stays">
         <div class="form-group has-autocomplete">
           <label for="city-stays">@svg('mdi-map-marker-outline') Où ?</label>
-          <input type="text" name="city" id="city-stays" placeholder="Ville ou région" value="{{ request('city') }}" autocomplete="off">
+          <input type="text" name="city" id="city-stays" placeholder="Ville ou région" value="{{ request('city') }}"
+            autocomplete="off">
         </div>
         <button type="submit" class="submit-button">
           @svg('mdi-magnify')
@@ -42,7 +43,8 @@
         <input type="hidden" name="type" value="boats">
         <div class="form-group has-autocomplete">
           <label for="city-boats">@svg('mdi-anchor') Port de départ</label>
-          <input type="text" name="city" id="city-boats" placeholder="Ville ou port" value="{{ request('city') }}" autocomplete="off">
+          <input type="text" name="city" id="city-boats" placeholder="Ville ou port" value="{{ request('city') }}"
+            autocomplete="off">
         </div>
         <button type="submit" class="submit-button">
           @svg('mdi-magnify')
@@ -57,7 +59,8 @@
         </div>
         <div class="form-group">
           <label for="q-name">@svg('mdi-text-search') Nom de l'annonce ou de l'hôte</label>
-          <input type="text" name="q" id="q-name" placeholder="Ex&nbsp;: Villa Bretagne, Jean Dupont..." value="{{ request('q') }}" autocomplete="off">
+          <input type="text" name="q" id="q-name" placeholder="Ex&nbsp;: Villa Bretagne, Jean Dupont..."
+            value="{{ request('q') }}" autocomplete="off">
         </div>
         <button type="submit" class="submit-button">
           @svg('mdi-magnify')
@@ -115,12 +118,13 @@
       top: 0;
       background: white;
       z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
     }
 
     .close-button {
-      position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
+      align-self: flex-end;
       padding: 0.6rem;
       border-radius: 50%;
       background-color: #f5f5f7;
@@ -135,40 +139,35 @@
     }
 
     .search-tabs {
-      display: flex;
-      gap: 0.5rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.4rem;
       width: 100%;
-      margin: 3.5rem auto 0.5rem; /* Slightly reduced margin to compensate for padding */
-      overflow-x: auto;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      -webkit-overflow-scrolling: touch;
-      padding: 0.5rem 1rem; /* Added vertical padding to prevent clipping */
-    }
-
-    .search-tabs::-webkit-scrollbar {
-      display: none;
+      box-sizing: border-box;
+      margin: 0 auto 0.5rem;
+      padding: 0;
+      overflow: visible;
     }
 
     .tab-button {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      flex: 1;
-      min-width: max-content;
-      min-height: 3rem;
-      font-weight: 600;
-      color: var(--clr-text-dark);
-      padding: 0.6rem 1rem;
-      border: 1.5px solid #e5e5e7;
-      border-radius: 14px;
-      background-color: #fafafa;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 0.85rem;
+      min-width: 0;
+      width: 100%;
+      gap: 0.3rem;
+      padding: 0.55rem 0.35rem;
+      font-size: 0.78rem;
+      border-radius: 12px;
+    }
+
+    .tab-button span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
     }
+
 
     .tab-button svg {
       width: 1.1rem;
@@ -362,12 +361,12 @@
 
 @push('scripts')
   <script>
-    (function() {
+    (function () {
       function init() {
         // Global-ish state attached to window to avoid redeclaration errors if component is included twice
         window.autocompleteInstances = window.autocompleteInstances || new Map();
 
-        window.openSearchModal = window.openSearchModal || function() {
+        window.openSearchModal = window.openSearchModal || function () {
           const modal = document.getElementById('search-modal');
           if (!modal) return;
           const initialTab = modal.dataset.initialTab || 'stays';
@@ -376,13 +375,13 @@
           switchTab(initialTab);
         };
 
-        window.closeSearchModal = window.closeSearchModal || function() {
+        window.closeSearchModal = window.closeSearchModal || function () {
           const modal = document.getElementById('search-modal');
           if (modal) modal.classList.remove('active');
           document.body.style.overflow = '';
         };
 
-        window.switchTab = window.switchTab || function(tab) {
+        window.switchTab = window.switchTab || function (tab) {
           // Update buttons
           document.querySelectorAll('.tab-button').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.tab === tab);
@@ -432,13 +431,13 @@
             items = data;
 
             dropdown.innerHTML = data.map((d, i) => `
-              <div class="autocomplete-item" data-index="${i}" data-name="${d.name}">
-                <div>
-                  <div class="item-name">${d.name}</div>
-                  ${d.region ? `<div class="item-region">${d.region}</div>` : ''}
+                <div class="autocomplete-item" data-index="${i}" data-name="${d.name}">
+                  <div>
+                    <div class="item-name">${d.name}</div>
+                    ${d.region ? `<div class="item-region">${d.region}</div>` : ''}
+                  </div>
                 </div>
-              </div>
-            `).join('');
+              `).join('');
 
             dropdown.classList.add('visible');
           }
