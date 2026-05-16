@@ -5,7 +5,7 @@
   $visiblePhotos = $photos->take(3);
 @endphp
 
-@if($photos->isNotEmpty())
+@if($photos->count() >= 3)
   <section class="listing-gallery-grid" aria-label="Galerie photos">
     <h2>Galerie</h2>
 
@@ -42,14 +42,6 @@
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 0.5rem;
-      }
-
-      .gallery-grid--1 {
-        grid-template-columns: 1fr;
-      }
-
-      .gallery-grid--2 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .gallery-grid-item {

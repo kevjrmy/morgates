@@ -23,8 +23,7 @@ class Listing extends Model
     'region',
     'city',
     'address',
-    'latitude',
-    'longitude',
+    'map_url',
     'is_active',
     'tags',
     'contact_email',
@@ -106,5 +105,43 @@ class Listing extends Model
     }
 
     return 'mailto:' . $this->user->email;
+  }
+
+  public function getMapEmbedUrlAttribute(): ?string
+  {
+    if (!$this->map_url) {
+      if ($this->city) {
+        $q = urlencode($this->city . ($this->country ? ', ' . $this->country : ''));
+        return "https://maps.google.com/maps?q={$q}&output=embed";
+      }
+      return null;
+    }
+
+    $url = $this->map_url;
+
+    if (str_contains($url, 'maps.app.goo.gl')) {
+      $cacheKey = 'map_url_' . md5($url);
+      $url = \Illuminate\Support\Facades\Cache::remember($cacheKey, 86400, function() use ($url) {
+        $headers = @get_headers($url, 1);
+        if (!$headers) return $url;
+        $location = $headers['Location'] ?? $headers['location'] ?? $url;
+        return is_array($location) ? end($location) : $location;
+      });
+    }
+
+    if (preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $matches)) {
+      return "https://maps.google.com/maps?q={$matches[1]},{$matches[2]}&output=embed";
+    }
+
+    if (preg_match('/\/place\/([^\/\?]+)/', $url, $matches)) {
+      return "https://maps.google.com/maps?q=" . $matches[1] . "&output=embed";
+    }
+    
+    if (preg_match('/[\?&]q=([^&]+)/', $url, $matches)) {
+      return "https://maps.google.com/maps?q=" . $matches[1] . "&output=embed";
+    }
+
+    $fallback = $this->city ? ($this->city . ($this->country ? ', ' . $this->country : '')) : 'France';
+    return "https://maps.google.com/maps?q=" . urlencode($fallback) . "&output=embed";
   }
 }

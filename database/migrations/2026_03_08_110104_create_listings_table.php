@@ -29,8 +29,7 @@ return new class extends Migration {
       $table->string('city');
       $table->json('tags')->nullable();
       $table->string('address')->nullable();
-      $table->decimal('latitude', 10, 7)->nullable();
-      $table->decimal('longitude', 10, 7)->nullable();
+      $table->string('map_url')->nullable();
       $table->string('contact_email')->nullable();
       $table->string('contact_phone')->nullable();
       $table->string('contact_whatsapp')->nullable();

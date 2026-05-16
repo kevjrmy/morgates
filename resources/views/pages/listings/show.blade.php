@@ -166,6 +166,26 @@
         <hr class="listing-divider">
       @endif
 
+      {{-- Map --}}
+      @if ($listing->map_embed_url)
+        <section class="listing-map">
+          <h2>Emplacement</h2>
+          <div class="map-container">
+            <iframe 
+              src="{{ $listing->map_embed_url }}" 
+              width="100%" 
+              height="100%" 
+              style="border:0;" 
+              allowfullscreen="" 
+              loading="lazy" 
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+        </section>
+
+        <hr class="listing-divider">
+      @endif
+
       <x-listings.gallery :listing="$listing" />
 
     </div>
@@ -293,7 +313,8 @@
 
     /* Description */
     .listing-description h2,
-    .listing-tags h2 {
+    .listing-tags h2,
+    .listing-map h2 {
       font-size: 1.1rem;
       font-weight: 700;
       margin-bottom: 0.75rem;
@@ -339,6 +360,21 @@
       font-size: 0.8rem;
       color: var(--clr-text-medium);
       background-color: #fff;
+    }
+
+    /* Map */
+    .map-container {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      background-color: var(--clr-tertiary);
+    }
+    
+    .map-container iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
     }
 
     .contact-list {

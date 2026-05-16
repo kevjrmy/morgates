@@ -23,3 +23,20 @@
 - Rules/norms etc
 - Footer
 - Floating price + CTA
+
+## Morgates listing show structure
+- Header buttons: back + (bookmark) + share
+- Images: 1 image + "Voir la galerie" button that opens lightbox with all images
+- Type category (w/ icon)
+- Title
+- Where (region + city)
+- Max capacity + min stay + max stay
+- Host box (profile picture + name)
+- Quick contact (email + phone + whatsapp)
+- Evaluation rating (reviews)
+- Host box (picture, name, etc)
+- Description
+- Accomodations/services/utils tags (wifi, kitchen, fridge, etc...)
+- Gallery if >=3 images
+- Map (Google Map preview)
+- Floating price + CTA (open contact bottom sheet)
