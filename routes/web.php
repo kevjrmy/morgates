@@ -100,7 +100,7 @@ Route::get('/annonces', function () {
 })->name('listings');
 
 /* Listing */
-Route::get('/annonces/{listing}', function (\App\Models\Listing $listing) {
+Route::get('/annonces/{listing:slug}', function (\App\Models\Listing $listing) {
   $listing->load('user');
   return view('pages.listings.show', compact('listing'));
 })->name('listing');

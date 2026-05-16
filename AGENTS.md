@@ -36,25 +36,21 @@ The product currently has two listing categories:
 
 If a boat is rented as a classic overnight stay instead of for sailing/touring, it belongs to the stay rental category, not the sailing rental category.
 
-Suggested internal category names:
-- `boats`
-- `stays`
-
-Suggested French UI names:
-- `Bateaux`
-- `Séjours`
-
-These names can evolve, but keep them short and easy to translate later.
+Internal DB enum values and their French UI labels:
+- `boats` → `Bateau`
+- `stays` → `Séjour`
 
 ## Contact Model
 Morgates does not include internal messaging, chat, or email forms in the MVP. Visitors contact owners directly through owner-provided contact channels.
 
-Supported MVP contact channels may include:
-- direct email address
-- phone number
-- WhatsApp
-- external website or booking/contact link
-- social media profile/link
+The `Listing` model stores the following contact fields:
+- `contact_email`
+- `contact_phone`
+- `contact_whatsapp`
+- `contact_website`
+- `contact_social_links` (JSON array)
+
+The model has a `primaryContactUrl()` helper that returns the best available contact link in order: email → phone → WhatsApp → website → owner email fallback.
 
 The contact experience should make the owner's direct channels clear and accessible without adding Morgates as an intermediary.
 
@@ -118,49 +114,76 @@ Detailed prohibited listing types, regions, owner behavior rules, and claim rule
 ## Main App Areas
 - Public home page: `/`
 - Listings index: `/annonces`
-- Listing detail pages: `/annonces/{listing}`
+- Listing detail pages: `/annonces/{listing:slug}`
 - Authentication: `/connexion`, `/inscription`, `/deconnexion`
 - Account area: `/mon-espace`
+- Account subscriptions: `/mon-espace/abonnements`
 - Account onboarding: `/bienvenue`
 - Listing creation flow: `/mon-espace/publier`
+- Legal pages: `/confidentialite`, `/conditions-utilisation`, `/a-propos`
+- Contact page: `/contact`
 
 ## Domain Model
 The main domain entity is `Listing`.
 
 Listings belong to a user and currently include fields for:
-- listing type
-- title and description
-- photos
-- nightly price and currency
-- guest and night limits
-- country, city, address, latitude, and longitude
-- active/inactive state
-- tags
-- external booking links
+- `type` (enum: `boats`, `stays`)
+- `title`, `slug`, `description`
+- `photos` (JSON array)
+- `price_amount` (decimal), `currency` (char 3, default `EUR`), `price_unit` (enum: `night`, `day`, `trip`, `week`, `month`, `contact`)
+- `capacity` (unsigned small int)
+- `min_duration`, `max_duration`, `duration_unit` (enum: `night`, `day`, `week`, `month`)
+- `country` (char 2), `region`, `city`, `address`
+- `map_url` (Google Maps URL; the model derives a Google Maps embed URL from it via `getMapEmbedUrlAttribute()`)
+- `tags` (JSON array; resolved via `config/tags.php` through `resolveTags()`)
+- `is_active` (boolean)
+- `contact_email`, `contact_phone`, `contact_whatsapp`, `contact_website`, `contact_social_links` (JSON)
+
+The model exposes helper methods: `typeLabel()`, `priceUnitLabel()`, `currencySymbol()`, `durationUnitLabel()`, `primaryContactUrl()`, `resolveTags()`, `getMapEmbedUrlAttribute()`.
+
+Listing routes use the `slug` as the route key.
+
+## Tags System
+Tags are defined in `config/tags.php` as a flat associative array keyed by slug. Each entry has `icon` and `label` fields. There are two groups of tags: stay tags and boat tags. Tags are stored as a JSON array of slugs on each listing and resolved via `Listing::resolveTags()`.
 
 ## Current Implementation State
-- Public listing browsing exists.
-- Listing filtering supports `type`, `city`, free text query `q`, and JSON tag filtering.
+- Public listing browsing and filtering exist.
+- Listing filtering on `/annonces` supports:
+  - `type` (enum filter)
+  - `city` (exact match)
+  - `region` (exact match)
+  - `q` (free text: title, description, city, owner name)
+  - `tag` (JSON contains)
+  - `price_min` / `price_max` with `price_unit` normalization (weekly equivalent)
+  - `capacity` (minimum capacity)
+  - `sort` (`price_asc`, `price_desc`; defaults to latest)
+- Listing detail page (`/annonces/{listing:slug}`) is fully built out with photos, map embed, tags, owner info, and contact channels.
 - Login, registration, logout, and account access exist.
 - Registration validates email uniqueness and strong passwords.
-- User onboarding exists for name, photo placeholder, phone, country, and bio.
-- Listing creation is currently scaffolded as a six-step Blade flow:
+- User onboarding exists for name, photo, phone, country, and bio.
+- Account dashboard (`/mon-espace`) shows the owner's listings.
+- Account subscriptions page (`/mon-espace/abonnements`) exists with placeholder plan data.
+- Legal pages (privacy, terms, about) and a contact page exist with placeholder content.
+- Listing creation is scaffolded as a six-step Blade flow:
   1. type
   2. location
   3. basics
   4. details
   5. description
   6. photos
-- The listing creation controller currently redirects between steps but does not fully persist listing data yet.
+- The listing creation controller redirects between steps but does **not** persist listing data yet.
 
 ## Important Files
 - `routes/web.php`: main web routes.
-- `app/Models/Listing.php`: listing model and casts.
+- `app/Models/Listing.php`: listing model, fillable fields, casts, and helper methods.
 - `app/Http/Controllers/AuthController.php`: login, registration, logout.
+- `app/Http/Controllers/AccountController.php`: account dashboard and subscriptions page.
 - `app/Http/Controllers/OnboardingController.php`: account onboarding saves.
-- `app/Http/Controllers/ListingController.php`: listing creation flow.
-- `resources/views/pages/`: public pages.
-- `resources/views/account/`: private account and listing creation views.
+- `app/Http/Controllers/ListingController.php`: listing creation flow (steps).
+- `config/tags.php`: tag definitions (slug → icon + French label).
+- `resources/views/pages/`: public pages (home, listings index, listing show, legal, contact).
+- `resources/views/account/`: private account pages and listing creation step views.
+- `resources/views/components/`: reusable Blade components (filter panel, search modal, listing cards, tags, etc.).
 - `resources/views/layouts/`: Blade layouts.
 - `resources/css/`: application CSS entry points.
 - `database/migrations/`: database schema.
@@ -200,9 +223,13 @@ Listings belong to a user and currently include fields for:
 - Make forms, filters, listing cards, and account flows responsive on mobile and desktop.
 
 ## Known TODOs
-- Persist the listing creation flow.
-- Implement production-ready image upload/storage. `TODO.md` mentions Cloudinary as a TODO.
-- Add confirmation email support.
+- Persist the listing creation flow (save each step to a `Listing` record).
+- Implement production-ready image upload/storage (evaluate Cloudinary).
+- Improve the owner dashboard: show listings with status, edit/delete/activate actions.
+- Add basic admin dashboard for Loïs (users, listings, basic KPIs).
+- Add owner trust fields: confirmation email, required contact details before publishing.
+- Track key MVP metrics: listing views, contact clicks by channel, owner signups, published listings.
+- Refine legal page content (privacy, terms).
 - Expand test coverage beyond the default/example tests.
 
 ## Agent Workflow Notes

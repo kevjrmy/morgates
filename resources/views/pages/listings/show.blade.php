@@ -152,19 +152,9 @@
         <hr class="listing-divider">
       @endif
 
-      {{-- Tags --}}
-      @if ($listing->tags && count($listing->tags) > 0)
-        <section class="listing-tags">
-          <h2>Équipements</h2>
-          <ul class="tags-list" role="list">
-            @foreach ($listing->tags as $tag)
-              <li class="tag">{{ $tag }}</li>
-            @endforeach
-          </ul>
-        </section>
+      <x-listings.tags :listing="$listing" />
 
-        <hr class="listing-divider">
-      @endif
+      <hr class="listing-divider">
 
       {{-- Map --}}
       @if ($listing->map_embed_url)
@@ -347,20 +337,7 @@
     }
 
     /* Tags */
-    .tags-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
 
-    .tag {
-      padding: 0.4rem 0.85rem;
-      border-radius: 99px;
-      border: var(--border);
-      font-size: 0.8rem;
-      color: var(--clr-text-medium);
-      background-color: #fff;
-    }
 
     /* Map */
     .map-container {
