@@ -20,11 +20,11 @@ return new class extends Migration {
       $table->longText('description')->nullable();
       $table->decimal('price_amount', 8, 2)->nullable();
       $table->char('currency', 3)->default('EUR');
-      $table->enum('price_unit', ['night', 'day', 'trip', 'week', 'month', 'contact'])->default('night');
+      $table->enum('price_unit', ['day', 'trip', 'week', 'month', 'contact'])->default('day');
       $table->unsignedSmallInteger('capacity')->nullable();
       $table->unsignedSmallInteger('min_duration')->nullable();
       $table->unsignedSmallInteger('max_duration')->nullable();
-      $table->enum('duration_unit', ['night', 'day', 'week', 'month'])->default('night');
+      $table->enum('duration_unit', ['day', 'week', 'month'])->default('day');
       $table->char('country', 2)->index();
       $table->string('region')->nullable()->index();
       $table->string('city');

@@ -11,9 +11,10 @@
   <meta name="robots"
     content="@yield('robots', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1')">
   <meta name="title" content="@yield('title', 'Morgates - annonces de locations en direct')">
-  <meta name="description" content="@yield('description', 'Trouvez une annonce et contactez le propriétaire directement sur Morgates')">
+  <meta name="description"
+    content="@yield('description', 'Trouvez une annonce et contactez le propriétaire directement sur Morgates')">
   <meta name="author" content="Morgates">
-  <meta name="keywords" content="@yield('keywords', 'location, direct, séjour, sortie en mer')">
+  <meta name="keywords" content="@yield('keywords', 'location, direct, hébergement, sortie en mer')">
   <link rel="canonical" href="@yield('canonical', url()->current())">
 
   <!-- Language & Locale -->
@@ -25,7 +26,8 @@
   <meta property="og:type" content="@yield('og_type', 'website')">
   <meta property="og:site_name" content="Morgages">
   <meta property="og:title" content="@yield('og_title', 'Morgates - locations en direct')">
-  <meta property="og:description" content="@yield('og_description', 'Morgates - trouvez une annonce et contactez le propriétaire directement')">
+  <meta property="og:description"
+    content="@yield('og_description', 'Morgates - trouvez une annonce et contactez le propriétaire directement')">
   <meta property="og:image" content="@yield('og_image', asset('images/Morgates.png'))">
   <meta property="og:image:width" content="512">
   <meta property="og:image:height" content="512">
@@ -33,7 +35,8 @@
   <meta property="og:url" content="{{ url()->current() }}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="@yield('twitter_title', 'Morgates - locations en direct')">
-  <meta name="twitter:description" content="@yield('twitter_description', 'Morgates - trouvez une annonce et contactez le propriétaire directement')">
+  <meta name="twitter:description"
+    content="@yield('twitter_description', 'Morgates - trouvez une annonce et contactez le propriétaire directement')">
   <meta name="twitter:image" content="@yield('twitter_image', asset('images/Morgates.png'))">
   <meta name="twitter:image:alt" content="@yield('twitter_image_alt', 'Morgates - locations en direct')">
 

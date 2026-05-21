@@ -20,9 +20,9 @@
     </ul>
 
     @if ($hasMore)
-      <button type="button" class="btn-all-tags" id="btn-all-tags-open">
+      <x-ui.more-btn id="btn-all-tags-open">
         Voir les {{ count($tags) }} équipements
-      </button>
+      </x-ui.more-btn>
 
       {{-- Bottom Sheet for all tags --}}
       <div class="bottom-sheet-overlay" id="tags-bottom-sheet" hidden>
@@ -53,56 +53,46 @@
         font-weight: 700;
         margin-bottom: 0.75rem;
       }
+
       .tags-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
       }
+
       .tag {
-        display: inline-flex;
+        display: flex;
         align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: 99px;
-        border: var(--border);
+        gap: 0.65rem;
+        padding: 0.85rem 0;
         font-size: 0.875rem;
-        color: var(--clr-text-medium);
-        background-color: #fff;
-        transition: all 0.2s ease;
+        color: var(--clr-text-dark);
       }
-      .tag:hover {
-        border-color: var(--clr-primary);
-        color: var(--clr-primary);
+
+      .tag:nth-last-child(-n+2) {
+        border-bottom: none;
       }
+
       .tag-icon {
         width: 1.1rem;
         height: 1.1rem;
         flex-shrink: 0;
         color: var(--clr-primary);
       }
+
       .tag-label {
         line-height: 1;
+        font-weight: 500;
       }
-      .btn-all-tags {
-        margin-top: 1rem;
-        width: 100%;
-        padding: 0.75rem;
-        border-radius: 0.5rem;
-        border: 1px solid var(--clr-text-dark);
-        background: #fff;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-      }
-      .btn-all-tags:hover {
-        background-color: var(--clr-tertiary);
-      }
+
+
       .tags-full-list {
         display: flex;
         flex-direction: column;
         gap: 0;
         margin-top: 1.5rem;
       }
+
       .tag-full-item {
         display: flex;
         align-items: center;
@@ -110,18 +100,22 @@
         padding: 1.25rem 0;
         border-bottom: var(--border);
       }
+
       .tag-full-item:last-child {
         border-bottom: none;
       }
+
       .tag-full-icon {
         color: var(--clr-text-dark);
         display: flex;
         align-items: center;
       }
+
       .tag-full-icon svg {
         width: 1.5rem;
         height: 1.5rem;
       }
+
       .tag-full-label {
         font-size: 1rem;
         color: var(--clr-text-dark);
@@ -132,7 +126,7 @@
   @if ($hasMore)
     @push('scripts')
       <script>
-        (function() {
+        (function () {
           const btnTagsOpen = document.getElementById('btn-all-tags-open');
           const tagsBottomSheet = document.getElementById('tags-bottom-sheet');
           const tagsClose = tagsBottomSheet?.querySelector('.bottom-sheet-close');

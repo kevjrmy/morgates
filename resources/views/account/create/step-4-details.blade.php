@@ -79,8 +79,7 @@
           <label for="duration_unit" class="lc-label">Unité de durée</label>
           <div class="lc-select-wrap">
             <select name="duration_unit" id="duration_unit" class="lc-select">
-              <option value="night" {{ old('duration_unit', $listing->duration_unit ?? 'night') === 'night' ? 'selected' : '' }}>Nuit</option>
-              <option value="day" {{ old('duration_unit', $listing->duration_unit ?? '') === 'day' ? 'selected' : '' }}>Jour</option>
+              <option value="day" {{ old('duration_unit', $listing->duration_unit ?? 'day') === 'day' ? 'selected' : '' }}>Jour</option>
               <option value="week" {{ old('duration_unit', $listing->duration_unit ?? '') === 'week' ? 'selected' : '' }}>Semaine</option>
               <option value="month" {{ old('duration_unit', $listing->duration_unit ?? '') === 'month' ? 'selected' : '' }}>Mois</option>
             </select>

@@ -8,7 +8,7 @@
     <div class="listing-top">
       <span class="listing-type">
         @switch($listing->type)
-          @case('stays') @svg('tabler-home-star') Séjour @break
+          @case('stays') @svg('tabler-home-star') Hébergement @break
           @case('boats') @svg('tabler-sailboat') Bateau @break
         @endswitch
       </span>
@@ -25,7 +25,7 @@
     </p>
     <p class="listing-price">
       @if($listing->price_amount)
-        <strong>{{ number_format($listing->price_amount, 0, ',', ' ') }} {{ $listing->currencySymbol() }}</strong>
+        <strong>À partir de {{ number_format($listing->price_amount, 0, ',', ' ') }} €</strong>
         <span>/ {{ $listing->priceUnitLabel() }}</span>
       @else
         <strong>Prix sur demande</strong>

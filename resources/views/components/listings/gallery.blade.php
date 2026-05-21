@@ -5,27 +5,23 @@
   $visiblePhotos = $photos->take(3);
 @endphp
 
-@if($photos->count() >= 3)
+@if($photos->count() >= 2)
   <section class="listing-gallery-grid" aria-label="Galerie photos">
     <h2>Galerie</h2>
 
     <div class="gallery-grid gallery-grid--{{ $visiblePhotos->count() }}" role="list">
       @foreach($visiblePhotos as $index => $photo)
         <button type="button" class="gallery-grid-item" data-gallery-index="{{ $index }}" role="listitem">
-          <img
-            src="{{ Str::startsWith($photo, 'http') ? $photo : asset('storage/' . $photo) }}"
-            alt="{{ $listing->title }} {{ $index + 1 }}"
-          >
+          <img src="{{ Str::startsWith($photo, 'http') ? $photo : asset('storage/' . $photo) }}"
+            alt="{{ $listing->title }} {{ $index + 1 }}">
         </button>
       @endforeach
     </div>
 
-    @if($photos->count() > 3)
-      <button type="button" class="gallery-grid-open" data-gallery-index="0">
-        @svg('tabler-photo-library', ['class' => 'gallery-grid-open-icon'])
-        <span>Voir la galerie</span>
-      </button>
-    @endif
+    <x-ui.more-btn data-gallery-index="0" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+      @svg('tabler-photo', ['style' => 'width: 1.25rem; height: 1.25rem;'])
+      <span>Voir les {{ $photos->count() }} photos</span>
+    </x-ui.more-btn>
   </section>
 @endif
 
@@ -66,28 +62,6 @@
         transform: scale(1.05);
       }
 
-      .gallery-grid-open {
-        width: 100%;
-        min-height: 2.75rem;
-        margin-top: 0.75rem;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.4rem;
-        padding: 0.65rem 1rem;
-        border: var(--border);
-        border-radius: 0.5rem;
-        background-color: #fff;
-        color: var(--clr-text-dark);
-        font-size: 0.9rem;
-        font-weight: 700;
-        cursor: pointer;
-      }
-
-      .gallery-grid-open-icon {
-        width: 1.1rem;
-        height: 1.1rem;
-      }
     </style>
   @endpush
 

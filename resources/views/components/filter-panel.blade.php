@@ -11,11 +11,11 @@
     <form id="filter-form" action="{{ route('listings') }}" method="GET" class="filter-panel-body">
 
       {{-- Preserve active search params --}}
-      @if(request('type'))   <input type="hidden" name="type"  value="{{ request('type') }}">  @endif
-      @if(request('city'))   <input type="hidden" name="city"  value="{{ request('city') }}">  @endif
+      @if(request('type')) <input type="hidden" name="type" value="{{ request('type') }}"> @endif
+      @if(request('city')) <input type="hidden" name="city" value="{{ request('city') }}"> @endif
       @if(request('region')) <input type="hidden" name="region" value="{{ request('region') }}"> @endif
-      @if(request('q'))      <input type="hidden" name="q"     value="{{ request('q') }}">     @endif
-      @if(request('tag'))    <input type="hidden" name="tag"   value="{{ request('tag') }}">   @endif
+      @if(request('q')) <input type="hidden" name="q" value="{{ request('q') }}"> @endif
+      @if(request('tag')) <input type="hidden" name="tag" value="{{ request('tag') }}"> @endif
 
       {{-- Sort --}}
       <div class="filter-section">
@@ -43,7 +43,8 @@
           <select name="region" class="filter-select">
             <option value="">Toutes les régions</option>
             <option value="Bretagne" {{ request('region') === 'Bretagne' ? 'selected' : '' }}>Bretagne</option>
-            <option value="Auvergne-Rhône-Alpes" {{ request('region') === 'Auvergne-Rhône-Alpes' ? 'selected' : '' }}>Auvergne-Rhône-Alpes</option>
+            <option value="Auvergne-Rhône-Alpes" {{ request('region') === 'Auvergne-Rhône-Alpes' ? 'selected' : '' }}>
+              Auvergne-Rhône-Alpes</option>
             <option value="Provence-Alpes-Côte d'Azur" {{ request('region') === "Provence-Alpes-Côte d'Azur" ? 'selected' : '' }}>Provence-Alpes-Côte d'Azur</option>
           </select>
         </div>
@@ -52,7 +53,8 @@
       {{-- City --}}
       <div class="filter-section">
         <h3 class="filter-section-label">Ville</h3>
-        <input type="text" name="city" class="filter-text-input" placeholder="Nom de la ville" value="{{ request('city') }}">
+        <input type="text" name="city" class="filter-text-input" placeholder="Nom de la ville"
+          value="{{ request('city') }}">
       </div>
 
       {{-- Price unit --}}
@@ -60,19 +62,20 @@
         <h3 class="filter-section-label">Prix</h3>
         <div class="price-filter-row">
           <select name="price_unit" class="filter-select-sm" id="price-unit-select">
-            <option value="night" {{ (request('price_unit') ?: session('price_unit', 'night')) === 'night' ? 'selected' : '' }}>nuit</option>
-            <option value="day" {{ (request('price_unit') ?: session('price_unit', 'night')) === 'day' ? 'selected' : '' }}>jour</option>
-            <option value="week" {{ (request('price_unit') ?: session('price_unit', 'night')) === 'week' ? 'selected' : '' }}>semaine</option>
-            <option value="month" {{ (request('price_unit') ?: session('price_unit', 'night')) === 'month' ? 'selected' : '' }}>mois</option>
+            <option value="day" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'day' ? 'selected' : '' }}>jour</option>
+            <option value="week" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'week' ? 'selected' : '' }}>semaine</option>
+            <option value="month" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'month' ? 'selected' : '' }}>mois</option>
           </select>
           <div class="price-range">
             <div class="price-field">
-              <input type="number" name="price_min" id="price-min" placeholder="Min" value="{{ request('price_min') }}" min="0">
+              <input type="number" name="price_min" id="price-min" placeholder="Min" value="{{ request('price_min') }}"
+                min="0">
               <span class="price-unit">€</span>
             </div>
             <span class="price-dash">—</span>
             <div class="price-field">
-              <input type="number" name="price_max" id="price-max" placeholder="Max" value="{{ request('price_max') }}" min="0">
+              <input type="number" name="price_max" id="price-max" placeholder="Max" value="{{ request('price_max') }}"
+                min="0">
               <span class="price-unit">€</span>
             </div>
           </div>
@@ -137,8 +140,15 @@
     }
 
     @keyframes fpSlideUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .filter-panel-header {
@@ -171,7 +181,9 @@
       transition: background-color 0.2s;
     }
 
-    .fp-close-btn:hover { background-color: #e5e5e7; }
+    .fp-close-btn:hover {
+      background-color: #e5e5e7;
+    }
 
     .filter-panel-body {
       flex: 1;
@@ -526,7 +538,9 @@
       height: 1.2rem;
     }
 
-    .filter-submit-btn:active { transform: scale(0.98); }
+    .filter-submit-btn:active {
+      transform: scale(0.98);
+    }
   </style>
 @endpush
 
@@ -576,7 +590,7 @@
     function resetFilters() {
       document.querySelector('input[name="sort"][value="latest"]').checked = true
       document.querySelector('select[name="region"]').value = ''
-      document.getElementById('price-unit-select').value = 'night'
+      document.getElementById('price-unit-select').value = 'day'
       document.getElementById('price-min').value = ''
       document.getElementById('price-max').value = ''
       capacityValue = 0

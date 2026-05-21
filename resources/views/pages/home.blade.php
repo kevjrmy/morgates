@@ -18,7 +18,7 @@
 
     @if($listings->where('type', 'boats')->isNotEmpty())
       <section class="listings-section">
-      <h2>Bateaux récemment ajoutés</h2>
+        <h2>Bateaux récemment ajoutés</h2>
         <div class="listings-scroll">
           @foreach($listings->where('type', 'boats')->take(5) as $listing)
             <x-home.listing-card :listing="$listing" />
@@ -40,7 +40,7 @@
             @svg('mdi-magnify')
           </div>
           <h3>Explorez</h3>
-          <p>Parcourez une sélection d'annonces authentiques de bateaux et de séjours.</p>
+          <p>Parcourez une sélection d'annonces authentiques de bateaux et d'hébergements.</p>
         </div>
 
         <div class="step">
@@ -58,8 +58,13 @@
           <h3>Profitez</h3>
           <p>Réservez en direct, sans commission ni frais de service intermédiaires.</p>
         </div>
+      </div>
+
       <div class="how-it-works-footer">
-        <p>Vous voulez en savoir plus ? <a href="{{ route('contact') }}">Contactez-nous</a></p>
+        <a href="{{ route('contact') }}" class="footer-cta">
+          Vous voulez en savoir plus ?
+          <span>Contactez-nous</span>
+        </a>
       </div>
     </section>
 
@@ -75,7 +80,7 @@
       row-gap: 3.5rem;
       padding-bottom: 3rem;
     }
-    
+
     section {
       padding: 0 1.5rem;
     }
@@ -89,9 +94,8 @@
 
     /* How it works section */
     .how-it-works {
-      background: linear-gradient(180deg, transparent, var(--clr-softblue) 50%, transparent);
-      padding: 4rem 1.5rem;
-      margin: 1rem 0;
+      background: linear-gradient(180deg, transparent, rgba(213, 229, 255, 0.35) 40%, rgba(213, 229, 255, 0.15) 70%, transparent);
+      padding: 1.5rem;
     }
 
     .how-it-works-header {
@@ -100,10 +104,10 @@
     }
 
     .how-it-works-header h2 {
-      font-size: 1.75rem;
+      font-size: 1.85rem;
       font-weight: 800;
       color: var(--clr-text-dark);
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
     }
 
     .how-it-works-header p {
@@ -116,7 +120,7 @@
 
     .steps-grid {
       display: grid;
-      gap: 2rem;
+      gap: 1.5rem;
       max-width: 1000px;
       margin: 0 auto;
       grid-template-columns: 1fr;
@@ -128,59 +132,50 @@
       align-items: center;
       text-align: center;
       gap: 0.75rem;
-      padding: 2rem 1.5rem;
+      padding: 1.5rem;
       background: white;
-      border-radius: 28px;
-      border: 1px solid rgba(0, 68, 170, 0.05);
-      box-shadow: 0 10px 25px -5px rgba(0, 68, 170, 0.05);
-      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    }
-
-    .step:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 20px 40px -10px rgba(0, 68, 170, 0.12);
-      border-color: rgba(0, 68, 170, 0.1);
+      border-radius: 20px;
+      border: 1px solid rgba(0, 68, 170, 0.06);
+      box-shadow: 0 8px 20px -6px rgba(0, 68, 170, 0.06);
+      position: relative;
+      transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
     }
 
     .step-icon {
-      width: 64px;
-      height: 64px;
-      background: var(--clr-softblue);
-      color: var(--clr-primary);
-      border-radius: 20px;
+      width: 48px;
+      height: 48px;
+      background: var(--clr-primary);
+      color: white;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 0.75rem;
-      transition: transform 0.3s ease;
-    }
-
-    .step:hover .step-icon {
-      transform: scale(1.05) rotate(5deg);
+      transition: transform 0.3s ease, background 0.3s ease;
     }
 
     .step-icon svg {
-      width: 32px;
-      height: 32px;
+      width: 24px;
+      height: 24px;
     }
 
     .step h3 {
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       font-weight: 700;
       color: var(--clr-text-dark);
       letter-spacing: -0.01em;
     }
 
     .step p {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: var(--clr-text-medium);
       line-height: 1.6;
+      max-width: 260px;
     }
 
     @media (min-width: 768px) {
       .steps-grid {
         grid-template-columns: repeat(3, 1fr);
-        gap: 1.5rem;
+        gap: 1.25rem;
       }
 
       .how-it-works {
@@ -190,21 +185,36 @@
 
     .how-it-works-footer {
       text-align: center;
-      margin-top: 3.5rem;
-      font-size: 1rem;
-      color: var(--clr-text-medium);
+      margin-top: 3rem;
     }
 
-    .how-it-works-footer a {
+    .footer-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.65rem 1.5rem;
+      background: white;
+      border: 1px solid rgba(0, 68, 170, 0.08);
+      border-radius: 100px;
+      font-size: 0.9rem;
+      color: var(--clr-text-medium);
+      box-shadow: 0 4px 12px -4px rgba(0, 68, 170, 0.06);
+      transition: all 0.3s ease;
+    }
+
+    .footer-cta:hover {
+      box-shadow: 0 8px 20px -8px rgba(0, 68, 170, 0.1);
+      border-color: rgba(0, 68, 170, 0.15);
+      transform: translateY(-1px);
+
+      span {
+        text-decoration: underline;
+      }
+    }
+
+    .footer-cta span {
       color: var(--clr-primary);
       font-weight: 700;
-      text-decoration: underline;
-      text-underline-offset: 4px;
-      transition: color 0.3s ease;
-    }
-
-    .how-it-works-footer a:hover {
-      color: var(--clr-marine);
     }
   </style>
 @endpush

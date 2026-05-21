@@ -42,7 +42,7 @@
     <a href="{{ route('listings', ['type' => 'stays']) }}"
       class="{{ request()->routeIs('listings') && request('type') === 'stays' ? 'active' : '' }}">
       @svg('tabler-home-star')
-      Séjours
+      Hébergements
     </a>
     <a href="{{ route('listings.create.index') }}"
       class="{{ request()->routeIs('listings.create.*') ? 'active' : '' }}">

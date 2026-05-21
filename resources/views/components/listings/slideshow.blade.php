@@ -21,8 +21,8 @@
           alt="{{ $listing->title }}"
         >
         <button type="button" class="gallery-hero-btn" id="btn-open-gallery">
-          @svg('tabler-photo-library', ['class' => 'gallery-hero-btn-icon'])
-          <span>Voir la galerie</span>
+          @svg('tabler-photo', ['class' => 'gallery-hero-btn-icon'])
+          <span>Voir les photos</span>
         </button>
       </div>
     @endif

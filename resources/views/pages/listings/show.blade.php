@@ -16,7 +16,7 @@
       <section class="listing-header">
         <div class="listing-type">
           @switch($listing->type)
-            @case('stays') @svg('tabler-home-star') Séjour @break
+            @case('stays') @svg('tabler-home-star') Hébergement @break
             @case('boats') @svg('tabler-sailboat') Bateau @break
           @endswitch
         </div>
@@ -104,7 +104,7 @@
                 <span class="contact-icon">@svg('tabler-brand-whatsapp')</span>
                 <span class="contact-label">WhatsApp</span>
                 <span class="contact-reveal" hidden>
-                  <span class="contact-value">wa.me/{{ preg_replace('/\D+/', '', $listing->contact_whatsapp) }}</span>
+                  <span class="contact-value">Ouvrir WhatsApp</span>
                   <a class="contact-open" href="https://wa.me/{{ preg_replace('/\D+/', '', $listing->contact_whatsapp) }}" target="_blank" rel="noopener noreferrer" title="Ouvrir">@svg('tabler-external-link')</a>
                 </span>
               </button>
@@ -181,34 +181,24 @@
     </div>
     {{-- end listing-content --}}
 
-    {{-- Contact bar spacer --}}
-    <div class="contact-bar-spacer"></div>
 
   </main>
 @endsection
 
 @section('contact-bar')
-  <div class="contact-bar">
-    <div class="contact-price">
-      @if($listing->price_amount)
-        <span class="price-amount">{{ number_format($listing->price_amount, 0, ',', ' ') }}
-          {{ $listing->currencySymbol() }}</span>
-        <span class="price-label">/ {{ $listing->priceUnitLabel() }}</span>
-      @else
-        <span class="price-amount">Prix sur demande</span>
-      @endif
-    </div>
-    <button type="button" class="btn-contact" id="btn-contact-open">
-      Contacter directement
-    </button>
-  </div>
-  <x-listings.contact-bottom-sheet :listing="$listing" />
+  <x-listings.cta :listing="$listing" />
 @endsection
 
 @push('styles')
   <style>
     #listing-page {
-      padding-bottom: 2rem;
+      padding-bottom: calc(2rem + 130px);
+    }
+
+    @media (min-width: 380px) {
+      #listing-page {
+        padding-bottom: calc(2rem + 80px);
+      }
     }
 
     /* Content */
@@ -493,106 +483,6 @@
       height: 0.95rem;
     }
 
-    /* Contact bar */
-    .contact-bar-spacer {
-      height: 110px;
-    }
-
-    @media (min-width: 320px) {
-      .contact-bar-spacer {
-        height: 80px;
-      }
-    }
-
-    .contact-bar {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      translate: -50% 0;
-      width: 100%;
-      max-width: var(--max-width);
-      background-color: #fff;
-      border-top: var(--border);
-      padding: 0.75rem 1.25rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      z-index: 100;
-      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
-    }
-
-    .contact-price {
-      display: flex;
-      align-items: baseline;
-      gap: 0.25rem;
-      line-height: 1.2;
-    }
-
-    .price-amount {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--clr-text-dark);
-    }
-
-    .price-label {
-      font-size: 0.8rem;
-      color: var(--clr-text-light);
-    }
-
-    .btn-contact {
-      width: 100%;
-      padding: 0.8rem 1.25rem;
-      border-radius: 0.75rem;
-      background-color: var(--clr-primary);
-      color: #fff;
-      font-size: 0.95rem;
-      font-weight: 700;
-      transition: opacity 0.2s ease;
-      white-space: nowrap;
-    }
-
-    .btn-contact:hover {
-      opacity: 0.9;
-    }
-
-    @media (min-width: 320px) {
-      .contact-bar {
-        flex-direction: row;
-        justify-content: space-between;
-        gap: 0.75rem;
-      }
-      .contact-price {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .btn-contact {
-        width: auto;
-      }
-    }
-
-    @media (min-width: 400px) {
-      .contact-bar {
-        padding: 1rem 1.5rem;
-        gap: 1.5rem;
-      }
-      .contact-price {
-        flex-direction: row;
-        align-items: baseline;
-        gap: 0.25rem;
-      }
-      .price-amount {
-        font-size: 1.25rem;
-      }
-      .price-label {
-        font-size: 0.875rem;
-      }
-      .btn-contact {
-        padding: 0.85rem 2rem;
-        font-size: 1rem;
-      }
-    }
-
     /* Bottom sheet */
     .bottom-sheet-overlay {
       position: fixed;
@@ -725,6 +615,11 @@ document.querySelectorAll('.contact-item').forEach(item => {
     }
 
     if (e.target.closest('.contact-open')) return
+
+    if (item.dataset.type === 'whatsapp' && item.dataset.href && item.dataset.state === 'open') {
+      window.open(item.dataset.href, '_blank', 'noopener')
+      return
+    }
 
     if (openItem && openItem !== item) {
       openItem.dataset.state = 'closed'

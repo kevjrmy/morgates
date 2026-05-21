@@ -1,6 +1,6 @@
 {{--
-  listings/create/step-1-type.blade.php
-  Step 1: Choose listing type
+listings/create/step-1-type.blade.php
+Step 1: Choose listing type
 --}}
 @extends('layouts.listing-create')
 
@@ -18,14 +18,16 @@
 
       <div class="lc-type-grid">
         <label class="lc-type-card {{ old('type', $listing->type ?? '') === 'stays' ? 'selected' : '' }}">
-          <input type="radio" name="type" value="stays" {{ old('type', $listing->type ?? '') === 'stays' ? 'checked' : '' }} required>
+          <input type="radio" name="type" value="stays" {{ old('type', $listing->type ?? '') === 'stays' ? 'checked' : '' }}
+            required>
           @svg('tabler-home-star')
-          <span class="lc-type-label">Séjour</span>
+          <span class="lc-type-label">Hébergement</span>
           <span class="lc-type-desc">Maison, appartement, chambre, lieu insolite…</span>
         </label>
 
         <label class="lc-type-card {{ old('type', $listing->type ?? '') === 'boats' ? 'selected' : '' }}">
-          <input type="radio" name="type" value="boats" {{ old('type', $listing->type ?? '') === 'boats' ? 'checked' : '' }} required>
+          <input type="radio" name="type" value="boats" {{ old('type', $listing->type ?? '') === 'boats' ? 'checked' : '' }}
+            required>
           @svg('tabler-sailboat')
           <span class="lc-type-label">Bateau</span>
           <span class="lc-type-desc">Voilier, catamaran, bateau moteur, balade nautique…</span>

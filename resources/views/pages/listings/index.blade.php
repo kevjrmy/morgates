@@ -5,25 +5,17 @@
 
     {{-- Search + filter bar --}}
     @php
-      $initialTab      = request('q') ? 'name' : (request('type') ?: 'stays');
+      $initialTab = request('q') ? 'name' : (request('type') ?: 'stays');
       $hasSearchParams = request()->hasAny(['type', 'city', 'region', 'q', 'tag']);
       $hasFilterParams = request()->hasAny(['price_min', 'price_max', 'capacity'])
-                         || (request('sort') && request('sort') !== 'latest');
+        || (request('sort') && request('sort') !== 'latest');
       $searchPlaceholder = $hasSearchParams ? 'Modifier la recherche' : 'Rechercher';
     @endphp
 
     <div class="search-trigger-bar">
-      <x-searchbar
-        :placeholder="$searchPlaceholder"
-        :initial-tab="$initialTab"
-      />
-      <button
-        type="button"
-        id="filter-icon-btn"
-        class="filter-icon-btn {{ $hasFilterParams ? 'is-active' : '' }}"
-        onclick="openFilterPanel()"
-        aria-label="Ouvrir les filtres"
-      >
+      <x-searchbar :placeholder="$searchPlaceholder" :initial-tab="$initialTab" />
+      <button type="button" id="filter-icon-btn" class="filter-icon-btn {{ $hasFilterParams ? 'is-active' : '' }}"
+        onclick="openFilterPanel()" aria-label="Ouvrir les filtres">
         @svg('tabler-adjustments-horizontal')
       </button>
     </div>
@@ -36,7 +28,7 @@
 
         @if(request('type'))
           <div class="filter-chip filter-chip--type">
-            @if(request('type') === 'stays') @svg('tabler-home-star') <span>Séjours</span>
+            @if(request('type') === 'stays') @svg('tabler-home-star') <span>Hébergements</span>
             @else @svg('tabler-sailboat') <span>Bateaux</span>
             @endif
             <a href="{{ route('listings', request()->except('type')) }}" aria-label="Retirer">@svg('tabler-x')</a>
@@ -203,14 +195,18 @@
       transition: opacity 0.15s;
     }
 
-    .filter-chip a:hover { opacity: 1; }
+    .filter-chip a:hover {
+      opacity: 1;
+    }
 
     .filter-chip--type {
       background-color: var(--clr-primary);
       color: #fff;
     }
 
-    .filter-chip--type a { color: #fff; }
+    .filter-chip--type a {
+      color: #fff;
+    }
 
     .filter-chip--search {
       background-color: var(--clr-softblue);
@@ -218,14 +214,18 @@
       border: 1px solid rgba(0, 68, 170, 0.15);
     }
 
-    .filter-chip--search a { color: var(--clr-primary); }
+    .filter-chip--search a {
+      color: var(--clr-primary);
+    }
 
     .filter-chip--q {
       background-color: var(--clr-text-dark);
       color: #fff;
     }
 
-    .filter-chip--q a { color: #fff; }
+    .filter-chip--q a {
+      color: #fff;
+    }
 
     .filter-chip--filter {
       background-color: #f0f4ff;
@@ -233,7 +233,9 @@
       border: 1px solid rgba(0, 68, 170, 0.2);
     }
 
-    .filter-chip--filter a { color: var(--clr-primary); }
+    .filter-chip--filter a {
+      color: var(--clr-primary);
+    }
 
     /* Results */
     .search-results {

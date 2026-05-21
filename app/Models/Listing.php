@@ -71,7 +71,7 @@ class Listing extends Model
   {
     return match ($this->type) {
       'boats' => 'Bateau',
-      'stays' => 'Séjour',
+      'stays' => 'Hébergement',
       default => 'Annonce',
     };
   }
@@ -84,19 +84,10 @@ class Listing extends Model
       'week' => 'semaine',
       'month' => 'mois',
       'contact' => 'sur demande',
-      default => 'nuit',
+      default => 'jour',
     };
   }
 
-  public function currencySymbol(): string
-  {
-    return match ($this->currency) {
-      'EUR' => '€',
-      'USD' => '$',
-      'GBP' => '£',
-      default => $this->currency ?? '€',
-    };
-  }
 
   public function durationUnitLabel(): string
   {
@@ -104,7 +95,7 @@ class Listing extends Model
       'day' => 'jour',
       'week' => 'semaine',
       'month' => 'mois',
-      default => 'nuit',
+      default => 'jour',
     };
   }
 
@@ -188,10 +179,12 @@ class Listing extends Model
     $slug = $baseSlug;
     $suffix = 2;
 
-    while (static::query()
-      ->when($ignoreId, fn($query) => $query->whereKeyNot($ignoreId))
-      ->where('slug', $slug)
-      ->exists()) {
+    while (
+      static::query()
+        ->when($ignoreId, fn($query) => $query->whereKeyNot($ignoreId))
+        ->where('slug', $slug)
+        ->exists()
+    ) {
       $slug = $baseSlug . '-' . $suffix;
       $suffix++;
     }

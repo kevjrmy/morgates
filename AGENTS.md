@@ -107,6 +107,7 @@ Detailed prohibited listing types, regions, owner behavior rules, and claim rule
 - Vite
 - Vanilla CSS
 - Vanilla JavaScript
+- Tabler Icons (via `blade-tabler-icons`)
 - SQLite for local development
 - PHPUnit via Laravel's test runner
 - Hostinger for hosting
@@ -130,21 +131,21 @@ Listings belong to a user and currently include fields for:
 - `type` (enum: `boats`, `stays`)
 - `title`, `slug`, `description`
 - `photos` (JSON array)
-- `price_amount` (decimal), `currency` (char 3, default `EUR`), `price_unit` (enum: `night`, `day`, `trip`, `week`, `month`, `contact`)
+- `price_amount` (decimal), `currency` (char 3, default `EUR`), `price_unit` (enum: `day`, `trip`, `week`, `month`, `contact`)
 - `capacity` (unsigned small int)
-- `min_duration`, `max_duration`, `duration_unit` (enum: `night`, `day`, `week`, `month`)
+- `min_duration`, `max_duration`, `duration_unit` (enum: `day`, `week`, `month`)
 - `country` (char 2), `region`, `city`, `address`
 - `map_url` (Google Maps URL; the model derives a Google Maps embed URL from it via `getMapEmbedUrlAttribute()`)
 - `tags` (JSON array; resolved via `config/tags.php` through `resolveTags()`)
 - `is_active` (boolean)
 - `contact_email`, `contact_phone`, `contact_whatsapp`, `contact_website`, `contact_social_links` (JSON)
 
-The model exposes helper methods: `typeLabel()`, `priceUnitLabel()`, `currencySymbol()`, `durationUnitLabel()`, `primaryContactUrl()`, `resolveTags()`, `getMapEmbedUrlAttribute()`.
+The model exposes helper methods: `typeLabel()`, `priceUnitLabel()`, `durationUnitLabel()`, `primaryContactUrl()`, `resolveTags()`, `getMapEmbedUrlAttribute()`.
 
 Listing routes use the `slug` as the route key.
 
 ## Tags System
-Tags are defined in `config/tags.php` as a flat associative array keyed by slug. Each entry has `icon` and `label` fields. There are two groups of tags: stay tags and boat tags. Tags are stored as a JSON array of slugs on each listing and resolved via `Listing::resolveTags()`.
+Tags are defined in `config/tags.php` as a flat associative array keyed by slug. Each entry has `icon` and `label` fields. The `icon` must be a valid Tabler Icon name (rendered via the `blade-tabler-icons` package). There are two groups of tags: stay tags and boat tags. Tags are stored as a JSON array of slugs on each listing and resolved via `Listing::resolveTags()`.
 
 ## Current Implementation State
 - Public listing browsing and filtering exist.
@@ -184,6 +185,7 @@ Tags are defined in `config/tags.php` as a flat associative array keyed by slug.
 - `resources/views/pages/`: public pages (home, listings index, listing show, legal, contact).
 - `resources/views/account/`: private account pages and listing creation step views.
 - `resources/views/components/`: reusable Blade components (filter panel, search modal, listing cards, tags, etc.).
+- `resources/views/components/ui/`: generic reusable UI components (buttons, etc.).
 - `resources/views/layouts/`: Blade layouts.
 - `resources/css/`: application CSS entry points.
 - `database/migrations/`: database schema.
