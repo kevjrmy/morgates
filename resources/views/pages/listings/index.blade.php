@@ -6,7 +6,7 @@
     {{-- Search + filter bar --}}
     @php
       $initialTab = request('q') ? 'name' : (request('type') ?: 'stays');
-      $hasSearchParams = request()->hasAny(['type', 'city', 'region', 'q', 'tag']);
+      $hasSearchParams = request()->hasAny(['type', 'city', 'region', 'q', 'tag', 'include_nearby']);
       $hasFilterParams = request()->hasAny(['price_min', 'price_max', 'capacity'])
         || (request('sort') && request('sort') !== 'latest');
       $searchPlaceholder = $hasSearchParams ? 'Modifier la recherche' : 'Rechercher';
@@ -39,6 +39,13 @@
           <div class="filter-chip filter-chip--search">
             @svg('tabler-map-pin') <span>{{ request('city') }}</span>
             <a href="{{ route('listings', request()->except('city')) }}" aria-label="Retirer">@svg('tabler-x')</a>
+          </div>
+        @endif
+
+        @if(request()->boolean('include_nearby') && request('city') && !request('region') && !request('q'))
+          <div class="filter-chip filter-chip--filter">
+            @svg('tabler-route') <span>+ destinations proches (20 km)</span>
+            <a href="{{ route('listings', request()->except('include_nearby')) }}" aria-label="Retirer">@svg('tabler-x')</a>
           </div>
         @endif
 

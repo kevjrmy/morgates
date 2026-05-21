@@ -32,6 +32,10 @@
           <input type="text" name="city" id="city-stays" placeholder="Ville ou région" value="{{ request('city') }}"
             autocomplete="off">
         </div>
+        <label class="nearby-toggle">
+          <input type="checkbox" name="include_nearby" value="1" {{ request()->boolean('include_nearby') ? 'checked' : '' }}>
+          <span>Inclure les destinations proches (20 km)</span>
+        </label>
         <button type="submit" class="submit-button">
           @svg('mdi-magnify')
           <span>Rechercher</span>
@@ -46,6 +50,10 @@
           <input type="text" name="city" id="city-boats" placeholder="Ville ou port" value="{{ request('city') }}"
             autocomplete="off">
         </div>
+        <label class="nearby-toggle">
+          <input type="checkbox" name="include_nearby" value="1" {{ request()->boolean('include_nearby') ? 'checked' : '' }}>
+          <span>Inclure les destinations proches (20 km)</span>
+        </label>
         <button type="submit" class="submit-button">
           @svg('mdi-magnify')
           <span>Rechercher</span>
@@ -57,7 +65,7 @@
         <div class="name-search-intro">
           <p>Vous avez vu une annonce ailleurs ? Retrouvez-la ici en tapant son nom ou celui de l'hôte.</p>
         </div>
-        <div class="form-group">
+        <div class="form-group has-autocomplete" data-suggest-url="/api/listings/suggest" data-suggest-mode="navigate">
           <label for="q-name">@svg('mdi-text-search') Nom de l'annonce ou de l'hôte</label>
           <input type="text" name="q" id="q-name" placeholder="Ex&nbsp;: Villa Bretagne, Jean Dupont..."
             value="{{ request('q') }}" autocomplete="off">
@@ -252,6 +260,26 @@
       box-shadow: 0 0 0 4px rgba(0, 68, 170, 0.1);
     }
 
+    .nearby-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.95rem 1rem;
+      border: 1.5px solid #eee;
+      border-radius: 16px;
+      background-color: #fafafa;
+      color: var(--clr-text-dark);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .nearby-toggle input {
+      width: 1rem;
+      height: 1rem;
+      accent-color: var(--clr-primary);
+      flex-shrink: 0;
+    }
+
     .submit-button {
       display: flex;
       align-items: center;
@@ -356,6 +384,8 @@
       font-size: 0.9rem;
       text-align: center;
     }
+
+
   </style>
 @endpush
 
@@ -430,14 +460,28 @@
             highlightedIndex = -1;
             items = data;
 
-            dropdown.innerHTML = data.map((d, i) => `
+            dropdown.innerHTML = data.map((d, i) => {
+              // Listing suggestion (has 'url' field)
+              if (d.url) {
+                return `
+                  <div class="autocomplete-item" data-index="${i}" data-url="${d.url}">
+                    <div>
+                      <div class="item-name">${d.title}</div>
+                      <div class="item-region">${d.owner || ''}</div>
+                    </div>
+                  </div>
+                `
+              }
+              // Destination suggestion
+              return `
                 <div class="autocomplete-item" data-index="${i}" data-name="${d.name}">
                   <div>
                     <div class="item-name">${d.name}</div>
                     ${d.region ? `<div class="item-region">${d.region}</div>` : ''}
                   </div>
                 </div>
-              `).join('');
+              `
+            }).join('');
 
             dropdown.classList.add('visible');
           }
@@ -455,58 +499,67 @@
           }
 
           inputEl.addEventListener('input', () => {
-            const val = inputEl.value.trim();
+            const val = inputEl.value.trim()
+            const group = inputEl.closest('.form-group')
+            const suggestUrl = group?.dataset.suggestUrl || '/api/destinations'
 
-            closeDropdown();
+            closeDropdown()
 
-            if (val.length < 2) return;
+            if (val.length < 2) return
 
-            clearTimeout(debounceTimer);
-            showLoading();
+            clearTimeout(debounceTimer)
+            showLoading()
 
             debounceTimer = setTimeout(async () => {
               try {
-                const res = await fetch(`/api/destinations?q=${encodeURIComponent(val)}`);
-                if (!res.ok) throw new Error('fetch failed');
-                const data = await res.json();
-                renderResults(data);
+                const res = await fetch(`${suggestUrl}?q=${encodeURIComponent(val)}`)
+                if (!res.ok) throw new Error('fetch failed')
+                const data = await res.json()
+                renderResults(data)
               } catch {
-                closeDropdown();
+                closeDropdown()
               }
-            }, 300);
-          });
+            }, 300)
+          })
+
+          dropdown.addEventListener('click', (e) => {
+            const item = e.target.closest('.autocomplete-item')
+            if (item) {
+              if (item.dataset.url) {
+                window.location.href = item.dataset.url
+              } else {
+                inputEl.value = item.dataset.name
+                closeDropdown()
+                inputEl.focus()
+              }
+            }
+          })
 
           inputEl.addEventListener('keydown', (e) => {
-            if (!dropdown.classList.contains('visible') || items.length === 0) return;
-
+            if (!dropdown.classList.contains('visible') || items.length === 0) return
             if (e.key === 'ArrowDown') {
-              e.preventDefault();
-              setHighlight(Math.min(highlightedIndex + 1, items.length - 1));
+              e.preventDefault()
+              setHighlight(Math.min(highlightedIndex + 1, items.length - 1))
             } else if (e.key === 'ArrowUp') {
-              e.preventDefault();
-              setHighlight(Math.max(highlightedIndex - 1, 0));
+              e.preventDefault()
+              setHighlight(Math.max(highlightedIndex - 1, 0))
             } else if (e.key === 'Enter') {
               if (highlightedIndex >= 0) {
-                e.preventDefault();
-                const item = dropdown.querySelectorAll('.autocomplete-item')[highlightedIndex];
+                e.preventDefault()
+                const item = dropdown.querySelectorAll('.autocomplete-item')[highlightedIndex]
                 if (item) {
-                  inputEl.value = item.dataset.name;
-                  closeDropdown();
+                  if (item.dataset.url) {
+                    window.location.href = item.dataset.url
+                  } else {
+                    inputEl.value = item.dataset.name
+                    closeDropdown()
+                  }
                 }
               }
             } else if (e.key === 'Escape') {
-              closeDropdown();
+              closeDropdown()
             }
-          });
-
-          dropdown.addEventListener('click', (e) => {
-            const item = e.target.closest('.autocomplete-item');
-            if (item) {
-              inputEl.value = item.dataset.name;
-              closeDropdown();
-              inputEl.focus();
-            }
-          });
+          })
 
           document.addEventListener('click', (e) => {
             if (!group.contains(e.target)) closeDropdown();

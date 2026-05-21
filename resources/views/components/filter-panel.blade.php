@@ -57,12 +57,23 @@
           value="{{ request('city') }}">
       </div>
 
+      @if(request('city') && !request('region') && !request('q'))
+        <div class="filter-section">
+          <h3 class="filter-section-label">Destinations proches</h3>
+          <label class="filter-checkbox">
+            <input type="checkbox" name="include_nearby" value="1" {{ request()->boolean('include_nearby') ? 'checked' : '' }}>
+            <span>Inclure les villes dans un rayon de 20 km</span>
+          </label>
+        </div>
+      @endif
+
       {{-- Price unit --}}
       <div class="filter-section">
         <h3 class="filter-section-label">Prix</h3>
         <div class="price-filter-row">
           <select name="price_unit" class="filter-select-sm" id="price-unit-select">
-            <option value="day" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'day' ? 'selected' : '' }}>jour</option>
+            <option value="day" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'day' ? 'selected' : '' }}>
+              jour</option>
             <option value="week" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'week' ? 'selected' : '' }}>semaine</option>
             <option value="month" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'month' ? 'selected' : '' }}>mois</option>
           </select>
@@ -70,13 +81,13 @@
             <div class="price-field">
               <input type="number" name="price_min" id="price-min" placeholder="Min" value="{{ request('price_min') }}"
                 min="0">
-              <span class="price-unit">€</span>
+              <span class="price-field-currency">€</span>
             </div>
             <span class="price-dash">—</span>
             <div class="price-field">
               <input type="number" name="price_max" id="price-max" placeholder="Max" value="{{ request('price_max') }}"
                 min="0">
-              <span class="price-unit">€</span>
+              <span class="price-field-currency">€</span>
             </div>
           </div>
         </div>
@@ -115,7 +126,7 @@
 </div>
 
 @push('styles')
-  <style>
+  <style scoped>
     .filter-panel {
       position: fixed;
       inset: 0;
@@ -323,6 +334,26 @@
       color: #999;
     }
 
+    .filter-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.95rem 1rem;
+      border: 1.5px solid #eee;
+      border-radius: 14px;
+      background-color: #fafafa;
+      color: var(--clr-text-dark);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .filter-checkbox input {
+      width: 1rem;
+      height: 1rem;
+      accent-color: var(--clr-primary);
+      flex-shrink: 0;
+    }
+
     .price-filter-row {
       display: flex;
       align-items: center;
@@ -385,7 +416,7 @@
       background-color: white;
     }
 
-    .price-filter-row .price-unit {
+    .price-filter-row .price-field-currency {
       position: absolute;
       right: 0.5rem;
       top: 50%;
@@ -439,7 +470,7 @@
       box-shadow: 0 0 0 4px rgba(0, 68, 170, 0.1);
     }
 
-    .price-unit {
+    .price-field-currency {
       position: absolute;
       right: 0.85rem;
       top: 50%;
@@ -590,6 +621,10 @@
     function resetFilters() {
       document.querySelector('input[name="sort"][value="latest"]').checked = true
       document.querySelector('select[name="region"]').value = ''
+      const cityInput = document.querySelector('input[name="city"].filter-text-input')
+      const nearbyInput = document.querySelector('input[name="include_nearby"]')
+      if (cityInput) cityInput.value = ''
+      if (nearbyInput) nearbyInput.checked = false
       document.getElementById('price-unit-select').value = 'day'
       document.getElementById('price-min').value = ''
       document.getElementById('price-max').value = ''

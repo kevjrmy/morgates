@@ -60,13 +60,13 @@
       }
 
       .price-prefix {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         color: var(--clr-text-medium);
-        font-weight: 500;
+        font-weight: 400;
       }
 
       .price-amount {
-        font-size: 1rem;
+        font-size: 1.05rem;
         font-weight: 700;
         color: var(--clr-text-dark);
       }

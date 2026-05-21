@@ -20,8 +20,9 @@
     <h3 class="listing-card-title">{{ $listing->title }}</h3>
     <p class="listing-card-price">
       @if($listing->price_amount)
-        <strong>{{ number_format($listing->price_amount, 0, ',', ' ') }} €</strong>
-        / {{ $listing->priceUnitLabel() }}
+        <span class="listing-card-price-from">à partir de</span>
+        <strong class="listing-card-price-value">{{ number_format($listing->price_amount, 0, ',', ' ') }} €</strong>
+        <span class="listing-card-price-unit">/ {{ $listing->priceUnitLabel() }}</span>
       @else
         <strong>Prix sur demande</strong>
       @endif
@@ -103,13 +104,26 @@
   }
 
   .listing-card-price {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--clr-text-medium);
     margin-top: 0.25rem;
   }
 
-  .listing-card-price strong {
+  .listing-card-price-from {
+    font-size: 0.75rem;
+    color: var(--clr-text-medium);
+    font-weight: 400;
+  }
+
+  .listing-card-price-value {
+    font-size: 0.95rem;
+    font-weight: 700;
     color: var(--clr-text-dark);
+  }
+
+  .listing-card-price-unit {
+    font-size: 0.8rem;
+    color: var(--clr-text-medium);
   }
 
   .listing-card--more {

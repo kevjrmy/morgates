@@ -205,7 +205,7 @@
     .footer-cta:hover {
       box-shadow: 0 8px 20px -8px rgba(0, 68, 170, 0.1);
       border-color: rgba(0, 68, 170, 0.15);
-      transform: translateY(-1px);
+      transform: translateY(-4px);
 
       span {
         text-decoration: underline;

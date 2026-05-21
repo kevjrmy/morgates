@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\NearbyDestinationResolver;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountController;
@@ -18,13 +19,24 @@ Route::get('/', function () {
 /* Listings */
 Route::get('/annonces', function () {
   $query = \App\Models\Listing::query();
+  $includeNearby = request()->boolean('include_nearby') && request('city') && !request('region') && !request('q');
 
   if (request('type')) {
     $query->where('type', request('type'));
   }
 
   if (request('city')) {
-    $query->where('city', request('city'));
+    if ($includeNearby) {
+      $nearbyCities = app(NearbyDestinationResolver::class)->resolveCityNames(request('city'));
+
+      if (!empty($nearbyCities)) {
+        $query->whereIn('city', $nearbyCities);
+      } else {
+        $query->where('city', request('city'));
+      }
+    } else {
+      $query->where('city', request('city'));
+    }
   }
 
   if (request('region')) {
@@ -96,8 +108,36 @@ Route::get('/annonces', function () {
 
   $listings = $query->get();
 
-  return view('pages.listings.index', compact('listings'));
+  return view('pages.listings.index', compact('listings', 'includeNearby'));
 })->name('listings');
+
+/* Listing suggestions API (autocomplete) */
+Route::get('/api/listings/suggest', function () {
+  $q = trim(request('q', ''));
+  if (strlen($q) < 2) return response()->json([]);
+
+  $results = \App\Models\Listing::query()
+    ->with('user:id,name')
+    ->where(function ($query) use ($q) {
+      $query->where('title', 'like', '%' . $q . '%')
+        ->orWhereHas('user', fn($u) => $u->where('name', 'like', '%' . $q . '%'));
+    })
+    ->where('is_active', true)
+    ->orderByRaw('CASE WHEN title LIKE ? THEN 0 ELSE 1 END', ['%' . $q . '%'])
+    ->orderBy('title')
+    ->limit(8)
+    ->get(['id', 'title', 'slug', 'type', 'city', 'user_id'])
+    ->map(fn($l) => [
+      'title' => $l->title,
+      'slug'  => $l->slug,
+      'type'  => $l->typeLabel(),
+      'owner' => $l->user?->name,
+      'city'  => $l->city,
+      'url'   => route('listing', $l),
+    ]);
+
+  return response()->json($results);
+})->name('api.listings.suggest');
 
 /* Listing */
 Route::get('/annonces/{listing:slug}', function (\App\Models\Listing $listing) {

@@ -107,6 +107,7 @@ class DestinationsSeeder extends Seeder
             ['name' => 'Nice', 'type' => 'city', 'region' => 'Provence-Alpes-Côte d\'Azur', 'country' => 'FR', 'latitude' => 43.7102, 'longitude' => 7.2620],
             ['name' => 'Antibes', 'type' => 'city', 'region' => 'Provence-Alpes-Côte d\'Azur', 'country' => 'FR', 'latitude' => 43.5808, 'longitude' => 7.1237],
             ['name' => 'Cannes', 'type' => 'city', 'region' => 'Provence-Alpes-Côte d\'Azur', 'country' => 'FR', 'latitude' => 43.5528, 'longitude' => 7.0174],
+            ['name' => 'Mandelieu-la-Napoule', 'type' => 'city', 'region' => 'Provence-Alpes-Côte d\'Azur', 'country' => 'FR', 'latitude' => 43.5464, 'longitude' => 6.9399],
             ['name' => 'Avignon', 'type' => 'city', 'region' => 'Provence-Alpes-Côte d\'Azur', 'country' => 'FR', 'latitude' => 43.9493, 'longitude' => 4.8050],
             ['name' => 'Aix-en-Provence', 'type' => 'city', 'region' => 'Provence-Alpes-Côte d\'Azur', 'country' => 'FR', 'latitude' => 43.5297, 'longitude' => 5.4474],
             ['name' => 'Saint-Tropez', 'type' => 'city', 'region' => 'Provence-Alpes-Côte d\'Azur', 'country' => 'FR', 'latitude' => 43.2728, 'longitude' => 6.6407],

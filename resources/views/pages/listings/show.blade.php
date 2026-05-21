@@ -178,6 +178,17 @@
 
       <x-listings.gallery :listing="$listing" />
 
+      <hr class="listing-divider">
+
+      {{-- Share --}}
+      <section class="listing-share">
+        <p class="listing-share-label">Enregistrez ce lien en le partageant</p>
+        <button type="button" class="btn-share" id="btn-share">
+          @svg('tabler-share', ['class' => 'share-icon'])
+          <span class="btn-share-text">Partager cette annonce</span>
+        </button>
+      </section>
+
     </div>
     {{-- end listing-content --}}
 
@@ -483,6 +494,52 @@
       height: 0.95rem;
     }
 
+    /* Share */
+    .listing-share {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      text-align: center;
+      padding: 0.5rem 0 1rem;
+    }
+
+    .listing-share-label {
+      font-size: 0.85rem;
+      color: var(--clr-text-medium);
+    }
+
+    .btn-share {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.25rem;
+      border-radius: 2rem;
+      border: 1.5px solid var(--clr-border, #e0e0e0);
+      background: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--clr-text-dark);
+      cursor: pointer;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .btn-share:hover {
+      border-color: var(--clr-primary);
+      background-color: rgba(0, 68, 170, 0.04);
+    }
+
+    .btn-share.copied {
+      color: var(--clr-success);
+      border-color: var(--clr-success);
+    }
+
+    .share-icon {
+      width: 1.1rem;
+      height: 1.1rem;
+      flex-shrink: 0;
+    }
+
     /* Bottom sheet */
     .bottom-sheet-overlay {
       position: fixed;
@@ -699,6 +756,36 @@ if (btnContactOpen && contactBottomSheet) {
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !contactBottomSheet.hidden) {
       closeBottomSheet()
+    }
+  })
+}
+
+const btnShare = document.getElementById('btn-share')
+if (btnShare) {
+  btnShare.addEventListener('click', async () => {
+    const url = window.location.href
+    const title = document.title
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, url })
+      } catch (e) {
+        // user cancelled — do nothing
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url)
+        const text = btnShare.querySelector('.btn-share-text')
+        const original = text.textContent
+        btnShare.classList.add('copied')
+        text.textContent = 'Lien copié ✓'
+        setTimeout(() => {
+          btnShare.classList.remove('copied')
+          text.textContent = original
+        }, 2500)
+      } catch (e) {
+        // clipboard not available
+      }
     }
   })
 }

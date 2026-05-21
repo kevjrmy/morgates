@@ -25,8 +25,9 @@
     </p>
     <p class="listing-price">
       @if($listing->price_amount)
-        <strong>À partir de {{ number_format($listing->price_amount, 0, ',', ' ') }} €</strong>
-        <span>/ {{ $listing->priceUnitLabel() }}</span>
+        <span class="price-from">à partir de</span>
+        <strong class="price-value">{{ number_format($listing->price_amount, 0, ',', ' ') }} €</strong>
+        <span class="price-unit">/ {{ $listing->priceUnitLabel() }}</span>
       @else
         <strong>Prix sur demande</strong>
       @endif
@@ -37,7 +38,7 @@
 
 @once
 @push('styles')
-<style>
+<style scoped>
   .listing {
     display: flex;
     gap: 0.85rem;
@@ -121,14 +122,24 @@
   }
 
   .listing-price {
-    font-size: 0.9rem;
-    color: var(--clr-text-secondary);
     margin-top: auto;
   }
 
-  .listing-price strong {
-    color: var(--clr-text-primary);
-    font-size: 1rem;
+  .price-from {
+    font-size: 0.75rem;
+    color: var(--clr-text-medium);
+    font-weight: 400;
+  }
+
+  .price-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--clr-text-dark);
+  }
+
+  .price-unit {
+    font-size: 0.8rem;
+    color: var(--clr-text-secondary);
   }
 
 
