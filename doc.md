@@ -5,6 +5,3 @@
 ## Personal notes
 - Logements et bateau (section "Comment ça marche") / "Choisissez comment réserver en direct avec l'hôte" (mettre en avant que tu as le choix) / Choisissez votre mode de réservation avec l'hôte + possibilité de ne pas avoir de comission ni frais de services intermédiaire
 - Capicité minimale -> capacité
-
-## TODO
-- Enable a search by proximity (20km radius): if a user is searching for Cannes we should also display results for Mandelieu

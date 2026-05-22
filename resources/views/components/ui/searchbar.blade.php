@@ -11,7 +11,7 @@
     </span>
     <span class="search-bar-placeholder">{{ $placeholder }}</span>
   </button>
-  <x-search-modal :initial-tab="$initialTab" />
+  <x-ui.search-modal :initial-tab="$initialTab" />
 </div>
   
 @push('styles')

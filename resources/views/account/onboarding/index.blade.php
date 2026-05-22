@@ -5,6 +5,8 @@
 
 @section('content')
   <main class="auth-page" id="onboarding-page">
+    <x-ui.close-btn url="{{ route('account') }}" />
+
     <div class="auth-card onboarding-card">
 
       <div class="auth-header">
@@ -32,8 +34,8 @@
             @csrf
             <div class="form-group">
               <label for="name">Votre prénom</label>
-              <input type="text" id="name" name="name" value="{{ old('name', auth()->user()->name) }}" placeholder="Prénom"
-                autocomplete="given-name" autofocus>
+              <input type="text" id="name" name="name" value="{{ old('name', auth()->user()->name) }}"
+                placeholder="Prénom" autocomplete="given-name" autofocus>
             </div>
             <div class="onboarding-actions">
               <button type="submit" class="btn-submit">Continuer</button>
@@ -76,8 +78,20 @@
             @csrf
             <div class="form-group">
               <label for="phone">Numéro de téléphone</label>
-              <input type="tel" id="phone" name="phone" value="{{ old('phone', auth()->user()->phone) }}"
-                placeholder="+33 6 00 00 00 00" autocomplete="tel">
+              @php
+                $userCountry = auth()->user()->country ?? 'FR';
+              @endphp
+              <div class="phone-input-wrapper">
+                <select id="phone_country_select" class="phone-country-select" tabindex="-1">
+                  @foreach(config('phone_countries') as $country)
+                    <option value="{{ $country['dial'] }}" {{ $userCountry === $country['code'] ? 'selected' : '' }}>
+                      {{ $country['flag'] }} {{ $country['code'] }}
+                    </option>
+                  @endforeach
+                </select>
+                <input type="tel" id="phone" name="phone" value="{{ old('phone', auth()->user()->phone) }}"
+                  placeholder="+33 6 00 00 00 00" autocomplete="tel">
+              </div>
             </div>
             <div class="onboarding-actions">
               <button type="submit" class="btn-submit">Continuer</button>
@@ -176,6 +190,65 @@
       reader.readAsDataURL(file)
     })
 
+    // Phone input logic
+    const phoneInput = document.getElementById('phone')
+    const phoneCountrySelect = document.getElementById('phone_country_select')
+    const phoneCountries = @json(config('phone_countries'))
+    
+    if (phoneInput && phoneCountrySelect && phoneCountries) {
+      const sortedCountries = [...phoneCountries].sort((a, b) => b.dial.length - a.dial.length)
+
+      function updateSelectFromPhone() {
+        let val = phoneInput.value.trim()
+        if (val.startsWith('00')) val = '+' + val.substring(2)
+        
+        const cleanVal = val.replace(/[\s\(\)\-]/g, '')
+        if (cleanVal.startsWith('+')) {
+          const matched = sortedCountries.find(c => cleanVal.startsWith(c.dial))
+          if (matched) {
+            phoneCountrySelect.value = matched.dial
+          }
+        }
+      }
+
+      phoneInput.addEventListener('input', updateSelectFromPhone)
+
+      phoneCountrySelect.addEventListener('change', (e) => {
+        const newDial = e.target.value
+        let val = phoneInput.value.trim()
+        
+        if (!val) {
+          phoneInput.value = newDial + ' '
+          phoneInput.focus()
+          return
+        }
+
+        let normalizedVal = val
+        if (normalizedVal.startsWith('00')) normalizedVal = '+' + normalizedVal.substring(2)
+        
+        const cleanVal = normalizedVal.replace(/[\s\(\)\-]/g, '')
+        if (cleanVal.startsWith('+')) {
+          const matched = sortedCountries.find(c => cleanVal.startsWith(c.dial))
+          if (matched) {
+            let remaining = cleanVal.substring(matched.dial.length)
+            phoneInput.value = newDial + ' ' + remaining
+            phoneInput.focus()
+            return
+          }
+        }
+        
+        if (cleanVal.startsWith('0')) {
+          phoneInput.value = newDial + ' ' + cleanVal.substring(1)
+        } else {
+          phoneInput.value = newDial + ' ' + val
+        }
+        phoneInput.focus()
+      })
+
+      // Initial check
+      updateSelectFromPhone()
+    }
+
     // After form submit, go to next step (on validation error, Laravel will reload)
     // Steps advance on successful POST via redirect back with step param
     const urlStep = new URLSearchParams(window.location.search).get('step')
@@ -188,6 +261,18 @@
     .onboarding-card {
       max-width: 480px;
       overflow: hidden;
+      position: relative;
+    }
+
+    .auth-page {
+      position: relative;
+    }
+
+    .auth-page .btn-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 10;
     }
 
     /* Progress */
@@ -349,6 +434,46 @@
 
     .btn-skip:hover {
       color: var(--clr-text-medium);
+    }
+
+    /* Phone Input */
+    .phone-input-wrapper {
+      display: flex;
+      border: var(--border);
+      border-radius: 0.5rem;
+      background-color: var(--clr-background);
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+    }
+
+    .phone-input-wrapper:focus-within {
+      border-color: var(--clr-primary);
+    }
+
+    .phone-input-wrapper select.phone-country-select {
+      border: none;
+      border-right: var(--border);
+      border-radius: 0;
+      background-color: transparent;
+      width: auto;
+      padding: 0.75rem 0.5rem 0.75rem 0.75rem;
+    }
+
+    .phone-input-wrapper select.phone-country-select:focus {
+      border-color: var(--border);
+      outline: none;
+    }
+
+    .phone-input-wrapper input {
+      border: none;
+      border-radius: 0;
+      flex: 1;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      color: var(--clr-text-dark);
+      background-color: transparent;
+      outline: none;
+      width: 100%;
     }
   </style>
 @endpush

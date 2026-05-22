@@ -2,7 +2,7 @@
   <h1 id="hero-title">
     Louez <span class="highlight">sans frais</span> intermédiaires
   </h1>
-  <x-searchbar />
+  <x-ui.searchbar />
 </section>
 
 @push('scripts')

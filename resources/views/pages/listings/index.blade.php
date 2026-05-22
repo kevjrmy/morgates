@@ -13,7 +13,7 @@
     @endphp
 
     <div class="search-trigger-bar">
-      <x-searchbar :placeholder="$searchPlaceholder" :initial-tab="$initialTab" />
+      <x-ui.searchbar :placeholder="$searchPlaceholder" :initial-tab="$initialTab" />
       <button type="button" id="filter-icon-btn" class="filter-icon-btn {{ $hasFilterParams ? 'is-active' : '' }}"
         onclick="openFilterPanel()" aria-label="Ouvrir les filtres">
         @svg('tabler-adjustments-horizontal')
