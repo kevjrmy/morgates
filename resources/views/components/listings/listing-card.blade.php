@@ -2,7 +2,13 @@
 
 <a href="{{ route('listing', $listing) }}" class="listing">
   <div class="listing-photo">
-    <img src="{{ $listing->photos[0] }}" alt="{{ $listing->title }}" loading="lazy">
+    @if(!empty($listing->photos) && count($listing->photos) > 0)
+      <img src="{{ $listing->photos[0] }}" alt="{{ $listing->title }}" loading="lazy">
+    @else
+      <div class="listing-photo-fallback" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background-color: var(--color-surface-2, #f3f4f6); color: var(--color-text-muted, #9ca3af);">
+        @svg('tabler-photo-off', ['style' => 'width: 32px; height: 32px; opacity: 0.5;'])
+      </div>
+    @endif
   </div>
   <div class="listing-body">
     <div class="listing-top">

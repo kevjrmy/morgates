@@ -24,24 +24,36 @@
           <div class="lc-select-wrap">
             <select name="country" id="country" class="lc-select" required>
               <option value="" disabled {{ old('country', $listing->country ?? '') === '' ? 'selected' : '' }}>Sélectionnez un pays</option>
-              @foreach(config('countries') ?? [] as $code => $name)
-                <option value="{{ $code }}" {{ old('country', $listing->country ?? '') === $code ? 'selected' : '' }}>
-                  {{ $name }}
+              @foreach(config('countries') ?? [] as $country)
+                <option value="{{ $country['code'] }}" {{ old('country', $listing->country ?? '') === $country['code'] ? 'selected' : '' }}>
+                  {{ $country['flag'] }} {{ $country['label'] }}
                 </option>
               @endforeach
               {{-- Fallback if config not available yet --}}
               @if(!config('countries'))
-                <option value="FR" {{ old('country', $listing->country ?? '') === 'FR' ? 'selected' : '' }}>France</option>
-                <option value="ES" {{ old('country', $listing->country ?? '') === 'ES' ? 'selected' : '' }}>Espagne</option>
-                <option value="IT" {{ old('country', $listing->country ?? '') === 'IT' ? 'selected' : '' }}>Italie</option>
-                <option value="PT" {{ old('country', $listing->country ?? '') === 'PT' ? 'selected' : '' }}>Portugal</option>
-                <option value="HR" {{ old('country', $listing->country ?? '') === 'HR' ? 'selected' : '' }}>Croatie</option>
-                <option value="GR" {{ old('country', $listing->country ?? '') === 'GR' ? 'selected' : '' }}>Grèce</option>
-                <option value="ME" {{ old('country', $listing->country ?? '') === 'ME' ? 'selected' : '' }}>Monténégro</option>
+                <option value="FR" {{ old('country', $listing->country ?? '') === 'FR' ? 'selected' : '' }}>🇫🇷 France</option>
+                <option value="ES" {{ old('country', $listing->country ?? '') === 'ES' ? 'selected' : '' }}>🇪🇸 Espagne</option>
               @endif
             </select>
             @svg('tabler-chevron-down', ['class' => 'lc-select-icon'])
           </div>
+        </div>
+
+        {{-- Region --}}
+        <div class="lc-field">
+          <label for="region" class="lc-label">
+            Région ou Département
+            <span class="lc-label-optional">optionnel</span>
+          </label>
+          <input
+            type="text"
+            name="region"
+            id="region"
+            class="lc-input"
+            value="{{ old('region', $listing->region ?? '') }}"
+            placeholder="ex. PACA ou Bouches-du-Rhône"
+            maxlength="100"
+          >
         </div>
 
         {{-- City --}}
@@ -75,6 +87,24 @@
             maxlength="255"
           >
           <p class="lc-field-hint">L'adresse exacte ne sera partagée qu'après réservation.</p>
+        </div>
+
+        {{-- Map URL --}}
+        <div class="lc-field">
+          <label for="map_url" class="lc-label">
+            Lien Google Maps
+            <span class="lc-label-optional">optionnel</span>
+          </label>
+          <input
+            type="url"
+            name="map_url"
+            id="map_url"
+            class="lc-input"
+            value="{{ old('map_url', $listing->map_url ?? '') }}"
+            placeholder="ex. https://goo.gl/maps/..."
+            maxlength="255"
+          >
+          <p class="lc-field-hint">Un lien vers l'emplacement exact pour afficher une carte sur votre annonce.</p>
         </div>
 
       </div>

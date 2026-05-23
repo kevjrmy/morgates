@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Listing;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class ListingController extends Controller
 {
@@ -22,40 +25,131 @@ class ListingController extends Controller
       6 => 'account.create.step-6-photos',
     };
 
+    $listingData = $request->session()->get('listing_create', []);
+    $listing = (object) $listingData;
+
     return view($view, [
       'step'       => $step,
       'totalSteps' => $this->totalSteps,
-      'listing'    => null, // placeholder until controller is wired
+      'listing'    => $listing,
     ]);
   }
 
   public function storeType(Request $request)
   {
+    $validated = $request->validate([
+      'type' => ['required', 'in:boats,stays'],
+    ]);
+
+    $request->session()->put('listing_create.type', $validated['type']);
     return redirect()->route('listings.create.index', ['step' => 2]);
   }
 
   public function storeLocation(Request $request)
   {
+    $validated = $request->validate([
+      'country' => ['required', 'string', 'size:2'],
+      'region' => ['nullable', 'string', 'max:100'],
+      'city' => ['required', 'string', 'max:100'],
+      'address' => ['nullable', 'string', 'max:255'],
+      'map_url' => ['nullable', 'url', 'max:255'],
+    ]);
+
+    foreach ($validated as $key => $value) {
+      $request->session()->put('listing_create.'.$key, $value);
+    }
     return redirect()->route('listings.create.index', ['step' => 3]);
   }
 
   public function storeBasics(Request $request)
   {
+    $validated = $request->validate([
+      'title' => ['required', 'string', 'max:100'],
+      'price_amount' => ['nullable', 'numeric', 'min:1'],
+      'currency' => ['required', 'string', 'size:3'],
+      'price_unit' => ['required', 'in:day,trip,week,month,contact'],
+      'capacity' => ['required', 'integer', 'min:1', 'max:50'],
+    ]);
+
+    foreach ($validated as $key => $value) {
+      $request->session()->put('listing_create.'.$key, $value);
+    }
     return redirect()->route('listings.create.index', ['step' => 4]);
   }
 
   public function storeDetails(Request $request)
   {
+    $validated = $request->validate([
+      'min_duration' => ['required', 'integer', 'min:1', 'max:365'],
+      'max_duration' => ['nullable', 'integer', 'min:1', 'max:365'],
+      'duration_unit' => ['required', 'in:day,week,month'],
+      'tags' => ['nullable', 'array'],
+      'contact_email' => ['nullable', 'email', 'max:255'],
+      'contact_phone' => ['nullable', 'string', 'max:50'],
+      'contact_whatsapp' => ['nullable', 'string', 'max:50'],
+      'contact_website' => ['nullable', 'url', 'max:255'],
+    ]);
+
+    foreach ($validated as $key => $value) {
+      $request->session()->put('listing_create.'.$key, $value);
+    }
     return redirect()->route('listings.create.index', ['step' => 5]);
   }
 
   public function storeDescription(Request $request)
   {
+    $validated = $request->validate([
+      'description' => ['nullable', 'string', 'max:1000'],
+    ]);
+
+    $request->session()->put('listing_create.description', $validated['description'] ?? null);
     return redirect()->route('listings.create.index', ['step' => 6]);
   }
 
   public function storePhotos(Request $request)
   {
+    $data = $request->session()->get('listing_create', []);
+
+    if (empty($data['title']) || empty($data['city'])) {
+        return redirect()->route('listings.create.index')->with('error', 'Veuillez remplir les informations manquantes.');
+    }
+
+    $slug = Str::slug($data['title']);
+    $originalSlug = $slug;
+    $count = 1;
+    while (Listing::where('slug', $slug)->exists()) {
+        $slug = $originalSlug . '-' . $count;
+        $count++;
+    }
+
+    Listing::create([
+        'user_id' => Auth::id(),
+        'type' => $data['type'] ?? 'stays',
+        'title' => $data['title'],
+        'slug' => $slug,
+        'description' => $data['description'] ?? null,
+        'price_amount' => $data['price_amount'] ?? null,
+        'currency' => $data['currency'] ?? 'EUR',
+        'price_unit' => $data['price_unit'] ?? 'day',
+        'capacity' => $data['capacity'] ?? null,
+        'min_duration' => $data['min_duration'] ?? null,
+        'max_duration' => $data['max_duration'] ?? null,
+        'duration_unit' => $data['duration_unit'] ?? 'day',
+        'country' => $data['country'] ?? 'FR',
+        'region' => $data['region'] ?? null,
+        'city' => $data['city'] ?? '',
+        'tags' => $data['tags'] ?? [],
+        'address' => $data['address'] ?? null,
+        'map_url' => $data['map_url'] ?? null,
+        'contact_email' => $data['contact_email'] ?? null,
+        'contact_phone' => $data['contact_phone'] ?? null,
+        'contact_whatsapp' => $data['contact_whatsapp'] ?? null,
+        'contact_website' => $data['contact_website'] ?? null,
+        'is_active' => true,
+    ]);
+
+    $request->session()->forget('listing_create');
+
     return redirect()->route('account')->with('success', 'Annonce créée avec succès !');
   }
 }

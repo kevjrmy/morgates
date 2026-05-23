@@ -114,6 +114,31 @@
 
       </div>
 
+      <div class="lc-fields" style="margin-top: 2rem;">
+        <h2 class="lc-label" style="font-size: 1.125rem; font-weight: 600;">Coordonnées de contact</h2>
+        <p class="lc-field-hint">Comment les voyageurs peuvent-ils vous joindre ? (Ces informations seront publiques)</p>
+
+        <div class="lc-field">
+          <label for="contact_email" class="lc-label">Email de contact</label>
+          <input type="email" name="contact_email" id="contact_email" class="lc-input" value="{{ old('contact_email', $listing->contact_email ?? '') }}" placeholder="ex. contact@mon-domaine.com">
+        </div>
+
+        <div class="lc-field">
+          <label for="contact_phone" class="lc-label">Téléphone</label>
+          <input type="tel" name="contact_phone" id="contact_phone" class="lc-input" value="{{ old('contact_phone', $listing->contact_phone ?? '') }}" placeholder="ex. +33 6 12 34 56 78">
+        </div>
+
+        <div class="lc-field">
+          <label for="contact_whatsapp" class="lc-label">WhatsApp</label>
+          <input type="tel" name="contact_whatsapp" id="contact_whatsapp" class="lc-input" value="{{ old('contact_whatsapp', $listing->contact_whatsapp ?? '') }}" placeholder="ex. +33 6 12 34 56 78">
+        </div>
+
+        <div class="lc-field">
+          <label for="contact_website" class="lc-label">Site web personnel</label>
+          <input type="url" name="contact_website" id="contact_website" class="lc-input" value="{{ old('contact_website', $listing->contact_website ?? '') }}" placeholder="ex. https://monsite.com">
+        </div>
+      </div>
+
       <div class="lc-actions">
         <a href="{{ route('listings.create.index', ['step' => 3]) }}" class="lc-btn-back">Retour</a>
         <button type="submit" class="lc-btn-next">Continuer</button>

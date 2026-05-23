@@ -83,7 +83,7 @@
               @endphp
               <div class="phone-input-wrapper">
                 <select id="phone_country_select" class="phone-country-select" tabindex="-1">
-                  @foreach(config('phone_countries') as $country)
+                  @foreach(config('countries') as $country)
                     <option value="{{ $country['dial'] }}" {{ $userCountry === $country['code'] ? 'selected' : '' }}>
                       {{ $country['flag'] }} {{ $country['code'] }}
                     </option>
@@ -109,20 +109,26 @@
               <select id="country" name="country">
                 <option value="" disabled selected>Sélectionnez un pays</option>
                 <option value="FR" {{ auth()->user()->country === 'FR' ? 'selected' : '' }}>France</option>
-                <option value="BE" {{ auth()->user()->country === 'BE' ? 'selected' : '' }}>Belgique</option>
-                <option value="CH" {{ auth()->user()->country === 'CH' ? 'selected' : '' }}>Suisse</option>
-                <option value="LU" {{ auth()->user()->country === 'LU' ? 'selected' : '' }}>Luxembourg</option>
-                <option value="CA" {{ auth()->user()->country === 'CA' ? 'selected' : '' }}>Canada</option>
-                <option value="MA" {{ auth()->user()->country === 'MA' ? 'selected' : '' }}>Maroc</option>
-                <option value="TN" {{ auth()->user()->country === 'TN' ? 'selected' : '' }}>Tunisie</option>
-                <option value="DZ" {{ auth()->user()->country === 'DZ' ? 'selected' : '' }}>Algérie</option>
                 <option value="ES" {{ auth()->user()->country === 'ES' ? 'selected' : '' }}>Espagne</option>
                 <option value="IT" {{ auth()->user()->country === 'IT' ? 'selected' : '' }}>Italie</option>
-                <option value="DE" {{ auth()->user()->country === 'DE' ? 'selected' : '' }}>Allemagne</option>
+                <option value="CH" {{ auth()->user()->country === 'CH' ? 'selected' : '' }}>Suisse</option>
+                <option value="MC" {{ auth()->user()->country === 'MC' ? 'selected' : '' }}>Monaco</option>
+                <option value="AD" {{ auth()->user()->country === 'AD' ? 'selected' : '' }}>Andorre</option>
                 <option value="PT" {{ auth()->user()->country === 'PT' ? 'selected' : '' }}>Portugal</option>
+                <option value="BE" {{ auth()->user()->country === 'BE' ? 'selected' : '' }}>Belgique</option>
+                <option value="NL" {{ auth()->user()->country === 'NL' ? 'selected' : '' }}>Pays-Bas</option>
                 <option value="GB" {{ auth()->user()->country === 'GB' ? 'selected' : '' }}>Royaume-Uni</option>
-                <option value="US" {{ auth()->user()->country === 'US' ? 'selected' : '' }}>États-Unis</option>
+                <option value="IE" {{ auth()->user()->country === 'IE' ? 'selected' : '' }}>Irlande</option>
+                <option value="CA" {{ auth()->user()->country === 'CA' ? 'selected' : '' }}>Canada</option>
+                <option value="MT" {{ auth()->user()->country === 'MT' ? 'selected' : '' }}>Malte</option>
+                <option value="DE" {{ auth()->user()->country === 'DE' ? 'selected' : '' }}>Allemagne</option>
+                <option value="LU" {{ auth()->user()->country === 'LU' ? 'selected' : '' }}>Luxembourg</option>
               </select>
+              <details class="supported-countries-hint">
+                <summary>Voir les pays proposés</summary>
+                <p>France, Espagne, Italie, Suisse, Monaco, Andorre, Portugal, Belgique, Pays-Bas, Royaume-Uni, Irlande,
+                  Canada, Malte, Allemagne, Luxembourg.</p>
+              </details>
             </div>
             <div class="onboarding-actions">
               <button type="submit" class="btn-submit">Continuer</button>
@@ -193,20 +199,31 @@
     // Phone input logic
     const phoneInput = document.getElementById('phone')
     const phoneCountrySelect = document.getElementById('phone_country_select')
-    const phoneCountries = @json(config('phone_countries'))
-    
+    const phoneCountries = @json(config('countries'))
+
     if (phoneInput && phoneCountrySelect && phoneCountries) {
       const sortedCountries = [...phoneCountries].sort((a, b) => b.dial.length - a.dial.length)
+
+      function syncStep4Country(countryCode) {
+        const step4CountrySelect = document.getElementById('country')
+        if (step4CountrySelect) {
+          const optionExists = Array.from(step4CountrySelect.options).some(opt => opt.value === countryCode)
+          if (optionExists) {
+            step4CountrySelect.value = countryCode
+          }
+        }
+      }
 
       function updateSelectFromPhone() {
         let val = phoneInput.value.trim()
         if (val.startsWith('00')) val = '+' + val.substring(2)
-        
+
         const cleanVal = val.replace(/[\s\(\)\-]/g, '')
         if (cleanVal.startsWith('+')) {
           const matched = sortedCountries.find(c => cleanVal.startsWith(c.dial))
           if (matched) {
             phoneCountrySelect.value = matched.dial
+            syncStep4Country(matched.code)
           }
         }
       }
@@ -215,8 +232,15 @@
 
       phoneCountrySelect.addEventListener('change', (e) => {
         const newDial = e.target.value
+
+        // Sync Step 4 country
+        const matchedNew = sortedCountries.find(c => c.dial === newDial)
+        if (matchedNew) {
+          syncStep4Country(matchedNew.code)
+        }
+
         let val = phoneInput.value.trim()
-        
+
         if (!val) {
           phoneInput.value = newDial + ' '
           phoneInput.focus()
@@ -225,7 +249,7 @@
 
         let normalizedVal = val
         if (normalizedVal.startsWith('00')) normalizedVal = '+' + normalizedVal.substring(2)
-        
+
         const cleanVal = normalizedVal.replace(/[\s\(\)\-]/g, '')
         if (cleanVal.startsWith('+')) {
           const matched = sortedCountries.find(c => cleanVal.startsWith(c.dial))
@@ -236,7 +260,7 @@
             return
           }
         }
-        
+
         if (cleanVal.startsWith('0')) {
           phoneInput.value = newDial + ' ' + cleanVal.substring(1)
         } else {
@@ -474,6 +498,24 @@
       background-color: transparent;
       outline: none;
       width: 100%;
+    }
+
+    .supported-countries-hint {
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--clr-text-light);
+    }
+
+    .supported-countries-hint summary {
+      cursor: pointer;
+      text-decoration: underline;
+      display: inline-block;
+    }
+
+    .supported-countries-hint p {
+      margin-top: 0.5rem;
+      line-height: 1.5;
+      padding-left: 0.25rem;
     }
   </style>
 @endpush
