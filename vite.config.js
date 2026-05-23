@@ -10,6 +10,7 @@ export default defineConfig({
         'resources/css/footer.css',
         'resources/css/auth.css',
         'resources/css/account.css',
+        'resources/css/listing-create.css',
         'resources/js/app.js'
       ],
       refresh: true,

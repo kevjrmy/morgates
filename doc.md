@@ -5,3 +5,8 @@
 ## Personal notes
 - Logements et bateau (section "Comment ça marche") / "Choisissez comment réserver en direct avec l'hôte" (mettre en avant que tu as le choix) / Choisissez votre mode de réservation avec l'hôte + possibilité de ne pas avoir de comission ni frais de services intermédiaire
 - Capicité minimale -> capacité
+
+## TODO
+- Comment ça marche -> retirer mot "directe" + "authentique" et ajouter "hébergements et bateaux" / changer "échanger -> communiquer"
+- Réservez en direct avec les l'hôte / via différents canaux de contacts
+- 
