@@ -132,8 +132,9 @@ class Listing extends Model
   public function getMapEmbedUrlAttribute(): ?string
   {
     if (!$this->map_url) {
-      if ($this->city) {
-        $q = urlencode($this->city . ($this->country ? ', ' . $this->country : ''));
+      $fallbackParts = array_filter([$this->city, $this->region, $this->country]);
+      if ($fallbackParts) {
+        $q = urlencode(implode(', ', $fallbackParts));
         return "https://maps.google.com/maps?q={$q}&output=embed";
       }
       return null;
@@ -160,11 +161,12 @@ class Listing extends Model
       return "https://maps.google.com/maps?q=" . $matches[1] . "&output=embed";
     }
 
-    if (preg_match('/[\?&]q=([^&]+)/', $url, $matches)) {
+    if (preg_match('/[\?&](?:q|query)=([^&]+)/', $url, $matches)) {
       return "https://maps.google.com/maps?q=" . $matches[1] . "&output=embed";
     }
 
-    $fallback = $this->city ? ($this->city . ($this->country ? ', ' . $this->country : '')) : 'France';
+    $fallbackParts = array_filter([$this->city, $this->region, $this->country]);
+    $fallback = $fallbackParts ? implode(', ', $fallbackParts) : 'France';
     return "https://maps.google.com/maps?q=" . urlencode($fallback) . "&output=embed";
   }
 

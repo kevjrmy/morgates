@@ -40,7 +40,7 @@
             @svg('mdi-magnify')
           </div>
           <h3>Explorez</h3>
-          <p>Parcourez une sélection d'annonces authentiques de bateaux et d'hébergements.</p>
+          <p>Parcourez une sélection d'hébergements et de bateaux.</p>
         </div>
 
         <div class="step">
@@ -48,7 +48,7 @@
             @svg('mdi-account-voice')
           </div>
           <h3>Contactez</h3>
-          <p>Échangez directement avec les hôtes via leurs canaux de contact préférés.</p>
+          <p>Réservez en direct avec l'hôte via différents canaux de contacts.</p>
         </div>
 
         <div class="step">
@@ -56,7 +56,7 @@
             @svg('mdi-check-decagram-outline')
           </div>
           <h3>Profitez</h3>
-          <p>Réservez en direct, sans commission ni frais de service intermédiaires.</p>
+          <p>Réservez sans commission ni frais de service intermédiaires.</p>
         </div>
       </div>
 
