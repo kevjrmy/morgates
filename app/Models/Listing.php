@@ -23,6 +23,8 @@ class Listing extends Model
     'country',
     'region',
     'city',
+    'latitude',
+    'longitude',
     'address',
     'map_url',
     'is_active',
@@ -53,6 +55,8 @@ class Listing extends Model
     'photos' => 'array',
     'tags' => 'array',
     'contact_social_links' => 'array',
+    'latitude' => 'float',
+    'longitude' => 'float',
     'is_active' => 'boolean',
   ];
 

@@ -245,3 +245,15 @@ Tags are defined in `config/tags.php` as a flat associative array keyed by slug.
 ## Local Development Notes
 - Kevin usually runs `php artisan serve` from the IDE terminal during development.
 - Kevin usually has the Vite dev server/build watcher running from the IDE, so agents should not run `npm run build` unless explicitly needed or requested.
+
+## Hostinger premium plan
+- Project will be powered by Hostinger with their premium plan:
+`Storage: 20 GB SSD storage (some sources note 25 GB, but 20 GB is the standard listed spec). 
+RAM: 2 GB of memory. 
+CPU: 1 CPU core.
+Websites: Host up to 3 websites. 
+Bandwidth: Unlimited bandwidth.
+PHP Workers: 40 workers. 
+Databases: 10 databases with a 3 GB size limit. 
+Inodes: 400,000 files and directories.`
+- Therefore we need to be extra careful because MVP has to be able to run smoothly there at least until reaching ~3000 users, then we'll upgrade

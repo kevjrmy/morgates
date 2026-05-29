@@ -11,7 +11,9 @@
   - retirer mot "direct" + "authentique" et ajouter "hébergements et bateaux" // fait
   changer "échanger -> communiquer" // fait
 - "Réservez en direct avec l'hôte via différents canaux de contacts" // fait
-- page "Publier" (`resources/views/account/create/step-2-location.blade.php`): prédictif pour le google map (ville ou adresse exacte)
+- page "Publier" (`resources/views/account/create/step-2-location.blade.php`): prédictif pour le google map (ville ou adresse exacte) // fait
 - remplacer unité "sortie" sur la partie bateau par "heure" + "demi-journée" // fait
-- supprimer unité "minimum" + "unité de durée" par "jour" // fait
-- sites classiques de réservation
+- enlever les monnaies pour n'en avoir qu'une seule: Euros (€) // fait
+
+- ajout sites classiques de réservation (création annonce)
+- supprimer unité "minimum" + "unité de durée" par "jour"

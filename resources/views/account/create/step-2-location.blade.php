@@ -57,7 +57,7 @@
         </div>
 
         {{-- City --}}
-        <div class="lc-field">
+        <div class="lc-field lc-autocomplete" data-city-autocomplete>
           <label for="city" class="lc-label">Ville</label>
           <input
             type="text"
@@ -65,10 +65,15 @@
             id="city"
             class="lc-input"
             value="{{ old('city', $listing->city ?? '') }}"
-            placeholder="ex. Marseille"
+            placeholder="Sélectionnez d'abord un pays"
             required
             maxlength="100"
+            autocomplete="off"
+            {{ old('country', $listing->country ?? '') === '' ? 'disabled' : '' }}
           >
+          <div class="lc-autocomplete-list" id="city-suggestions"></div>
+          <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude', $listing->latitude ?? '') }}">
+          <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', $listing->longitude ?? '') }}">
         </div>
 
         {{-- Address --}}
@@ -151,8 +156,233 @@
     </form>
   </div>
 @endsection
+
+@push('styles')
+  <style>
+    .lc-autocomplete {
+      position: relative;
+    }
+
+    .lc-autocomplete-list {
+      position: absolute;
+      top: calc(100% + 0.45rem);
+      left: 0;
+      right: 0;
+      z-index: 30;
+      display: none;
+      max-height: 18rem;
+      overflow-y: auto;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+    }
+
+    .lc-autocomplete-list.is-open {
+      display: block;
+    }
+
+    .lc-autocomplete-item {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      background: #fff;
+    }
+
+    .lc-autocomplete-item:last-child {
+      border-bottom: 0;
+    }
+
+    .lc-autocomplete-item:hover,
+    .lc-autocomplete-item.is-active {
+      background: var(--clr-softblue);
+    }
+
+    .lc-autocomplete-name {
+      display: block;
+      color: var(--clr-text-dark);
+      font-weight: 700;
+    }
+
+    .lc-autocomplete-region {
+      display: block;
+      margin-top: 0.15rem;
+      color: var(--clr-text-medium);
+      font-size: 0.82rem;
+    }
+  </style>
+@endpush
 @push('scripts')
   <script>
+    (() => {
+      const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#039;',
+        '"': '&quot;',
+      }[char]))
+
+      function initAutocomplete({ input, list, fetchSuggestions, renderItem, onSelect }) {
+        if (!input || !list) return
+
+        let items = []
+        let activeIndex = -1
+        let timer = null
+
+        const close = () => {
+          list.classList.remove('is-open')
+          list.innerHTML = ''
+          items = []
+          activeIndex = -1
+        }
+
+        const setActive = (index) => {
+          activeIndex = index
+          list.querySelectorAll('[data-autocomplete-index]').forEach((item, itemIndex) => {
+            item.classList.toggle('is-active', itemIndex === activeIndex)
+          })
+        }
+
+        const select = (index) => {
+          const item = items[index]
+          if (!item) return
+          onSelect(item)
+          close()
+        }
+
+        input.addEventListener('input', () => {
+          clearTimeout(timer)
+          close()
+          timer = setTimeout(async () => {
+            const query = input.value.trim()
+            if (query.length < 3 || input.disabled) return
+
+            try {
+              items = await fetchSuggestions(query)
+            } catch {
+              close()
+              return
+            }
+
+            if (!items.length) {
+              close()
+              return
+            }
+
+            list.innerHTML = items.map((item, index) => `
+              <button type="button" class="lc-autocomplete-item" data-autocomplete-index="${index}">
+                ${renderItem(item)}
+              </button>
+            `).join('')
+            list.classList.add('is-open')
+          }, 300)
+        })
+
+        list.addEventListener('mousedown', (event) => {
+          const item = event.target.closest('[data-autocomplete-index]')
+          if (!item) return
+          event.preventDefault()
+          select(Number(item.dataset.autocompleteIndex))
+        })
+
+        input.addEventListener('keydown', (event) => {
+          if (!list.classList.contains('is-open')) return
+
+          if (event.key === 'ArrowDown') {
+            event.preventDefault()
+            setActive(Math.min(activeIndex + 1, items.length - 1))
+          } else if (event.key === 'ArrowUp') {
+            event.preventDefault()
+            setActive(Math.max(activeIndex - 1, 0))
+          } else if (event.key === 'Enter' && activeIndex >= 0) {
+            event.preventDefault()
+            select(activeIndex)
+          } else if (event.key === 'Escape') {
+            close()
+          }
+        })
+
+        document.addEventListener('click', (event) => {
+          if (!list.contains(event.target) && event.target !== input) close()
+        })
+      }
+
+      const countryInput = document.getElementById('country')
+      const cityInput = document.getElementById('city')
+      const regionInput = document.getElementById('region')
+      const latitudeInput = document.getElementById('latitude')
+      const longitudeInput = document.getElementById('longitude')
+      const cityList = document.getElementById('city-suggestions')
+      const cache = new Map()
+
+      const updateCityAvailability = () => {
+        const country = countryInput.value
+        cityInput.disabled = !country
+        cityInput.placeholder = country ? 'ex. Vannes' : "Sélectionnez d'abord un pays"
+
+        if (!country) {
+          cityInput.value = ''
+          regionInput.value = ''
+          latitudeInput.value = ''
+          longitudeInput.value = ''
+        }
+      }
+
+      countryInput.addEventListener('change', () => {
+        latitudeInput.value = ''
+        longitudeInput.value = ''
+        updateCityAvailability()
+      })
+
+      cityInput.addEventListener('input', () => {
+        latitudeInput.value = ''
+        longitudeInput.value = ''
+      })
+
+      initAutocomplete({
+        input: cityInput,
+        list: cityList,
+        fetchSuggestions: async (query) => {
+          if (countryInput.value !== 'FR') return []
+          const key = query.toLowerCase()
+          if (cache.has(key)) return cache.get(key)
+
+          const controller = new AbortController()
+          const timeout = setTimeout(() => controller.abort(), 3000)
+
+          try {
+            const response = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(query)}&fields=nom,region,departement,centre&boost=population&limit=8`, {
+              signal: controller.signal,
+            })
+            if (!response.ok) return []
+            const results = await response.json()
+            cache.set(key, results)
+            return results
+          } catch {
+            return []
+          } finally {
+            clearTimeout(timeout)
+          }
+        },
+        renderItem: (result) => `
+          <span class="lc-autocomplete-name">${escapeHtml(result.nom)}</span>
+          <span class="lc-autocomplete-region">${escapeHtml(result.region?.nom || result.departement?.nom || '')}</span>
+        `,
+        onSelect: (result) => {
+          cityInput.value = result.nom || ''
+          regionInput.value = result.region?.nom || ''
+          countryInput.value = 'FR'
+          cityInput.dispatchEvent(new Event('change', { bubbles: true }))
+          latitudeInput.value = result.centre?.coordinates?.[1] ?? ''
+          longitudeInput.value = result.centre?.coordinates?.[0] ?? ''
+        },
+      })
+
+      updateCityAvailability()
+    })();
+
     (() => {
       const picker = document.querySelector('[data-map-picker]');
       if (!picker) return;
@@ -235,13 +465,12 @@
       }
     })();
 
-    // Enable/disable next button based on required fields
     (() => {
       const btn = document.querySelector('.lc-form .lc-btn-next')
       const required = document.querySelectorAll('.lc-form [required]')
 
       const toggle = () => {
-        btn.disabled = !Array.from(required).every(input => input.value.trim() !== '')
+        btn.disabled = !Array.from(required).every(input => input.disabled || input.value.trim() !== '')
       }
 
       required.forEach(input => {

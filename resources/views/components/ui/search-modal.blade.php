@@ -27,14 +27,14 @@
       <!-- Stays Form -->
       <form action="{{ route('listings') }}" method="GET" id="form-stays" class="search-form active">
         <input type="hidden" name="type" value="stays">
-        <div class="form-group has-autocomplete">
+        <div class="form-group has-autocomplete" data-city-autocomplete>
           <label for="city-stays">@svg('mdi-map-marker-outline') Où ?</label>
           <input type="text" name="city" id="city-stays" placeholder="Ville ou région" value="{{ request('city') }}"
             autocomplete="off">
         </div>
-        <label class="nearby-toggle">
+        <label class="nearby-toggle" data-nearby-toggle>
           <input type="checkbox" name="include_nearby" value="1" {{ request()->boolean('include_nearby') ? 'checked' : '' }}>
-          <span>Inclure les destinations proches (20 km)</span>
+          <span>Inclure les annonces à proximité (20 km)</span>
         </label>
         <button type="submit" class="submit-button">
           @svg('mdi-magnify')
@@ -45,14 +45,14 @@
       <!-- Boats Form -->
       <form action="{{ route('listings') }}" method="GET" id="form-boats" class="search-form">
         <input type="hidden" name="type" value="boats">
-        <div class="form-group has-autocomplete">
+        <div class="form-group has-autocomplete" data-city-autocomplete>
           <label for="city-boats">@svg('mdi-anchor') Port de départ</label>
           <input type="text" name="city" id="city-boats" placeholder="Ville ou port" value="{{ request('city') }}"
             autocomplete="off">
         </div>
-        <label class="nearby-toggle">
+        <label class="nearby-toggle" data-nearby-toggle>
           <input type="checkbox" name="include_nearby" value="1" {{ request()->boolean('include_nearby') ? 'checked' : '' }}>
-          <span>Inclure les destinations proches (20 km)</span>
+          <span>Inclure les annonces à proximité (20 km)</span>
         </label>
         <button type="submit" class="submit-button">
           @svg('mdi-magnify')
@@ -273,6 +273,10 @@
       font-weight: 500;
     }
 
+    .nearby-toggle[hidden] {
+      display: none;
+    }
+
     .nearby-toggle input {
       width: 1rem;
       height: 1rem;
@@ -393,203 +397,222 @@
   <script>
     (function () {
       function init() {
-        // Global-ish state attached to window to avoid redeclaration errors if component is included twice
-        window.autocompleteInstances = window.autocompleteInstances || new Map();
+        window.autocompleteInstances = window.autocompleteInstances || new Map()
+
+        const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, (char) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#039;',
+          '"': '&quot;',
+        }[char]))
 
         window.openSearchModal = window.openSearchModal || function () {
-          const modal = document.getElementById('search-modal');
-          if (!modal) return;
-          const initialTab = modal.dataset.initialTab || 'stays';
-          modal.classList.add('active');
-          document.body.style.overflow = 'hidden';
-          switchTab(initialTab);
-        };
+          const modal = document.getElementById('search-modal')
+          if (!modal) return
+          const initialTab = modal.dataset.initialTab || 'stays'
+          modal.classList.add('active')
+          document.body.style.overflow = 'hidden'
+          switchTab(initialTab)
+        }
 
         window.closeSearchModal = window.closeSearchModal || function () {
-          const modal = document.getElementById('search-modal');
-          if (modal) modal.classList.remove('active');
-          document.body.style.overflow = '';
-        };
+          const modal = document.getElementById('search-modal')
+          if (modal) modal.classList.remove('active')
+          document.body.style.overflow = ''
+        }
 
         window.switchTab = window.switchTab || function (tab) {
-          // Update buttons
           document.querySelectorAll('.tab-button').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.tab === tab);
-            btn.setAttribute('aria-pressed', btn.dataset.tab === tab ? 'true' : 'false');
-          });
+            btn.classList.toggle('active', btn.dataset.tab === tab)
+            btn.setAttribute('aria-pressed', btn.dataset.tab === tab ? 'true' : 'false')
+          })
 
-          // Update forms
           document.querySelectorAll('.search-form').forEach(form => {
-            form.classList.toggle('active', form.id === `form-${tab}`);
-          });
-        };
+            form.classList.toggle('active', form.id === `form-${tab}`)
+          })
+        }
 
-        function initAutocomplete(inputEl) {
-          const group = inputEl.closest('.form-group');
-          if (!group) return;
+        function initAutocomplete({ input, list, fetchSuggestions, renderItem, onSelect }) {
+          if (!input || !list) return
 
-          let dropdown = group.querySelector('.autocomplete-dropdown');
-          if (!dropdown) {
-            dropdown = document.createElement('div');
-            dropdown.className = 'autocomplete-dropdown';
-            group.appendChild(dropdown);
+          let debounceTimer = null
+          let highlightedIndex = -1
+          let items = []
+
+          const close = () => {
+            list.classList.remove('visible')
+            list.innerHTML = ''
+            highlightedIndex = -1
+            items = []
           }
 
-          let debounceTimer = null;
-          let highlightedIndex = -1;
-          let items = [];
-
-          function showLoading() {
-            dropdown.innerHTML = '<div class="autocomplete-loading">Recherche...</div>';
-            dropdown.classList.add('visible');
+          const setHighlight = (index) => {
+            highlightedIndex = index
+            list.querySelectorAll('.autocomplete-item').forEach((item, itemIndex) => {
+              item.classList.toggle('highlighted', itemIndex === highlightedIndex)
+            })
           }
 
-          function showEmpty() {
-            dropdown.innerHTML = '<div class="autocomplete-empty">Aucune destination trouvée</div>';
-            dropdown.classList.add('visible');
-            highlightedIndex = -1;
-            items = [];
+          const select = (index) => {
+            const item = items[index]
+            if (!item) return
+            onSelect(item)
+            close()
           }
 
-          function renderResults(data) {
-            if (!data || data.length === 0) {
-              showEmpty();
-              return;
-            }
-
-            highlightedIndex = -1;
-            items = data;
-
-            dropdown.innerHTML = data.map((d, i) => {
-              // Listing suggestion (has 'url' field)
-              if (d.url) {
-                return `
-                  <div class="autocomplete-item" data-index="${i}" data-url="${d.url}">
-                    <div>
-                      <div class="item-name">${d.title}</div>
-                      <div class="item-region">${d.owner || ''}</div>
-                    </div>
-                  </div>
-                `
-              }
-              // Destination suggestion
-              return `
-                <div class="autocomplete-item" data-index="${i}" data-name="${d.name}">
-                  <div>
-                    <div class="item-name">${d.name}</div>
-                    ${d.region ? `<div class="item-region">${d.region}</div>` : ''}
-                  </div>
-                </div>
-              `
-            }).join('');
-
-            dropdown.classList.add('visible');
-          }
-
-          function closeDropdown() {
-            dropdown.classList.remove('visible');
-            highlightedIndex = -1;
-            items = [];
-          }
-
-          function setHighlight(idx) {
-            const allItems = dropdown.querySelectorAll('.autocomplete-item');
-            allItems.forEach((el, i) => el.classList.toggle('highlighted', i === idx));
-            highlightedIndex = idx;
-          }
-
-          inputEl.addEventListener('input', () => {
-            const val = inputEl.value.trim()
-            const group = inputEl.closest('.form-group')
-            const suggestUrl = group?.dataset.suggestUrl || '/api/destinations'
-
-            closeDropdown()
-
-            if (val.length < 2) return
-
+          input.addEventListener('input', () => {
             clearTimeout(debounceTimer)
-            showLoading()
+            close()
+
+            const query = input.value.trim()
+            if (query.length < 2) return
 
             debounceTimer = setTimeout(async () => {
               try {
-                const res = await fetch(`${suggestUrl}?q=${encodeURIComponent(val)}`)
-                if (!res.ok) throw new Error('fetch failed')
-                const data = await res.json()
-                renderResults(data)
+                items = await fetchSuggestions(query)
               } catch {
-                closeDropdown()
+                close()
+                return
               }
-            }, 300)
+
+              if (!items.length) {
+                close()
+                return
+              }
+
+              list.innerHTML = items.map((item, index) => `
+                <button type="button" class="autocomplete-item" data-index="${index}">
+                  ${renderItem(item)}
+                </button>
+              `).join('')
+              list.classList.add('visible')
+            }, 250)
           })
 
-          dropdown.addEventListener('click', (e) => {
-            const item = e.target.closest('.autocomplete-item')
-            if (item) {
-              if (item.dataset.url) {
-                window.location.href = item.dataset.url
-              } else {
-                inputEl.value = item.dataset.name
-                closeDropdown()
-                inputEl.focus()
-              }
-            }
+          list.addEventListener('mousedown', (event) => {
+            const item = event.target.closest('[data-index]')
+            if (!item) return
+            event.preventDefault()
+            select(Number(item.dataset.index))
           })
 
-          inputEl.addEventListener('keydown', (e) => {
-            if (!dropdown.classList.contains('visible') || items.length === 0) return
-            if (e.key === 'ArrowDown') {
-              e.preventDefault()
+          input.addEventListener('keydown', (event) => {
+            if (!list.classList.contains('visible') || items.length === 0) return
+
+            if (event.key === 'ArrowDown') {
+              event.preventDefault()
               setHighlight(Math.min(highlightedIndex + 1, items.length - 1))
-            } else if (e.key === 'ArrowUp') {
-              e.preventDefault()
+            } else if (event.key === 'ArrowUp') {
+              event.preventDefault()
               setHighlight(Math.max(highlightedIndex - 1, 0))
-            } else if (e.key === 'Enter') {
-              if (highlightedIndex >= 0) {
-                e.preventDefault()
-                const item = dropdown.querySelectorAll('.autocomplete-item')[highlightedIndex]
-                if (item) {
-                  if (item.dataset.url) {
-                    window.location.href = item.dataset.url
-                  } else {
-                    inputEl.value = item.dataset.name
-                    closeDropdown()
-                  }
-                }
-              }
-            } else if (e.key === 'Escape') {
-              closeDropdown()
+            } else if (event.key === 'Enter' && highlightedIndex >= 0) {
+              event.preventDefault()
+              select(highlightedIndex)
+            } else if (event.key === 'Escape') {
+              close()
             }
           })
 
-          document.addEventListener('click', (e) => {
-            if (!group.contains(e.target)) closeDropdown();
-          });
+          document.addEventListener('click', (event) => {
+            if (!list.contains(event.target) && event.target !== input) close()
+          })
         }
 
-        function attachAutocomplete() {
-          document.querySelectorAll('.form-group.has-autocomplete input').forEach(input => {
-            if (!window.autocompleteInstances.has(input)) {
-              initAutocomplete(input);
-              window.autocompleteInstances.set(input, true);
-            }
-          });
+        const suggestionCache = new Map()
+        const fetchJson = async (url, query) => {
+          const key = `${url}:${query.toLowerCase()}`
+          if (suggestionCache.has(key)) return suggestionCache.get(key)
+
+          const response = await fetch(`${url}?q=${encodeURIComponent(query)}`)
+          if (!response.ok) return []
+          const results = await response.json()
+          suggestionCache.set(key, results)
+          return results
         }
 
-        // Close on Escape key (global)
+        document.querySelectorAll('.form-group.has-autocomplete input').forEach(input => {
+          if (window.autocompleteInstances.has(input)) return
+
+          const group = input.closest('.form-group')
+          let dropdown = group.querySelector('.autocomplete-dropdown')
+          if (!dropdown) {
+            dropdown = document.createElement('div')
+            dropdown.className = 'autocomplete-dropdown'
+            group.appendChild(dropdown)
+          }
+
+          if (group.dataset.cityAutocomplete !== undefined) {
+            initAutocomplete({
+              input,
+              list: dropdown,
+              fetchSuggestions: (query) => fetchJson('/api/listings/cities', query),
+              renderItem: (result) => `
+                <div>
+                  <div class="item-name">${escapeHtml(result.name)}</div>
+                  ${result.region ? `<div class="item-region">${escapeHtml(result.region)}</div>` : ''}
+                </div>
+              `,
+              onSelect: (result) => {
+                input.value = result.name || ''
+                input.dispatchEvent(new Event('input', { bubbles: true }))
+              },
+            })
+          } else {
+            initAutocomplete({
+              input,
+              list: dropdown,
+              fetchSuggestions: (query) => fetchJson(group.dataset.suggestUrl || '/api/listings/suggest', query),
+              renderItem: (result) => `
+                <div>
+                  <div class="item-name">${escapeHtml(result.title || result.name)}</div>
+                  <div class="item-region">${escapeHtml(result.owner || result.region || '')}</div>
+                </div>
+              `,
+              onSelect: (result) => {
+                if (result.url) {
+                  window.location.href = result.url
+                  return
+                }
+
+                input.value = result.name || result.title || ''
+              },
+            })
+          }
+
+          window.autocompleteInstances.set(input, true)
+        })
+
+        document.querySelectorAll('.search-form').forEach(form => {
+          const cityInput = form.querySelector('input[name="city"]')
+          const nearbyToggle = form.querySelector('[data-nearby-toggle]')
+          const nearbyInput = nearbyToggle?.querySelector('input[name="include_nearby"]')
+          if (!cityInput || !nearbyToggle || !nearbyInput) return
+
+          const syncNearby = () => {
+            const hasCity = cityInput.value.trim() !== ''
+            nearbyToggle.hidden = !hasCity
+            nearbyInput.disabled = !hasCity
+            if (!hasCity) nearbyInput.checked = false
+          }
+
+          cityInput.addEventListener('input', syncNearby)
+          form.addEventListener('submit', syncNearby)
+          syncNearby()
+        })
+
         if (!window.hasGlobalEscListener) {
-          document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') window.closeSearchModal();
-          });
-          window.hasGlobalEscListener = true;
+          document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') window.closeSearchModal()
+          })
+          window.hasGlobalEscListener = true
         }
-
-        attachAutocomplete();
       }
 
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', init)
       } else {
-        init();
+        init()
       }
     })();
   </script>

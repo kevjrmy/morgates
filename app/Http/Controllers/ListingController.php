@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Destination;
 use App\Models\Listing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -51,6 +52,8 @@ class ListingController extends Controller
       'country' => ['required', 'string', 'size:2'],
       'region' => ['nullable', 'string', 'max:100'],
       'city' => ['required', 'string', 'max:100'],
+      'latitude' => ['nullable', 'numeric'],
+      'longitude' => ['nullable', 'numeric'],
       'address' => ['nullable', 'string', 'max:255'],
       'map_url' => ['nullable', 'url', 'max:255'],
     ]);
@@ -126,7 +129,7 @@ class ListingController extends Controller
         $count++;
     }
 
-    Listing::create([
+    $listing = Listing::create([
         'user_id' => Auth::id(),
         'type' => $data['type'] ?? 'stays',
         'title' => $data['title'],
@@ -141,6 +144,8 @@ class ListingController extends Controller
         'country' => $data['country'] ?? 'FR',
         'region' => $data['region'] ?? null,
         'city' => $data['city'] ?? '',
+        'latitude' => $data['latitude'] ?? null,
+        'longitude' => $data['longitude'] ?? null,
         'tags' => $data['tags'] ?? [],
         'address' => $data['address'] ?? null,
         'map_url' => $data['map_url'] ?? null,
@@ -150,6 +155,18 @@ class ListingController extends Controller
         'contact_website' => $data['contact_website'] ?? null,
         'is_active' => true,
     ]);
+
+    if (!empty($data['city']) && !empty($data['latitude'])) {
+        Destination::firstOrCreate(
+            ['name' => $data['city'], 'country' => $data['country'] ?? 'FR'],
+            [
+                'type' => 'city',
+                'region' => $data['region'] ?? null,
+                'latitude' => $data['latitude'],
+                'longitude' => $data['longitude'] ?? null,
+            ]
+        );
+    }
 
     $request->session()->forget('listing_create');
 

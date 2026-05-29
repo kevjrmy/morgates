@@ -12,8 +12,6 @@
 
       {{-- Preserve active search params --}}
       @if(request('type')) <input type="hidden" name="type" value="{{ request('type') }}"> @endif
-      @if(request('city')) <input type="hidden" name="city" value="{{ request('city') }}"> @endif
-      @if(request('region')) <input type="hidden" name="region" value="{{ request('region') }}"> @endif
       @if(request('q')) <input type="hidden" name="q" value="{{ request('q') }}"> @endif
       @if(request('tag')) <input type="hidden" name="tag" value="{{ request('tag') }}"> @endif
 
@@ -53,19 +51,20 @@
       {{-- City --}}
       <div class="filter-section">
         <h3 class="filter-section-label">Ville</h3>
-        <input type="text" name="city" class="filter-text-input" placeholder="Nom de la ville"
-          value="{{ request('city') }}">
+        <div class="filter-autocomplete" data-filter-city-autocomplete>
+          <input type="text" name="city" class="filter-text-input" placeholder="Nom de la ville"
+            value="{{ request('city') }}" autocomplete="off">
+          <div class="filter-autocomplete-list" data-filter-city-list></div>
+        </div>
       </div>
 
-      @if(request('city') && !request('region') && !request('q'))
-        <div class="filter-section">
-          <h3 class="filter-section-label">Destinations proches</h3>
-          <label class="filter-checkbox">
-            <input type="checkbox" name="include_nearby" value="1" {{ request()->boolean('include_nearby') ? 'checked' : '' }}>
-            <span>Inclure les villes dans un rayon de 20 km</span>
-          </label>
-        </div>
-      @endif
+      <div class="filter-section" data-filter-nearby-section {{ request('city') ? '' : 'hidden' }}>
+        <h3 class="filter-section-label">À proximité</h3>
+        <label class="filter-checkbox">
+          <input type="checkbox" name="include_nearby" value="1" {{ request()->boolean('include_nearby') && request('city') ? 'checked' : '' }} {{ request('city') ? '' : 'disabled' }}>
+          <span>Inclure les annonces à proximité (20 km)</span>
+        </label>
+      </div>
 
       {{-- Price unit --}}
       <div class="filter-section">
@@ -334,6 +333,63 @@
 
     .filter-text-input::placeholder {
       color: #999;
+    }
+
+    .filter-autocomplete {
+      position: relative;
+    }
+
+    .filter-autocomplete-list {
+      position: absolute;
+      top: calc(100% + 0.45rem);
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: none;
+      max-height: 18rem;
+      overflow-y: auto;
+      border: 1.5px solid #eee;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-autocomplete-list.is-open {
+      display: block;
+    }
+
+    .filter-autocomplete-item {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid #f5f5f5;
+      background: #fff;
+      text-align: left;
+    }
+
+    .filter-autocomplete-item:last-child {
+      border-bottom: 0;
+    }
+
+    .filter-autocomplete-item:hover,
+    .filter-autocomplete-item.is-active {
+      background: var(--clr-softblue);
+    }
+
+    .filter-autocomplete-name {
+      display: block;
+      color: var(--clr-text-dark);
+      font-weight: 700;
+    }
+
+    .filter-autocomplete-region {
+      display: block;
+      margin-top: 0.15rem;
+      color: var(--clr-text-medium);
+      font-size: 0.82rem;
+    }
+
+    [data-filter-nearby-section][hidden] {
+      display: none;
     }
 
     .filter-checkbox {
@@ -620,13 +676,145 @@
       updateCapacityDisplay()
     })
 
+    const escapeFilterHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, (char) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#039;',
+      '"': '&quot;',
+    }[char]))
+
+    function initAutocomplete({ input, list, fetchSuggestions, renderItem, onSelect }) {
+      if (!input || !list) return
+
+      let timer = null
+      let items = []
+      let activeIndex = -1
+
+      const close = () => {
+        list.classList.remove('is-open')
+        list.innerHTML = ''
+        items = []
+        activeIndex = -1
+      }
+
+      const setActive = (index) => {
+        activeIndex = index
+        list.querySelectorAll('[data-autocomplete-index]').forEach((item, itemIndex) => {
+          item.classList.toggle('is-active', itemIndex === activeIndex)
+        })
+      }
+
+      const select = (index) => {
+        const item = items[index]
+        if (!item) return
+        onSelect(item)
+        close()
+      }
+
+      input.addEventListener('input', () => {
+        clearTimeout(timer)
+        close()
+        const query = input.value.trim()
+        if (query.length < 2) return
+
+        timer = setTimeout(async () => {
+          try {
+            items = await fetchSuggestions(query)
+          } catch {
+            close()
+            return
+          }
+
+          if (!items.length) {
+            close()
+            return
+          }
+
+          list.innerHTML = items.map((item, index) => `
+            <button type="button" class="filter-autocomplete-item" data-autocomplete-index="${index}">
+              ${renderItem(item)}
+            </button>
+          `).join('')
+          list.classList.add('is-open')
+        }, 250)
+      })
+
+      list.addEventListener('mousedown', (event) => {
+        const item = event.target.closest('[data-autocomplete-index]')
+        if (!item) return
+        event.preventDefault()
+        select(Number(item.dataset.autocompleteIndex))
+      })
+
+      input.addEventListener('keydown', (event) => {
+        if (!list.classList.contains('is-open') || !items.length) return
+        if (event.key === 'ArrowDown') {
+          event.preventDefault()
+          setActive(Math.min(activeIndex + 1, items.length - 1))
+        } else if (event.key === 'ArrowUp') {
+          event.preventDefault()
+          setActive(Math.max(activeIndex - 1, 0))
+        } else if (event.key === 'Enter' && activeIndex >= 0) {
+          event.preventDefault()
+          select(activeIndex)
+        } else if (event.key === 'Escape') {
+          close()
+        }
+      })
+
+      document.addEventListener('click', (event) => {
+        if (!list.contains(event.target) && event.target !== input) close()
+      })
+    }
+
+    const filterCityInput = document.querySelector('input[name="city"].filter-text-input')
+    const filterCityList = document.querySelector('[data-filter-city-list]')
+    const filterNearbySection = document.querySelector('[data-filter-nearby-section]')
+    const filterNearbyInput = filterNearbySection?.querySelector('input[name="include_nearby"]')
+    const filterCityCache = new Map()
+
+    function syncFilterNearby() {
+      if (!filterCityInput || !filterNearbySection || !filterNearbyInput) return
+      const hasCity = filterCityInput.value.trim() !== ''
+      filterNearbySection.hidden = !hasCity
+      filterNearbyInput.disabled = !hasCity
+      if (!hasCity) filterNearbyInput.checked = false
+    }
+
+    if (filterCityInput && filterCityList) {
+      initAutocomplete({
+        input: filterCityInput,
+        list: filterCityList,
+        fetchSuggestions: async (query) => {
+          const key = query.toLowerCase()
+          if (filterCityCache.has(key)) return filterCityCache.get(key)
+          const response = await fetch(`/api/listings/cities?q=${encodeURIComponent(query)}`)
+          if (!response.ok) return []
+          const results = await response.json()
+          filterCityCache.set(key, results)
+          return results
+        },
+        renderItem: (result) => `
+          <span class="filter-autocomplete-name">${escapeFilterHtml(result.name)}</span>
+          ${result.region ? `<span class="filter-autocomplete-region">${escapeFilterHtml(result.region)}</span>` : ''}
+        `,
+        onSelect: (result) => {
+          filterCityInput.value = result.name || ''
+          filterCityInput.dispatchEvent(new Event('input', { bubbles: true }))
+        },
+      })
+
+      filterCityInput.addEventListener('input', syncFilterNearby)
+      syncFilterNearby()
+    }
+
     function resetFilters() {
       document.querySelector('input[name="sort"][value="latest"]').checked = true
       document.querySelector('select[name="region"]').value = ''
-      const cityInput = document.querySelector('input[name="city"].filter-text-input')
-      const nearbyInput = document.querySelector('input[name="include_nearby"]')
-      if (cityInput) cityInput.value = ''
-      if (nearbyInput) nearbyInput.checked = false
+      if (filterCityInput) filterCityInput.value = ''
+      if (filterNearbyInput) filterNearbyInput.checked = false
+      syncFilterNearby()
       document.getElementById('price-unit-select').value = 'day'
       document.getElementById('price-min').value = ''
       document.getElementById('price-max').value = ''

@@ -1,6 +1,5 @@
 <?php
 
-use App\Support\NearbyDestinationResolver;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountController;
@@ -19,23 +18,38 @@ Route::get('/', function () {
 /* Listings */
 Route::get('/annonces', function () {
   $query = \App\Models\Listing::query();
-  $includeNearby = request()->boolean('include_nearby') && request('city') && !request('region') && !request('q');
 
   if (request('type')) {
     $query->where('type', request('type'));
   }
 
   if (request('city')) {
-    if ($includeNearby) {
-      $nearbyCities = app(NearbyDestinationResolver::class)->resolveCityNames(request('city'));
+    $city = trim(request('city'));
 
-      if (!empty($nearbyCities)) {
-        $query->whereIn('city', $nearbyCities);
+    if (request()->boolean('include_nearby')) {
+      $destination = \App\Models\Destination::query()
+        ->whereRaw('LOWER(name) = ?', [strtolower($city)])
+        ->where('country', 'FR')
+        ->whereNotNull('latitude')
+        ->whereNotNull('longitude')
+        ->first();
+
+      if ($destination) {
+        $query
+          ->whereNotNull('latitude')
+          ->whereNotNull('longitude')
+          ->whereRaw("
+            (6371 * acos(
+              cos(radians(?)) * cos(radians(latitude)) *
+              cos(radians(longitude) - radians(?)) +
+              sin(radians(?)) * sin(radians(latitude))
+            )) <= 20
+          ", [$destination->latitude, $destination->longitude, $destination->latitude]);
       } else {
-        $query->where('city', request('city'));
+        $query->where('city', $city);
       }
     } else {
-      $query->where('city', request('city'));
+      $query->where('city', $city);
     }
   }
 
@@ -114,7 +128,7 @@ Route::get('/annonces', function () {
 
   $listings = $query->get();
 
-  return view('pages.listings.index', compact('listings', 'includeNearby'));
+  return view('pages.listings.index', compact('listings'));
 })->name('listings');
 
 /* Listing suggestions API (autocomplete) */
@@ -144,6 +158,21 @@ Route::get('/api/listings/suggest', function () {
 
   return response()->json($results);
 })->name('api.listings.suggest');
+
+
+/* Listing city API (autocomplete) */
+Route::get('/api/listings/cities', function () {
+  $q = trim(request('q', ''));
+  if (strlen($q) < 2) return response()->json([]);
+
+  $cities = \App\Models\Destination::whereRaw('LOWER(name) LIKE ?', [strtolower($q) . '%'])
+    ->where('country', 'FR')
+    ->orderBy('name')
+    ->limit(8)
+    ->get(['name', 'region', 'latitude', 'longitude']);
+
+  return response()->json($cities);
+})->name('api.listings.cities');
 
 /* Listing */
 Route::get('/annonces/{listing:slug}', function (\App\Models\Listing $listing) {

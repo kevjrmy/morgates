@@ -16,8 +16,8 @@ class ListingSearchTest extends TestCase
     {
         $this->seedNearbyDestinations();
 
-        $strictListing = $this->createListing('Cannes', 'Annonce Cannes');
-        $nearbyListing = $this->createListing('Mandelieu-la-Napoule', 'Annonce Mandelieu');
+        $strictListing = $this->createListing('Cannes', 'Annonce Cannes', 43.5528, 7.0174);
+        $nearbyListing = $this->createListing('Mandelieu-la-Napoule', 'Annonce Mandelieu', 43.5464, 6.9399);
 
         $response = $this->get(route('listings', ['city' => 'Cannes']));
 
@@ -30,8 +30,8 @@ class ListingSearchTest extends TestCase
     {
         $this->seedNearbyDestinations();
 
-        $strictListing = $this->createListing('Cannes', 'Annonce Cannes');
-        $nearbyListing = $this->createListing('Mandelieu-la-Napoule', 'Annonce Mandelieu');
+        $strictListing = $this->createListing('Cannes', 'Annonce Cannes', 43.5528, 7.0174);
+        $nearbyListing = $this->createListing('Mandelieu-la-Napoule', 'Annonce Mandelieu', 43.5464, 6.9399);
 
         $response = $this->get(route('listings', [
             'city' => 'Cannes',
@@ -43,7 +43,7 @@ class ListingSearchTest extends TestCase
         $response->assertSee($nearbyListing->title);
     }
 
-    private function createListing(string $city, string $title): Listing
+    private function createListing(string $city, string $title, float $latitude, float $longitude): Listing
     {
         return Listing::create([
             'user_id' => User::factory()->create()->id,
@@ -57,6 +57,8 @@ class ListingSearchTest extends TestCase
             'country' => 'FR',
             'region' => "Provence-Alpes-Côte d'Azur",
             'city' => $city,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
             'is_active' => true,
         ]);
     }
