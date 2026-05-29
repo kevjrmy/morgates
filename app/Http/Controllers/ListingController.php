@@ -63,11 +63,15 @@ class ListingController extends Controller
 
   public function storeBasics(Request $request)
   {
+    $type = $request->session()->get('listing_create.type', 'stays');
+    $priceUnits = $type === 'boats'
+      ? ['hour', 'half-day', 'day', 'week', 'month', 'contact']
+      : ['day', 'week', 'month', 'contact'];
+
     $validated = $request->validate([
       'title' => ['required', 'string', 'max:100'],
       'price_amount' => ['nullable', 'numeric', 'min:1'],
-      'currency' => ['required', 'string', 'size:3'],
-      'price_unit' => ['required', 'in:day,trip,week,month,contact'],
+      'price_unit' => ['required', 'in:' . implode(',', $priceUnits)],
       'capacity' => ['required', 'integer', 'min:1', 'max:50'],
     ]);
 
@@ -129,7 +133,6 @@ class ListingController extends Controller
         'slug' => $slug,
         'description' => $data['description'] ?? null,
         'price_amount' => $data['price_amount'] ?? null,
-        'currency' => $data['currency'] ?? 'EUR',
         'price_unit' => $data['price_unit'] ?? 'day',
         'capacity' => $data['capacity'] ?? null,
         'min_duration' => $data['min_duration'] ?? null,

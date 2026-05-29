@@ -15,7 +15,6 @@ class Listing extends Model
     'description',
     'photos',
     'price_amount',
-    'currency',
     'price_unit',
     'capacity',
     'min_duration',
@@ -79,8 +78,9 @@ class Listing extends Model
   public function priceUnitLabel(): string
   {
     return match ($this->price_unit) {
+      'hour' => 'heure',
+      'half-day' => 'demi-journée',
       'day' => 'jour',
-      'trip' => 'sortie',
       'week' => 'semaine',
       'month' => 'mois',
       'contact' => 'sur demande',

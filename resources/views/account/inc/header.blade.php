@@ -23,6 +23,10 @@
           @svg('tabler-user')
           Mon espace
         </a>
+        <a href="{{ route('account.profile') }}" class="{{ request()->routeIs('account.profile') ? 'active' : '' }}">
+          @svg('tabler-user-edit')
+          Mon profil
+        </a>
         <a href="{{ route('listings.create.index') }}"
           class="{{ request()->routeIs('listings.create.*') ? 'active' : '' }}">
           @svg('tabler-circle-plus')

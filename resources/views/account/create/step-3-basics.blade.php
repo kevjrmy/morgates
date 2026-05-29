@@ -1,12 +1,16 @@
 {{--
 listings/create/step-3-basics.blade.php
-Step 3: Title, price, currency, capacity
+Step 3: Title, price, capacity
 --}}
 @extends('layouts.listing-create')
 
 @section('title', 'Informations de base — Publier une annonce')
 
 @section('content')
+  @php
+    $isBoatListing = ($listing->type ?? null) === 'boats';
+  @endphp
+
   <div class="lc-step">
     <div class="lc-step-header">
       <h1 class="lc-title">Les informations essentielles</h1>
@@ -29,25 +33,13 @@ Step 3: Title, price, currency, capacity
           <p class="lc-field-hint">Un titre court et descriptif attire plus de visiteurs.</p>
         </div>
 
-        {{-- Price + Currency --}}
+        {{-- Price --}}
         <div class="lc-field">
           <label class="lc-label">Prix indicatif</label>
           <div class="lc-price-row">
             <input type="number" name="price_amount" id="price_amount" class="lc-input lc-input-price"
               value="{{ old('price_amount', $listing->price_amount ?? '') }}" placeholder="0" min="1" max="99999"
               step="1">
-            <div class="lc-select-wrap lc-currency-wrap">
-              <select name="currency" id="currency" class="lc-select lc-select-currency">
-                <option value="EUR" {{ old('currency', $listing->currency ?? 'EUR') === 'EUR' ? 'selected' : '' }}>EUR €
-                </option>
-                <option value="USD" {{ old('currency', $listing->currency ?? '') === 'USD' ? 'selected' : '' }}>USD $
-                </option>
-                <option value="GBP" {{ old('currency', $listing->currency ?? '') === 'GBP' ? 'selected' : '' }}>GBP £
-                </option>
-                <option value="CHF" {{ old('currency', $listing->currency ?? '') === 'CHF' ? 'selected' : '' }}>CHF</option>
-              </select>
-              @svg('tabler-chevron-down', ['class' => 'lc-select-icon'])
-            </div>
           </div>
           <p class="lc-field-hint">Le prix reste indicatif : les visiteurs vous contactent directement.</p>
         </div>
@@ -56,10 +48,14 @@ Step 3: Title, price, currency, capacity
           <label for="price_unit" class="lc-label">Unité de prix</label>
           <div class="lc-select-wrap">
             <select name="price_unit" id="price_unit" class="lc-select">
+              @if($isBoatListing)
+                <option value="hour" {{ old('price_unit', $listing->price_unit ?? '') === 'hour' ? 'selected' : '' }}>
+                  Par heure</option>
+                <option value="half-day" {{ old('price_unit', $listing->price_unit ?? '') === 'half-day' ? 'selected' : '' }}>
+                  Par demi-journée</option>
+              @endif
               <option value="day" {{ old('price_unit', $listing->price_unit ?? 'day') === 'day' ? 'selected' : '' }}>
                 Par jour</option>
-              <option value="trip" {{ old('price_unit', $listing->price_unit ?? '') === 'trip' ? 'selected' : '' }}>Par
-                sortie</option>
               <option value="week" {{ old('price_unit', $listing->price_unit ?? '') === 'week' ? 'selected' : '' }}>Par
                 semaine</option>
               <option value="month" {{ old('price_unit', $listing->price_unit ?? '') === 'month' ? 'selected' : '' }}>Par
@@ -90,7 +86,7 @@ Step 3: Title, price, currency, capacity
 
       <div class="lc-actions">
         <a href="{{ route('listings.create.index', ['step' => 2]) }}" class="lc-btn-back">Retour</a>
-        <button type="submit" class="lc-btn-next">Continuer</button>
+        <button type="submit" class="lc-btn-next" disabled>Continuer</button>
       </div>
     </form>
   </div>
@@ -116,5 +112,22 @@ Step 3: Title, price, currency, capacity
         input.value = val
       })
     })
+
+    // Enable/disable next button based on required fields
+    (() => {
+      const btn = document.querySelector('.lc-form .lc-btn-next')
+      const required = document.querySelectorAll('.lc-form [required]')
+
+      const toggle = () => {
+        btn.disabled = !Array.from(required).every(input => input.value.trim() !== '')
+      }
+
+      required.forEach(input => {
+        input.addEventListener('input', toggle)
+        input.addEventListener('change', toggle)
+      })
+
+      toggle()
+    })();
   </script>
 @endpush

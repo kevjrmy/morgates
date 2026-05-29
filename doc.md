@@ -7,12 +7,11 @@
 - Capicité minimale -> capacité
 
 ## TODO
-- Section "Comment ça marche":
+- section "Comment ça marche":
   - retirer mot "direct" + "authentique" et ajouter "hébergements et bateaux" // fait
   changer "échanger -> communiquer" // fait
 - "Réservez en direct avec l'hôte via différents canaux de contacts" // fait
 - page "Publier" (`resources/views/account/create/step-2-location.blade.php`): prédictif pour le google map (ville ou adresse exacte)
-- Enlever "par sortie"
-- Sur la partie bateau -> heure et demi-journée
-- Supprimer unité minimum + Unité de durée et mettre par jour
-- sites classiques de réservation 
+- remplacer unité "sortie" sur la partie bateau par "heure" + "demi-journée" // fait
+- supprimer unité "minimum" + "unité de durée" par "jour" // fait
+- sites classiques de réservation

@@ -146,7 +146,7 @@
 
       <div class="lc-actions">
         <a href="{{ route('listings.create.index', ['step' => 1]) }}" class="lc-btn-back">Retour</a>
-        <button type="submit" class="lc-btn-next">Continuer</button>
+        <button type="submit" class="lc-btn-next" disabled>Continuer</button>
       </div>
     </form>
   </div>
@@ -233,6 +233,23 @@
       } else {
         updateMap('Paris, France', { syncSearch: false, persist: false });
       }
+    })();
+
+    // Enable/disable next button based on required fields
+    (() => {
+      const btn = document.querySelector('.lc-form .lc-btn-next')
+      const required = document.querySelectorAll('.lc-form [required]')
+
+      const toggle = () => {
+        btn.disabled = !Array.from(required).every(input => input.value.trim() !== '')
+      }
+
+      required.forEach(input => {
+        input.addEventListener('input', toggle)
+        input.addEventListener('change', toggle)
+      })
+
+      toggle()
     })();
   </script>
 @endpush

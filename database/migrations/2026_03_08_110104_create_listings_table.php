@@ -19,8 +19,7 @@ return new class extends Migration {
       $table->json('photos')->nullable();
       $table->longText('description')->nullable();
       $table->decimal('price_amount', 8, 2)->nullable();
-      $table->char('currency', 3)->default('EUR');
-      $table->enum('price_unit', ['day', 'trip', 'week', 'month', 'contact'])->default('day');
+      $table->enum('price_unit', ['hour', 'half-day', 'day', 'week', 'month', 'contact'])->default('day');
       $table->unsignedSmallInteger('capacity')->nullable();
       $table->unsignedSmallInteger('min_duration')->nullable();
       $table->unsignedSmallInteger('max_duration')->nullable();

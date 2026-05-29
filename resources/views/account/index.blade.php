@@ -57,7 +57,7 @@
           @svg('tabler-plus')
           <span>Publier</span>
         </a>
-        <a href="{{ route('onboarding.index') }}" class="account-action">
+        <a href="{{ route('account.profile') }}" class="account-action">
           @svg('tabler-user-edit')
           <span>Mon profil</span>
         </a>
@@ -95,7 +95,7 @@
               <div class="account-listing-meta">
                 <span class="account-listing-price">
                   @if($listing->price_amount)
-                    {{ number_format($listing->price_amount, 0, ',', ' ') }} {{ $listing->currency }}<small>/{{ $listing->priceUnitLabel() }}</small>
+                    {{ number_format($listing->price_amount, 0, ',', ' ') }} €<small>/{{ $listing->priceUnitLabel() }}</small>
                   @else
                     Prix sur demande
                   @endif

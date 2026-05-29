@@ -35,7 +35,7 @@ Step 1: Choose listing type
       </div>
 
       <div class="lc-actions">
-        <button type="submit" class="lc-btn-next">Continuer</button>
+        <button type="submit" class="lc-btn-next" disabled>Continuer</button>
       </div>
     </form>
   </div>
@@ -44,11 +44,20 @@ Step 1: Choose listing type
 @push('scripts')
   <script>
     // Auto-select card styling on radio change
+    const nextBtn = document.querySelector('.lc-btn-next')
+
+    const toggleNext = () => {
+      nextBtn.disabled = !document.querySelector('.lc-type-card input[type="radio"]:checked')
+    }
+
     document.querySelectorAll('.lc-type-card input[type="radio"]').forEach(radio => {
       radio.addEventListener('change', () => {
         document.querySelectorAll('.lc-type-card').forEach(c => c.classList.remove('selected'))
         radio.closest('.lc-type-card').classList.add('selected')
+        toggleNext()
       })
     })
+
+    toggleNext()
   </script>
 @endpush

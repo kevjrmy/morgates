@@ -27,7 +27,6 @@ class User extends Authenticatable
     'country',
     'location',
     'locale',
-    'currency',
   ];
 
   /**

@@ -273,15 +273,6 @@
   appearance: textfield;
 }
 
-.lc-currency-wrap {
-  width: 7rem;
-  flex-shrink: 0;
-}
-
-.lc-select-currency {
-  padding-left: 0.75rem;
-}
-
 /* ── Stepper ───────────────────────────────────────────────── */
 
 .lc-stepper {

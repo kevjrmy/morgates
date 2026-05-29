@@ -28,7 +28,6 @@ return new class extends Migration {
       $table->string('location')->nullable();
       $table->integer('points')->default(0);
       $table->char('locale', 5)->default('fr');
-      $table->char('currency', 3)->default('EUR');
     });
 
     Schema::create('password_reset_tokens', function (Blueprint $table) {

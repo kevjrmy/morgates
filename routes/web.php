@@ -69,10 +69,12 @@ Route::get('/annonces', function () {
   $priceMax = request('price_max');
 
   if ($priceMin || $priceMax) {
-    // Include known-price listings in range OR trip/contact listings (they'll be sorted to bottom)
+    // Include known-price listings in range and keep contact-price listings out of numeric comparisons
     $query->where(function ($q) use ($priceMin, $priceMax) {
-      $q->whereNotIn('price_unit', ['trip', 'contact'])
+      $q->where('price_unit', '!=', 'contact')
         ->whereRaw("CASE
+          WHEN price_unit = 'hour' THEN price_amount * 24 * 7
+          WHEN price_unit = 'half-day' THEN price_amount * 2 * 7
           WHEN price_unit IN ('night', 'day') THEN price_amount * 7
           WHEN price_unit = 'week' THEN price_amount
           WHEN price_unit = 'month' THEN price_amount / 4.33
@@ -85,19 +87,23 @@ Route::get('/annonces', function () {
     $query->where('capacity', '>=', (int) request('capacity'));
   }
 
-  // Sort: known-price listings first (sorted by normalized price), then trip/contact at bottom
+  // Sort: known-price listings first (sorted by normalized price), then contact-price listings at bottom
   match (request('sort')) {
     'price_asc' => $query
-      ->orderByRaw("CASE WHEN price_unit IN ('trip', 'contact') THEN 1 ELSE 0 END")
+      ->orderByRaw("CASE WHEN price_unit = 'contact' THEN 1 ELSE 0 END")
       ->orderByRaw("CASE
+        WHEN price_unit = 'hour' THEN price_amount * 24 * 7
+        WHEN price_unit = 'half-day' THEN price_amount * 2 * 7
         WHEN price_unit IN ('night', 'day') THEN price_amount * 7
         WHEN price_unit = 'week' THEN price_amount
         WHEN price_unit = 'month' THEN price_amount / 4.33
         ELSE NULL
       END"),
     'price_desc' => $query
-      ->orderByRaw("CASE WHEN price_unit IN ('trip', 'contact') THEN 1 ELSE 0 END")
+      ->orderByRaw("CASE WHEN price_unit = 'contact' THEN 1 ELSE 0 END")
       ->orderByRaw("CASE
+        WHEN price_unit = 'hour' THEN price_amount * 24 * 7
+        WHEN price_unit = 'half-day' THEN price_amount * 2 * 7
         WHEN price_unit IN ('night', 'day') THEN price_amount * 7
         WHEN price_unit = 'week' THEN price_amount
         WHEN price_unit = 'month' THEN price_amount / 4.33
@@ -179,8 +185,14 @@ Route::post('/deconnexion', [AuthController::class, 'logout'])->name('logout')->
 /**
  * Account
  */
-Route::get('/mon-espace', [AccountController::class, 'index'])->name('account')->middleware('auth');
-Route::get('/mon-espace/abonnements', [AccountController::class, 'subscriptions'])->name('account.subscriptions.index')->middleware('auth');
+Route::middleware('auth')->group(function () {
+  Route::get('/mon-espace', [AccountController::class, 'index'])->name('account');
+  Route::get('/mon-espace/profil', [AccountController::class, 'profile'])->name('account.profile');
+  Route::put('/mon-espace/profil', [AccountController::class, 'updateProfile'])->name('account.profile.update');
+  Route::put('/mon-espace/profil/{field}', [AccountController::class, 'updateProfileField'])->name('account.profile.field.update');
+  Route::delete('/mon-espace/profil/{field}', [AccountController::class, 'clearProfileField'])->name('account.profile.clear');
+  Route::get('/mon-espace/abonnements', [AccountController::class, 'subscriptions'])->name('account.subscriptions.index');
+});
 
 /* Onboarding */
 Route::middleware('auth')->prefix('bienvenue')->name('onboarding.')->group(function () {

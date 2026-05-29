@@ -131,7 +131,7 @@ Listings belong to a user and currently include fields for:
 - `type` (enum: `boats`, `stays`)
 - `title`, `slug`, `description`
 - `photos` (JSON array)
-- `price_amount` (decimal), `currency` (char 3, default `EUR`), `price_unit` (enum: `day`, `trip`, `week`, `month`, `contact`)
+- `price_amount` (decimal), `price_unit` (enum: `hour`, `half-day`, `day`, `week`, `month`, `contact`)
 - `capacity` (unsigned small int)
 - `min_duration`, `max_duration`, `duration_unit` (enum: `day`, `week`, `month`)
 - `country` (char 2), `region`, `city`, `address`

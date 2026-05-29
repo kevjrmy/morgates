@@ -72,6 +72,8 @@
         <h3 class="filter-section-label">Prix</h3>
         <div class="price-filter-row">
           <select name="price_unit" class="filter-select-sm" id="price-unit-select">
+            <option value="hour" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'hour' ? 'selected' : '' }}>heure</option>
+            <option value="half-day" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'half-day' ? 'selected' : '' }}>demi-journée</option>
             <option value="day" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'day' ? 'selected' : '' }}>
               jour</option>
             <option value="week" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'week' ? 'selected' : '' }}>semaine</option>
