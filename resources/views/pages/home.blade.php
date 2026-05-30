@@ -60,12 +60,10 @@
         </div>
       </div>
 
-      <div class="how-it-works-footer">
-        <a href="{{ route('contact') }}" class="footer-cta">
-          Vous voulez en savoir plus ?
-          <span>Contactez-nous</span>
-        </a>
-      </div>
+      <a href="{{ route('contact') }}" class="footer-cta">
+        Vous voulez en savoir plus ?
+        <span>Contactez-nous</span>
+      </a>
     </section>
 
     @include('pages.inc.destinations')
@@ -92,10 +90,10 @@
       color: var(--clr-text-primary);
     }
 
-    /* How it works section */
     .how-it-works {
       background: linear-gradient(180deg, transparent, rgba(213, 229, 255, 0.35) 40%, rgba(213, 229, 255, 0.15) 70%, transparent);
       padding: 1.5rem;
+      text-align: center;
     }
 
     .how-it-works-header {
@@ -183,12 +181,8 @@
       }
     }
 
-    .how-it-works-footer {
-      text-align: center;
-      margin-top: 3rem;
-    }
-
     .footer-cta {
+      margin-top: 1.5rem;
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;

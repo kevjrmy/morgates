@@ -34,36 +34,26 @@
         </div>
       </div>
 
-      {{-- Region --}}
+      {{-- À proximité --}}
       <div class="filter-section">
-        <h3 class="filter-section-label">Région</h3>
-        <div class="region-options">
-          <select name="region" class="filter-select">
-            <option value="">Toutes les régions</option>
-            <option value="Bretagne" {{ request('region') === 'Bretagne' ? 'selected' : '' }}>Bretagne</option>
-            <option value="Auvergne-Rhône-Alpes" {{ request('region') === 'Auvergne-Rhône-Alpes' ? 'selected' : '' }}>
-              Auvergne-Rhône-Alpes</option>
-            <option value="Provence-Alpes-Côte d'Azur" {{ request('region') === "Provence-Alpes-Côte d'Azur" ? 'selected' : '' }}>Provence-Alpes-Côte d'Azur</option>
-          </select>
-        </div>
+        <h3 class="filter-section-label">À proximité</h3>
+        <label class="nearby-toggle">
+          <span class="toggle-track">
+            <input type="checkbox" name="include_nearby" value="1" {{ request()->boolean('include_nearby') ? 'checked' : '' }}>
+          </span>
+          <span>Inclure les annonces à proximité (20 km)</span>
+        </label>
       </div>
 
-      {{-- City --}}
+      {{-- Ville ou région --}}
       <div class="filter-section">
-        <h3 class="filter-section-label">Ville</h3>
+        <h3 class="filter-section-label">Ville ou région</h3>
         <div class="filter-autocomplete" data-filter-city-autocomplete>
-          <input type="text" name="city" class="filter-text-input" placeholder="Nom de la ville"
+          <input type="hidden" name="region" id="filter-region" value="{{ request('region') }}">
+          <input type="text" name="city" class="filter-text-input" placeholder="Nom de la ville ou région"
             value="{{ request('city') }}" autocomplete="off">
           <div class="filter-autocomplete-list" data-filter-city-list></div>
         </div>
-      </div>
-
-      <div class="filter-section" data-filter-nearby-section {{ request('city') ? '' : 'hidden' }}>
-        <h3 class="filter-section-label">À proximité</h3>
-        <label class="filter-checkbox">
-          <input type="checkbox" name="include_nearby" value="1" {{ request()->boolean('include_nearby') && request('city') ? 'checked' : '' }} {{ request('city') ? '' : 'disabled' }}>
-          <span>Inclure les annonces à proximité (20 km)</span>
-        </label>
       </div>
 
       {{-- Price unit --}}
@@ -117,7 +107,7 @@
       <button type="button" class="filter-clear-btn" onclick="resetFilters()">
         Effacer
       </button>
-      <button type="submit" form="filter-form" class="filter-submit-btn">
+      <button type="submit" form="filter-form" class="filter-submit-btn" disabled>
         @svg('mdi-magnify')
         Voir les annonces
       </button>
@@ -388,28 +378,57 @@
       font-size: 0.82rem;
     }
 
-    [data-filter-nearby-section][hidden] {
-      display: none;
-    }
-
-    .filter-checkbox {
+    .nearby-toggle {
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      padding: 0.95rem 1rem;
-      border: 1.5px solid #eee;
-      border-radius: 14px;
-      background-color: #fafafa;
       color: var(--clr-text-dark);
       font-size: 0.95rem;
       font-weight: 500;
     }
 
-    .filter-checkbox input {
-      width: 1rem;
-      height: 1rem;
-      accent-color: var(--clr-primary);
+    .nearby-toggle[hidden] {
+      display: none;
+    }
+
+    .toggle-track {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #ddd;
+      border-radius: 12px;
+      transition: background 0.2s;
       flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .toggle-track input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      pointer-events: none;
+    }
+
+    .toggle-track:has(input:checked) {
+      background: var(--clr-primary);
+    }
+
+    .toggle-track:has(input:checked)::after {
+      transform: translateX(20px);
     }
 
     .price-filter-row {
@@ -593,7 +612,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      padding: 1.25rem 1.5rem;
+      padding: 1.5rem;
       border-top: 1px solid #f0f0f0;
       position: sticky;
       bottom: 0;
@@ -611,24 +630,31 @@
     .filter-submit-btn {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      justify-content: center;
+      gap: 0.8rem;
       background-color: var(--clr-primary);
       color: white;
-      padding: 0.9rem 1.5rem;
-      border-radius: 14px;
+      padding: 1.2rem;
+      border-radius: 16px;
       font-weight: 700;
-      font-size: 1rem;
-      box-shadow: 0 6px 14px rgba(0, 68, 170, 0.28);
+      font-size: 1.2rem;
+      box-shadow: 0 8px 16px rgba(0, 68, 170, 0.3);
       transition: transform 0.2s;
     }
 
     .filter-submit-btn svg {
-      width: 1.2rem;
-      height: 1.2rem;
+      width: 1.5rem;
+      height: 1.5rem;
     }
 
     .filter-submit-btn:active {
       transform: scale(0.98);
+    }
+
+    .filter-submit-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
     }
   </style>
 @endpush
@@ -639,6 +665,8 @@
       document.getElementById('filter-panel').classList.add('active')
       document.getElementById('filter-panel').setAttribute('aria-hidden', 'false')
       document.body.style.overflow = 'hidden'
+      snapshotFilterState()
+      updateFilterSubmit()
     }
 
     function closeFilterPanel() {
@@ -664,6 +692,7 @@
         display.textContent = capacityValue + ' pers.'
         input.value = capacityValue
       }
+      updateFilterSubmit()
     }
 
     document.getElementById('capacity-increment').addEventListener('click', () => {
@@ -690,6 +719,7 @@
       let timer = null
       let items = []
       let activeIndex = -1
+      let isSelecting = false
 
       const close = () => {
         list.classList.remove('is-open')
@@ -708,6 +738,7 @@
       const select = (index) => {
         const item = items[index]
         if (!item) return
+        isSelecting = true
         onSelect(item)
         close()
       }
@@ -715,6 +746,12 @@
       input.addEventListener('input', () => {
         clearTimeout(timer)
         close()
+
+        if (isSelecting) {
+          isSelecting = false
+          return
+        }
+
         const query = input.value.trim()
         if (query.length < 2) return
 
@@ -770,17 +807,40 @@
 
     const filterCityInput = document.querySelector('input[name="city"].filter-text-input')
     const filterCityList = document.querySelector('[data-filter-city-list]')
-    const filterNearbySection = document.querySelector('[data-filter-nearby-section]')
-    const filterNearbyInput = filterNearbySection?.querySelector('input[name="include_nearby"]')
     const filterCityCache = new Map()
+    const filterSubmitBtn = document.querySelector('.filter-submit-btn')
+    let filterSnapshot = {}
 
-    function syncFilterNearby() {
-      if (!filterCityInput || !filterNearbySection || !filterNearbyInput) return
-      const hasCity = filterCityInput.value.trim() !== ''
-      filterNearbySection.hidden = !hasCity
-      filterNearbyInput.disabled = !hasCity
-      if (!hasCity) filterNearbyInput.checked = false
+    function snapshotFilterState() {
+      filterSnapshot = {
+        city: filterCityInput?.value || '',
+        nearby: document.querySelector('#filter-form input[name="include_nearby"]')?.checked || false,
+        sort: document.querySelector('input[name="sort"]:checked')?.value || 'latest',
+        priceMin: document.getElementById('price-min')?.value || '',
+        priceMax: document.getElementById('price-max')?.value || '',
+        capacity: document.getElementById('capacity-input')?.value || '',
+        priceUnit: document.getElementById('price-unit-select')?.value || 'day',
+      }
     }
+
+    function updateFilterSubmit() {
+      if (!filterSubmitBtn) return
+      filterSubmitBtn.disabled = (
+        (filterCityInput?.value || '') === filterSnapshot.city &&
+        (document.querySelector('#filter-form input[name="include_nearby"]')?.checked || false) === filterSnapshot.nearby &&
+        (document.querySelector('input[name="sort"]:checked')?.value || 'latest') === filterSnapshot.sort &&
+        (document.getElementById('price-min')?.value || '') === filterSnapshot.priceMin &&
+        (document.getElementById('price-max')?.value || '') === filterSnapshot.priceMax &&
+        (document.getElementById('capacity-input')?.value || '') === filterSnapshot.capacity &&
+        (document.getElementById('price-unit-select')?.value || 'day') === filterSnapshot.priceUnit
+      )
+    }
+
+    document.querySelector('#filter-form input[name="include_nearby"]')?.addEventListener('change', updateFilterSubmit)
+    document.querySelectorAll('input[name="sort"]').forEach(el => el.addEventListener('change', updateFilterSubmit))
+    document.getElementById('price-min')?.addEventListener('input', updateFilterSubmit)
+    document.getElementById('price-max')?.addEventListener('input', updateFilterSubmit)
+    document.getElementById('price-unit-select')?.addEventListener('change', updateFilterSubmit)
 
     if (filterCityInput && filterCityList) {
       initAutocomplete({
@@ -801,20 +861,25 @@
         `,
         onSelect: (result) => {
           filterCityInput.value = result.name || ''
+          document.getElementById('filter-region').value = result.region || ''
           filterCityInput.dispatchEvent(new Event('input', { bubbles: true }))
         },
       })
 
-      filterCityInput.addEventListener('input', syncFilterNearby)
-      syncFilterNearby()
+      filterCityInput.addEventListener('input', updateFilterSubmit)
+      updateFilterSubmit()
     }
+
+    document.getElementById('filter-form').addEventListener('submit', (e) => {
+      if (filterSubmitBtn?.disabled) e.preventDefault()
+    })
 
     function resetFilters() {
       document.querySelector('input[name="sort"][value="latest"]').checked = true
-      document.querySelector('select[name="region"]').value = ''
       if (filterCityInput) filterCityInput.value = ''
-      if (filterNearbyInput) filterNearbyInput.checked = false
-      syncFilterNearby()
+      document.getElementById('filter-region').value = ''
+      const nearbyInput = document.querySelector('#filter-form input[name="include_nearby"]')
+      if (nearbyInput) nearbyInput.checked = false
       document.getElementById('price-unit-select').value = 'day'
       document.getElementById('price-min').value = ''
       document.getElementById('price-max').value = ''
