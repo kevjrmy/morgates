@@ -22,11 +22,10 @@
   </button>
 </div>
 
-<dialog id="{{ $modalId }}" class="account-bottom-sheet" aria-labelledby="{{ $modalId }}-title">
+<dialog id="{{ $modalId }}" class="account-bottom-sheet" aria-label="{{ $field['label'] }}">
   <div class="account-bottom-sheet-header">
     <div>
       <span>{{ $field['label'] }}</span>
-      <h3 id="{{ $modalId }}-title">Modifier</h3>
     </div>
     <form method="dialog">
       <button type="submit" class="account-bottom-sheet-close" aria-label="Fermer">
@@ -40,7 +39,6 @@
       @csrf
       @method('PUT')
 
-      <label for="profile-{{ $name }}">{{ $field['label'] }}</label>
       @if($isTextarea)
         <textarea id="profile-{{ $name }}" name="{{ $name }}" rows="5" placeholder="{{ $field['placeholder'] }}">{{ $value }}</textarea>
       @else
