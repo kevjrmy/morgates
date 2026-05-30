@@ -10,7 +10,7 @@
         <button type="button" class="tab-button active" data-tab="stays" onclick="switchTab('stays')"
           aria-pressed="true">
           @svg('mdi-home-outline')
-          <span>Logements</span>
+          <span>Hébergements</span>
         </button>
         <button type="button" class="tab-button" data-tab="boats" onclick="switchTab('boats')" aria-pressed="false">
           @svg('mdi-sail-boat')
@@ -27,37 +27,33 @@
       <!-- Stays Form -->
       <form action="{{ route('listings') }}" method="GET" id="form-stays" class="search-form active">
         <input type="hidden" name="type" value="stays">
+        <label class="nearby-toggle" data-nearby-toggle>
+          <span class="toggle-track">
+            <input type="checkbox" name="include_nearby" value="1" {{ request()->boolean('include_nearby') ? 'checked' : '' }}>
+          </span>
+          <span>Inclure les annonces à proximité (20 km)</span>
+        </label>
         <div class="form-group has-autocomplete" data-city-autocomplete>
           <label for="city-stays">@svg('mdi-map-marker-outline') Où ?</label>
           <input type="text" name="city" id="city-stays" placeholder="Ville ou région" value="{{ request('city') }}"
             autocomplete="off">
         </div>
-        <label class="nearby-toggle" data-nearby-toggle>
-          <input type="checkbox" name="include_nearby" value="1" {{ request()->boolean('include_nearby') ? 'checked' : '' }}>
-          <span>Inclure les annonces à proximité (20 km)</span>
-        </label>
-        <button type="submit" class="submit-button">
-          @svg('mdi-magnify')
-          <span>Rechercher</span>
-        </button>
       </form>
 
       <!-- Boats Form -->
       <form action="{{ route('listings') }}" method="GET" id="form-boats" class="search-form">
         <input type="hidden" name="type" value="boats">
+        <label class="nearby-toggle" data-nearby-toggle>
+          <span class="toggle-track">
+            <input type="checkbox" name="include_nearby" value="1" {{ request()->boolean('include_nearby') ? 'checked' : '' }}>
+          </span>
+          <span>Inclure les annonces à proximité (20 km)</span>
+        </label>
         <div class="form-group has-autocomplete" data-city-autocomplete>
           <label for="city-boats">@svg('mdi-anchor') Port de départ</label>
           <input type="text" name="city" id="city-boats" placeholder="Ville ou port" value="{{ request('city') }}"
             autocomplete="off">
         </div>
-        <label class="nearby-toggle" data-nearby-toggle>
-          <input type="checkbox" name="include_nearby" value="1" {{ request()->boolean('include_nearby') ? 'checked' : '' }}>
-          <span>Inclure les annonces à proximité (20 km)</span>
-        </label>
-        <button type="submit" class="submit-button">
-          @svg('mdi-magnify')
-          <span>Rechercher</span>
-        </button>
       </form>
 
       <!-- Name Search Form -->
@@ -70,11 +66,13 @@
           <input type="text" name="q" id="q-name" placeholder="Ex&nbsp;: Villa Bretagne, Jean Dupont..."
             value="{{ request('q') }}" autocomplete="off">
         </div>
-        <button type="submit" class="submit-button">
-          @svg('mdi-magnify')
-          <span>Rechercher</span>
-        </button>
       </form>
+    </div>
+    <div class="search-modal-footer">
+      <button type="button" class="submit-button" disabled>
+        @svg('mdi-magnify')
+        <span>Rechercher</span>
+      </button>
     </div>
   </div>
 </div>
@@ -264,10 +262,6 @@
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      padding: 0.95rem 1rem;
-      border: 1.5px solid #eee;
-      border-radius: 16px;
-      background-color: #fafafa;
       color: var(--clr-text-dark);
       font-size: 0.95rem;
       font-weight: 500;
@@ -277,11 +271,44 @@
       display: none;
     }
 
-    .nearby-toggle input {
-      width: 1rem;
-      height: 1rem;
-      accent-color: var(--clr-primary);
+    .toggle-track {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #ddd;
+      border-radius: 12px;
+      transition: background 0.2s;
       flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .toggle-track input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      pointer-events: none;
+    }
+
+    .toggle-track:has(input:checked) {
+      background: var(--clr-primary);
+    }
+
+    .toggle-track:has(input:checked)::after {
+      transform: translateX(20px);
     }
 
     .submit-button {
@@ -295,7 +322,6 @@
       border-radius: 16px;
       font-weight: 700;
       font-size: 1.2rem;
-      margin-top: 1rem;
       box-shadow: 0 8px 16px rgba(0, 68, 170, 0.3);
       transition: transform 0.2s;
     }
@@ -307,6 +333,26 @@
 
     .submit-button:active {
       transform: scale(0.98);
+    }
+
+    .submit-button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .search-modal-footer {
+      position: sticky;
+      bottom: 0;
+      padding: 1.5rem;
+      background: white;
+      border-top: 1px solid #f0f0f0;
+      z-index: 10;
+    }
+
+    .search-modal-footer .submit-button {
+      margin-top: 0;
+      width: 100%;
     }
 
     .name-search-intro {
@@ -345,6 +391,7 @@
     }
 
     .autocomplete-item {
+      width: 100%;
       padding: 0.9rem 1.1rem;
       cursor: pointer;
       display: flex;
@@ -431,6 +478,20 @@
           document.querySelectorAll('.search-form').forEach(form => {
             form.classList.toggle('active', form.id === `form-${tab}`)
           })
+
+          updateFooterSubmit()
+        }
+
+        const footerSubmitBtn = document.querySelector('.search-modal-footer .submit-button')
+
+        function updateFooterSubmit() {
+          if (!footerSubmitBtn) return
+          const activeForm = document.querySelector('.search-form.active')
+          if (!activeForm) return
+          const cityInput = activeForm.querySelector('input[name="city"]')
+          const qInput = activeForm.querySelector('input[name="q"]')
+          if (cityInput) footerSubmitBtn.disabled = cityInput.value.trim().length < 2
+          else if (qInput) footerSubmitBtn.disabled = qInput.value.trim().length < 2
         }
 
         function initAutocomplete({ input, list, fetchSuggestions, renderItem, onSelect }) {
@@ -439,6 +500,7 @@
           let debounceTimer = null
           let highlightedIndex = -1
           let items = []
+          let isSelecting = false
 
           const close = () => {
             list.classList.remove('visible')
@@ -457,6 +519,7 @@
           const select = (index) => {
             const item = items[index]
             if (!item) return
+            isSelecting = true
             onSelect(item)
             close()
           }
@@ -464,6 +527,11 @@
           input.addEventListener('input', () => {
             clearTimeout(debounceTimer)
             close()
+
+            if (isSelecting) {
+              isSelecting = false
+              return
+            }
 
             const query = input.value.trim()
             if (query.length < 2) return
@@ -576,6 +644,7 @@
                 }
 
                 input.value = result.name || result.title || ''
+                input.dispatchEvent(new Event('input', { bubbles: true }))
               },
             })
           }
@@ -585,20 +654,27 @@
 
         document.querySelectorAll('.search-form').forEach(form => {
           const cityInput = form.querySelector('input[name="city"]')
+          const qInput = form.querySelector('input[name="q"]')
           const nearbyToggle = form.querySelector('[data-nearby-toggle]')
           const nearbyInput = nearbyToggle?.querySelector('input[name="include_nearby"]')
-          if (!cityInput || !nearbyToggle || !nearbyInput) return
 
-          const syncNearby = () => {
-            const hasCity = cityInput.value.trim() !== ''
-            nearbyToggle.hidden = !hasCity
-            nearbyInput.disabled = !hasCity
-            if (!hasCity) nearbyInput.checked = false
+          if (cityInput && nearbyToggle && nearbyInput) {
+            cityInput.addEventListener('input', updateFooterSubmit)
+            updateFooterSubmit()
+          } else if (qInput) {
+            qInput.addEventListener('input', updateFooterSubmit)
+            updateFooterSubmit()
           }
 
-          cityInput.addEventListener('input', syncNearby)
-          form.addEventListener('submit', syncNearby)
-          syncNearby()
+          form.addEventListener('submit', (e) => {
+            if (footerSubmitBtn?.disabled) e.preventDefault()
+          })
+        })
+
+        footerSubmitBtn?.addEventListener('click', () => {
+          const activeForm = document.querySelector('.search-form.active')
+          if (!activeForm || footerSubmitBtn.disabled) return
+          activeForm.requestSubmit()
         })
 
         if (!window.hasGlobalEscListener) {
