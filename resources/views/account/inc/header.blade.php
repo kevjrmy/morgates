@@ -10,11 +10,11 @@
       <button type="button" id="user-menu-toggle" aria-label="Ouvrir le menu du compte" aria-expanded="false"
         aria-controls="user-menu">
         @if(auth()->user()->profile_picture)
-          <img src="{{ asset(auth()->user()->profile_picture) }}" alt="{{ auth()->user()->name }}" class="user-avatar">
+          <img src="{{ asset(auth()->user()->profile_picture) }}" alt="{{ auth()->user()->display_host_name }}" class="user-avatar">
         @else
           @svg('tabler-user-circle', ['class' => 'user-avatar-placeholder'])
         @endif
-        <span class="user-name">{{ auth()->user()->name }}</span>
+        <span class="user-name">{{ auth()->user()->display_host_name }}</span>
         @svg('tabler-chevron-down', ['class' => 'user-chevron'])
       </button>
 

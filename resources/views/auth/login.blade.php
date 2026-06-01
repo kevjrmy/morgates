@@ -46,10 +46,12 @@
           </div>
         </div>
 
-        <div class="form-remember">
-          <input type="checkbox" id="remember" name="remember">
-          <label for="remember">Se souvenir de moi</label>
-        </div>
+        <label class="form-remember">
+          <span class="toggle-track">
+            <input type="checkbox" id="remember" name="remember">
+          </span>
+          <span>Se souvenir de moi</span>
+        </label>
 
         <button type="submit" class="btn-submit">
           Connexion
@@ -65,6 +67,60 @@
     </div>
   </main>
 @endsection
+
+@push('styles')
+  <style scoped>
+    .form-remember {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--clr-text-dark);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .toggle-track {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #ddd;
+      border-radius: 12px;
+      transition: background 0.2s;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .toggle-track input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      pointer-events: none;
+    }
+
+    .toggle-track:has(input:checked) {
+      background: var(--clr-primary);
+    }
+
+    .toggle-track:has(input:checked)::after {
+      transform: translateX(20px);
+    }
+  </style>
+@endpush
 
 @push('scripts')
   <script>

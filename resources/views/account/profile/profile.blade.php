@@ -5,11 +5,12 @@
 @section('content')
   @php
     $profileFields = [
-      'name' => ['label' => 'Prénom', 'type' => 'text', 'placeholder' => 'Votre prénom', 'icon' => 'tabler-user'],
+      'first_name' => ['label' => 'Prénom', 'type' => 'text', 'placeholder' => 'Votre prénom', 'icon' => 'tabler-user', 'clearable' => false],
+      'last_name' => ['label' => 'Nom', 'type' => 'text', 'placeholder' => 'Votre nom', 'icon' => 'tabler-user'],
+      'host_name' => ['label' => 'Nom d’hôte', 'type' => 'text', 'placeholder' => $user->display_host_name ?: 'Jean D.', 'icon' => 'tabler-id', 'displayValue' => $user->display_host_name, 'emptyText' => 'Non renseigné', 'helperText' => 'Ce nom est visible par les visiteurs sur vos annonces'],
       'email' => ['label' => 'Email', 'type' => 'email', 'placeholder' => 'vous@exemple.fr', 'icon' => 'tabler-mail', 'clearable' => false],
       'phone' => ['label' => 'Téléphone', 'type' => 'tel', 'placeholder' => '+33 6 00 00 00 00', 'icon' => 'tabler-phone'],
       'country' => ['label' => 'Pays', 'type' => 'text', 'placeholder' => 'FR', 'icon' => 'tabler-map-pin', 'maxlength' => 2],
-      'location' => ['label' => 'Localisation', 'type' => 'text', 'placeholder' => 'Ville ou région', 'icon' => 'tabler-current-location'],
     ];
   @endphp
 
@@ -18,7 +19,7 @@
     <section class="account-profile-hero">
       <div class="account-profile-avatar">
         @if($user->profile_picture)
-          <img src="{{ asset($user->profile_picture) }}" alt="{{ $user->name ?: 'Photo de profil' }}">
+          <img src="{{ asset($user->profile_picture) }}" alt="{{ $user->display_host_name ?: 'Photo de profil' }}">
         @else
           @svg('tabler-user', ['class' => 'account-avatar-icon'])
         @endif
@@ -175,10 +176,27 @@
     document.querySelectorAll('[data-profile-modal-open]').forEach((trigger) => {
       trigger.addEventListener('click', () => {
         const modal = document.getElementById(trigger.dataset.profileModalOpen);
+        const currentModal = trigger.dataset.profileModalClose
+          ? document.getElementById(trigger.dataset.profileModalClose)
+          : trigger.closest('dialog');
 
-        if (modal && typeof modal.showModal === 'function') {
-          modal.showModal();
+        if (!modal || typeof modal.showModal !== 'function') return;
+
+        if (currentModal && currentModal.open && currentModal !== modal) {
+          currentModal.close();
         }
+
+        if (modal.classList.contains('account-actions-sheet')) {
+          const rect = trigger.getBoundingClientRect();
+          const menuWidth = Math.min(224, window.innerWidth - 32);
+          const left = Math.min(Math.max(16, rect.right - menuWidth), window.innerWidth - menuWidth - 16);
+          const top = Math.min(rect.bottom + 8, window.innerHeight - 160);
+
+          modal.style.setProperty('--account-actions-left', `${left}px`);
+          modal.style.setProperty('--account-actions-top', `${Math.max(16, top)}px`);
+        }
+
+        modal.showModal();
       });
     });
 
@@ -189,6 +207,78 @@
         }
       });
     });
+
+    // Phone input logic
+    const profilePhoneInput = document.getElementById('profile-phone');
+    const profilePhoneCountrySelect = document.getElementById('profile_phone_country_select');
+    const profilePhoneCountries = @json(config('countries'));
+
+    if (profilePhoneInput && profilePhoneCountrySelect && profilePhoneCountries) {
+      const sortedProfilePhoneCountries = [...profilePhoneCountries].sort((a, b) => b.dial.length - a.dial.length);
+
+      function syncProfileCountry(countryCode) {
+        const profileCountryInput = document.getElementById('profile-country');
+        if (profileCountryInput) {
+          profileCountryInput.value = countryCode;
+        }
+      }
+
+      function updateProfileSelectFromPhone() {
+        let val = profilePhoneInput.value.trim();
+        if (val.startsWith('00')) val = '+' + val.substring(2);
+
+        const cleanVal = val.replace(/[\s\(\)\-]/g, '');
+        if (cleanVal.startsWith('+')) {
+          const matched = sortedProfilePhoneCountries.find(c => cleanVal.startsWith(c.dial));
+          if (matched) {
+            profilePhoneCountrySelect.value = matched.dial;
+            syncProfileCountry(matched.code);
+          }
+        }
+      }
+
+      profilePhoneInput.addEventListener('input', updateProfileSelectFromPhone);
+
+      profilePhoneCountrySelect.addEventListener('change', (event) => {
+        const newDial = event.target.value;
+        const matchedNew = sortedProfilePhoneCountries.find(c => c.dial === newDial);
+
+        if (matchedNew) {
+          syncProfileCountry(matchedNew.code);
+        }
+
+        let val = profilePhoneInput.value.trim();
+
+        if (!val) {
+          profilePhoneInput.value = newDial + ' ';
+          profilePhoneInput.focus();
+          return;
+        }
+
+        let normalizedVal = val;
+        if (normalizedVal.startsWith('00')) normalizedVal = '+' + normalizedVal.substring(2);
+
+        const cleanVal = normalizedVal.replace(/[\s\(\)\-]/g, '');
+        if (cleanVal.startsWith('+')) {
+          const matched = sortedProfilePhoneCountries.find(c => cleanVal.startsWith(c.dial));
+          if (matched) {
+            const remaining = cleanVal.substring(matched.dial.length);
+            profilePhoneInput.value = newDial + ' ' + remaining;
+            profilePhoneInput.focus();
+            return;
+          }
+        }
+
+        if (cleanVal.startsWith('0')) {
+          profilePhoneInput.value = newDial + ' ' + cleanVal.substring(1);
+        } else {
+          profilePhoneInput.value = newDial + ' ' + val;
+        }
+        profilePhoneInput.focus();
+      });
+
+      updateProfileSelectFromPhone();
+    }
 
     // Language tag toggles
     document.querySelectorAll('.account-language-tag').forEach((tag) => {

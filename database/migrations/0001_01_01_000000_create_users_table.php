@@ -14,6 +14,9 @@ return new class extends Migration {
       /* Classic */
       $table->id();
       $table->string('name')->nullable();
+      $table->string('first_name')->nullable();
+      $table->string('last_name')->nullable();
+      $table->string('host_name')->nullable();
       $table->string('email')->unique();
       $table->timestamp('email_verified_at')->nullable();
       $table->string('password');
@@ -25,7 +28,6 @@ return new class extends Migration {
       $table->string('profile_picture')->nullable();
       $table->longText('bio')->nullable();
       $table->char('country', 2)->index()->nullable();
-      $table->string('location')->nullable();
       $table->integer('points')->default(0);
       $table->char('locale', 5)->default('fr');
     });

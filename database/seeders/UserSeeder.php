@@ -14,21 +14,18 @@ class UserSeeder extends Seeder
   {
     $users = [
       [
-        'name' => 'Loïs',
+        'first_name' => 'Loïs',
+        'last_name' => 'Voisin',
+        'host_name' => null,
         'email' => 'lois@morgates.com',
         'email_verified_at' => now(),
         'password' => bcrypt('abretesesamo'),
         'bio' => 'Salut c\'est Loïs!',
       ],
       [
-        'name' => 'Alice',
-        'email' => 'alice@morgates.com',
-        'email_verified_at' => now(),
-        'password' => bcrypt('notrelogiquevousdepasse'),
-        'bio' => 'Hôte passionnée de locations.',
-      ],
-      [
-        'name' => 'Kevin Jérémy',
+        'first_name' => 'Kevin',
+        'last_name' => 'Jérémy',
+        'host_name' => null,
         'email' => 'kj@morgates.com',
         'email_verified_at' => now(),
         'password' => bcrypt('123'),

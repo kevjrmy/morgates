@@ -8,10 +8,9 @@ use Illuminate\Validation\Rule;
 class AccountController extends Controller
 {
   private const CLEARABLE_PROFILE_FIELDS = [
-    'name',
+    'host_name',
     'phone',
     'country',
-    'location',
     'bio',
     'locale',
   ];
@@ -61,9 +60,11 @@ class AccountController extends Controller
   {
     abort_unless(in_array($field, self::CLEARABLE_PROFILE_FIELDS, true), 404);
 
-    $request->user()->update([
+    $data = [
       $field => $field === 'locale' ? $this->defaultValueFor($field) : null,
-    ]);
+    ];
+
+    $request->user()->update($data);
 
     return redirect()->route('account.profile')->with('success', 'La valeur a été supprimée.');
   }
@@ -86,11 +87,12 @@ class AccountController extends Controller
   private function profileValidationRules($user): array
   {
     return [
-      'name' => ['nullable', 'string', 'max:255'],
+      'first_name' => ['required', 'string', 'max:255'],
+      'last_name' => ['nullable', 'string', 'max:255'],
+      'host_name' => ['nullable', 'string', 'max:255'],
       'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
       'phone' => ['nullable', 'string', 'max:20'],
       'country' => ['nullable', 'string', 'size:2'],
-      'location' => ['nullable', 'string', 'max:255'],
       'bio' => ['nullable', 'string', 'max:1000'],
       'locale' => ['nullable', 'string', 'max:5'],
     ];
@@ -100,6 +102,12 @@ class AccountController extends Controller
   {
     if (array_key_exists('email', $data)) {
       $data['email'] = strtolower($data['email']);
+    }
+
+    if (array_key_exists('first_name', $data) || array_key_exists('last_name', $data)) {
+      $firstName = $data['first_name'] ?? auth()->user()?->first_name;
+      $lastName = $data['last_name'] ?? auth()->user()?->last_name;
+      $data['name'] = trim(collect([$firstName, $lastName])->filter()->implode(' ')) ?: null;
     }
 
     if (array_key_exists('country', $data)) {
@@ -115,7 +123,7 @@ class AccountController extends Controller
 
   private function profileCompletion($user): int
   {
-    $missingFields = collect(['name', 'phone', 'country', 'bio'])
+    $missingFields = collect(['first_name', 'phone', 'country', 'bio'])
       ->filter(fn($field) => empty($user->$field))
       ->count();
 

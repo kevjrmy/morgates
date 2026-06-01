@@ -56,14 +56,14 @@
           <div class="host-avatar">
             @if ($listing->user->profile_picture)
               <img src="{{ Str::startsWith($listing->user->profile_picture, 'http') ? $listing->user->profile_picture : asset('storage/' . $listing->user->profile_picture) }}"
-                alt="{{ $listing->user->name }}">
+                alt="{{ $listing->user->display_host_name }}">
             @else
               @svg('tabler-user', ['class' => 'icon'])
             @endif
           </div>
           <div class="host-details">
             <span class="host-label">Proposé par</span>
-            <span class="host-name">{{ $listing->user->name ?? 'Hôte Morgates' }}</span>
+            <span class="host-name">{{ $listing->user->display_host_name ?? 'Hôte Morgates' }}</span>
           </div>
         </div>
       </section>

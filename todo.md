@@ -41,3 +41,7 @@
 8. **Expand test coverage**
    - Add feature tests for listing creation flow, filtering, and contact.
    - Add unit tests for model helpers.
+
+
+## Perso
+- finir le UI de la page de profil puis le conecter avec le backend

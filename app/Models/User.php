@@ -19,13 +19,15 @@ class User extends Authenticatable
    */
   protected $fillable = [
     'name',
+    'first_name',
+    'last_name',
+    'host_name',
     'email',
     'password',
     'phone',
     'profile_picture',
     'bio',
     'country',
-    'location',
     'locale',
   ];
 
@@ -50,6 +52,44 @@ class User extends Authenticatable
       'email_verified_at' => 'datetime',
       'password' => 'hashed',
     ];
+  }
+
+  public function getNameAttribute($value): ?string
+  {
+    return $this->display_host_name ?? $value;
+  }
+
+  public function getDisplayHostNameAttribute(): ?string
+  {
+    $rawName = $this->getRawOriginal('name');
+
+    if (filled($this->host_name)) {
+      return $this->host_name;
+    }
+
+    if (filled($this->first_name) && filled($this->last_name)) {
+      return trim($this->first_name) . ' ' . mb_strtoupper(mb_substr(trim($this->last_name), 0, 1)) . '.';
+    }
+
+    if (filled($this->first_name)) {
+      return $this->first_name;
+    }
+
+    return $rawName ?: null;
+  }
+
+  public function getGreetingNameAttribute(): ?string
+  {
+    $rawName = $this->getRawOriginal('name');
+
+    return $this->first_name ?: $this->host_name ?: $rawName ?: null;
+  }
+
+  public function getFullNameAttribute(): ?string
+  {
+    $rawName = $this->getRawOriginal('name');
+
+    return trim(collect([$this->first_name, $this->last_name])->filter()->implode(' ')) ?: ($rawName ?: null);
   }
 
   public function listings(): \Illuminate\Database\Eloquent\Relations\HasMany

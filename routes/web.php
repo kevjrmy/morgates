@@ -63,7 +63,10 @@ Route::get('/annonces', function () {
         ->orWhere('description', 'like', '%' . request('q') . '%')
         ->orWhere('city', 'like', '%' . request('q') . '%')
         ->orWhereHas('user', function ($u) {
-          $u->where('name', 'like', '%' . request('q') . '%');
+          $term = '%' . request('q') . '%';
+          $u->where('first_name', 'like', $term)
+            ->orWhere('last_name', 'like', $term)
+            ->orWhere('host_name', 'like', $term);
         });
     });
   }
@@ -137,10 +140,15 @@ Route::get('/api/listings/suggest', function () {
   if (strlen($q) < 2) return response()->json([]);
 
   $results = \App\Models\Listing::query()
-    ->with('user:id,name')
+    ->with('user:id,name,first_name,last_name,host_name')
     ->where(function ($query) use ($q) {
-      $query->where('title', 'like', '%' . $q . '%')
-        ->orWhereHas('user', fn($u) => $u->where('name', 'like', '%' . $q . '%'));
+      $term = '%' . $q . '%';
+      $query->where('title', 'like', $term)
+        ->orWhereHas('user', function ($u) use ($term) {
+          $u->where('first_name', 'like', $term)
+            ->orWhere('last_name', 'like', $term)
+            ->orWhere('host_name', 'like', $term);
+        });
     })
     ->where('is_active', true)
     ->orderByRaw('CASE WHEN title LIKE ? THEN 0 ELSE 1 END', ['%' . $q . '%'])
@@ -151,7 +159,7 @@ Route::get('/api/listings/suggest', function () {
       'title' => $l->title,
       'slug'  => $l->slug,
       'type'  => $l->typeLabel(),
-      'owner' => $l->user?->name,
+      'owner' => $l->user?->display_host_name,
       'city'  => $l->city,
       'url'   => route('listing', $l),
     ]);

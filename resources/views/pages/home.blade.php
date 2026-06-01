@@ -183,16 +183,9 @@
 
     .footer-cta {
       margin-top: 1.5rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.65rem 1.5rem;
-      background: white;
-      border: 1px solid rgba(0, 68, 170, 0.08);
-      border-radius: 100px;
+      display: block;
       font-size: 0.9rem;
       color: var(--clr-text-medium);
-      box-shadow: 0 4px 12px -4px rgba(0, 68, 170, 0.06);
       transition: all 0.3s ease;
     }
 

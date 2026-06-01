@@ -33,13 +33,17 @@
           <form action="{{ route('onboarding.name') }}" method="POST" class="auth-form">
             @csrf
             <div class="form-group">
-              <label for="name">Votre prénom</label>
-              <input type="text" id="name" name="name" value="{{ old('name', auth()->user()->name) }}"
-                placeholder="Prénom" autocomplete="given-name" autofocus>
+              <label for="first_name">Votre prénom</label>
+              <input type="text" id="first_name" name="first_name" value="{{ old('first_name', auth()->user()->first_name) }}"
+                placeholder="Prénom" autocomplete="given-name" autofocus required>
+            </div>
+            <div class="form-group">
+              <label for="last_name">Votre nom</label>
+              <input type="text" id="last_name" name="last_name" value="{{ old('last_name', auth()->user()->last_name) }}"
+                placeholder="Nom" autocomplete="family-name">
             </div>
             <div class="onboarding-actions">
               <button type="submit" class="btn-submit">Continuer</button>
-              <button type="button" class="btn-skip" data-next="2">Passer cette étape</button>
             </div>
           </form>
         </div>

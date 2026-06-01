@@ -425,6 +425,7 @@
   background: var(--clr-background);
   border: 0.5px solid #EBEBEB;
   border-radius: 0.75rem;
+  cursor: pointer;
 }
 
 .account-profile-value-icon {
@@ -447,8 +448,7 @@
 .account-profile-value-content p {
   margin: 0;
   font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--clr-text-dark);
+  letter-spacing: 0.25px;
   overflow-wrap: anywhere;
 }
 
@@ -562,15 +562,86 @@
   overflow-y: auto;
 }
 
+.account-actions-sheet {
+  inset: var(--account-actions-top, 1rem) auto auto var(--account-actions-left, 1rem);
+  width: min(14rem, calc(100vw - 2rem));
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16);
+}
+
+.account-actions-sheet::backdrop {
+  background: transparent;
+}
+
+.account-actions-sheet .account-bottom-sheet-body {
+  gap: 0.15rem;
+  padding: 0.35rem;
+}
+
+.account-edit-sheet {
+  min-height: 50vh;
+}
+
+.account-edit-sheet .account-bottom-sheet-body {
+  align-content: start;
+}
+
+.account-confirm-sheet .account-bottom-sheet-body {
+  gap: 0.5rem;
+}
+
+.account-sheet-action {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.8rem 0.75rem;
+  background: #fff;
+  color: var(--clr-text-dark);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.account-sheet-action:hover,
+.account-sheet-action:focus-visible {
+  background: #F7F7F7;
+  outline: none;
+}
+
+.account-sheet-action svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  color: var(--clr-text-medium);
+}
+
+.account-sheet-action.is-danger {
+  color: #B42318;
+}
+
+.account-sheet-action.is-danger svg {
+  color: currentColor;
+}
+
+.account-confirm-copy {
+  margin: 0 0 0.25rem;
+  color: var(--clr-text-medium);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
 .account-bottom-sheet-form,
 .account-bottom-sheet-clear-form {
   display: grid;
   gap: 0.55rem;
-}
-
-.account-bottom-sheet-form label {
-  font-size: 0.72rem;
-  color: var(--clr-text-light);
 }
 
 .account-bottom-sheet-form input,
@@ -598,6 +669,47 @@
   border-color: var(--clr-primary);
 }
 
+.account-phone-input-wrapper {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border: 0.5px solid #DADADA;
+  border-radius: 0.5rem;
+  background: #fff;
+}
+
+.account-phone-input-wrapper:focus-within {
+  border-color: var(--clr-primary);
+}
+
+.account-phone-input-wrapper select.account-phone-country-select {
+  flex: 0 0 auto;
+  min-width: 4.75rem;
+  border: none;
+  border-right: 0.5px solid #DADADA;
+  border-radius: 0;
+  padding: 0.75rem 0.45rem 0.75rem 0.7rem;
+  background: transparent;
+  color: var(--clr-text-dark);
+  font: inherit;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.account-bottom-sheet-form .account-phone-input-wrapper input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  border-radius: 0;
+  padding: 0.75rem 0.8rem;
+  background: transparent;
+}
+
+.account-bottom-sheet-form .account-phone-input-wrapper input:focus {
+  border-color: transparent;
+}
+
 .account-field-save {
   width: 100%;
   border: none;
@@ -610,13 +722,64 @@
   font-weight: 600;
 }
 
+.account-field-save:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.account-edit-actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 0 0;
+  margin-top: auto;
+  background: var(--clr-background);
+  border-top: 0.5px solid #EBEBEB;
+}
+
+.account-edit-actions .account-field-save {
+  flex: 1;
+  width: auto;
+}
+
+.account-edit-actions .account-field-clear {
+  flex-shrink: 0;
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.account-edit-actions .account-field-clear svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.account-country-select {
+  width: 100%;
+  padding: 0.75rem 0.8rem;
+  border: 0.5px solid #DADADA;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: var(--clr-text-dark);
+  font: inherit;
+  font-size: 0.95rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.account-country-select:focus {
+  border-color: var(--clr-primary);
+}
+
 .account-field-clear {
   width: 100%;
   padding: 0.7rem 1rem;
-  border: 0.5px solid #EBEBEB;
+  border: 0.5px solid #F2C7C7;
   border-radius: 0.5rem;
-  background: transparent;
-  color: var(--clr-text-medium);
+  background: #fff;
+  color: #B42318;
   cursor: pointer;
   font-size: 0.82rem;
   font-weight: 600;
@@ -624,8 +787,26 @@
 
 .account-field-clear:hover,
 .account-field-clear:focus-visible {
-  border-color: #F2C7C7;
-  color: #b91c1c;
+  border-color: #B42318;
+  color: #8f1a12;
+  outline: none;
+}
+
+.account-field-cancel {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--clr-text-medium);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.account-field-cancel:hover,
+.account-field-cancel:focus-visible {
+  color: var(--clr-text-dark);
   outline: none;
 }
 
@@ -914,6 +1095,7 @@
 }
 
 @media (min-width: 720px) {
+
   .account-subscriptions-page,
   .account-profile-page {
     max-width: 720px;

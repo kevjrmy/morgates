@@ -5,7 +5,7 @@
 @section('content')
   @php
     $user = auth()->user();
-    $missingFields = collect(['name', 'phone', 'country', 'bio'])
+    $missingFields = collect(['first_name', 'phone', 'country', 'bio'])
       ->filter(fn($field) => empty($user->$field))
       ->count();
     $profileCompletion = (int) round((4 - $missingFields) / 4 * 100);
@@ -18,14 +18,14 @@
       <div class="account-hero-identity">
         <div class="account-avatar">
           @if($user->profile_picture)
-            <img src="{{ asset($user->profile_picture) }}" alt="{{ $user->name }}">
+            <img src="{{ asset($user->profile_picture) }}" alt="{{ $user->display_host_name }}">
           @else
             @svg('tabler-user', ['class' => 'account-avatar-icon'])
           @endif
         </div>
         <div>
           <h1 class="account-greeting">
-            Bonjour{{ $user->name ? ', ' . $user->name : '' }} !
+            Bonjour{{ $user->greeting_name ? ', ' . $user->greeting_name : '' }} !
           </h1>
           <p class="account-subtitle">Bienvenue sur votre espace.</p>
         </div>

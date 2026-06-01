@@ -8,8 +8,15 @@ class OnboardingController extends Controller
 {
   public function saveName(Request $request)
   {
-    $request->validate(['name' => 'nullable|string|max:255']);
-    $request->user()->update(['name' => $request->name]);
+    $data = $request->validate([
+      'first_name' => ['required', 'string', 'max:255'],
+      'last_name' => ['nullable', 'string', 'max:255'],
+    ]);
+
+    $data['name'] = trim(collect([$data['first_name'], $data['last_name'] ?? null])->filter()->implode(' ')) ?: null;
+
+    $request->user()->update($data);
+
     return redirect()->route('onboarding.index', ['step' => 2]);
   }
 
