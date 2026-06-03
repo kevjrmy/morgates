@@ -27,6 +27,15 @@ class AccountController extends Controller
     return view('account.listings.index', compact('listings'));
   }
 
+  public function editListing(\App\Models\Listing $listing)
+  {
+    if ($listing->user_id !== auth()->id()) {
+      abort(403);
+    }
+
+    return view('account.listings.edit', compact('listing'));
+  }
+
   public function profile()
   {
     $user = auth()->user();

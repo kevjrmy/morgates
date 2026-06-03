@@ -60,13 +60,20 @@
       <div class="filter-section">
         <h3 class="filter-section-label">Prix</h3>
         <div class="price-filter-row">
+          @php
+            $isBoats = request('type') === 'boats';
+            $rawUnit = request('price_unit') ?: session('price_unit', 'day');
+            // Fall back to 'day' if half-day is stored but we're not on boats
+            $activeUnit = (!$isBoats && $rawUnit === 'half-day') ? 'day' : $rawUnit;
+          @endphp
           <select name="price_unit" class="filter-select-sm" id="price-unit-select">
-            <option value="hour" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'hour' ? 'selected' : '' }}>heure</option>
-            <option value="half-day" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'half-day' ? 'selected' : '' }}>demi-journée</option>
-            <option value="day" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'day' ? 'selected' : '' }}>
-              jour</option>
-            <option value="week" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'week' ? 'selected' : '' }}>semaine</option>
-            <option value="month" {{ (request('price_unit') ?: session('price_unit', 'day')) === 'month' ? 'selected' : '' }}>mois</option>
+            <option value="hour" {{ $activeUnit === 'hour' ? 'selected' : '' }}>heure</option>
+            @if($isBoats)
+              <option value="half-day" {{ $activeUnit === 'half-day' ? 'selected' : '' }}>demi-journée</option>
+            @endif
+            <option value="day" {{ $activeUnit === 'day' ? 'selected' : '' }}>jour</option>
+            <option value="week" {{ $activeUnit === 'week' ? 'selected' : '' }}>semaine</option>
+            <option value="month" {{ $activeUnit === 'month' ? 'selected' : '' }}>mois</option>
           </select>
           <div class="price-range">
             <div class="price-field">

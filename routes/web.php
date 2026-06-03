@@ -246,6 +246,7 @@ Route::post('/deconnexion', [AuthController::class, 'logout'])->name('logout')->
 Route::middleware('auth')->group(function () {
   Route::get('/mon-espace', [AccountController::class, 'index'])->name('account');
   Route::get('/mon-espace/annonces', [AccountController::class, 'listings'])->name('account.listings');
+  Route::get('/mon-espace/annonces/{listing}/modifier', [AccountController::class, 'editListing'])->name('account.listings.edit');
   Route::get('/mon-espace/profil', [AccountController::class, 'profile'])->name('account.profile');
   Route::put('/mon-espace/profil', [AccountController::class, 'updateProfile'])->name('account.profile.update');
   Route::put('/mon-espace/profil/{field}', [AccountController::class, 'updateProfileField'])->name('account.profile.field.update');
