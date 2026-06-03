@@ -49,7 +49,7 @@
     <section class="account-section">
       <h2 class="account-section-title">Actions rapides</h2>
       <div class="account-actions">
-        <a href="{{ route('account') }}" class="account-action">
+        <a href="{{ route('account.listings') }}" class="account-action">
           @svg('tabler-list-details')
           <span>Mes annonces</span>
         </a>
@@ -68,47 +68,7 @@
       </div>
     </section>
 
-    {{-- Listings --}}
-    <section class="account-section">
-      <div class="account-section-header">
-        <h2 class="account-section-title">Mes annonces</h2>
-        @if($listings->isNotEmpty())
-          <a href="#" class="account-section-link">Voir tout</a>
-        @endif
-      </div>
 
-      @if($listings->isEmpty())
-        <div class="account-empty">
-          @svg('tabler-building-store')
-          <p>Vous n'avez pas encore d'annonce.</p>
-          <a href="{{ route('listings.create.index') }}" class="btn-primary">Publier ma première annonce</a>
-        </div>
-      @else
-        <ul class="account-listings">
-          @foreach($listings->take(5) as $listing)
-            <li class="account-listing">
-              <div class="account-listing-info">
-                <span class="account-listing-type">{{ $listing->typeLabel() }}</span>
-                <span class="account-listing-title">{{ $listing->title }}</span>
-                <span class="account-listing-location">{{ $listing->city }}</span>
-              </div>
-              <div class="account-listing-meta">
-                <span class="account-listing-price">
-                  @if($listing->price_amount)
-                    {{ number_format($listing->price_amount, 0, ',', ' ') }} €<small>/{{ $listing->priceUnitLabel() }}</small>
-                  @else
-                    Prix sur demande
-                  @endif
-                </span>
-                <span class="account-listing-status {{ $listing->is_active ? 'active' : 'inactive' }}">
-                  {{ $listing->is_active ? 'Active' : 'Inactive' }}
-                </span>
-              </div>
-            </li>
-          @endforeach
-        </ul>
-      @endif
-    </section>
 
   </main>
 @endsection

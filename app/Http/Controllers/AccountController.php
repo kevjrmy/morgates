@@ -17,9 +17,14 @@ class AccountController extends Controller
 
   public function index()
   {
+    return view('account.index');
+  }
+
+  public function listings()
+  {
     $listings = auth()->user()->listings()->latest()->get();
 
-    return view('account.index', compact('listings'));
+    return view('account.listings.index', compact('listings'));
   }
 
   public function profile()
