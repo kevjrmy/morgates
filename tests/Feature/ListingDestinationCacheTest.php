@@ -30,7 +30,6 @@ class ListingDestinationCacheTest extends TestCase
                     'price_unit' => 'day',
                     'capacity' => 2,
                     'min_duration' => 1,
-                    'duration_unit' => 'day',
                     'description' => 'Une annonce de test.',
                 ],
             ])

@@ -53,7 +53,6 @@ class ListingSearchTest extends TestCase
             'description' => 'Description',
             'price_amount' => 120,
             'price_unit' => 'day',
-            'duration_unit' => 'day',
             'country' => 'FR',
             'region' => "Provence-Alpes-Côte d'Azur",
             'city' => $city,

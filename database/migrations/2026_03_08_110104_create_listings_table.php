@@ -23,7 +23,6 @@ return new class extends Migration {
       $table->unsignedSmallInteger('capacity')->nullable();
       $table->unsignedSmallInteger('min_duration')->nullable();
       $table->unsignedSmallInteger('max_duration')->nullable();
-      $table->enum('duration_unit', ['day', 'week', 'month'])->default('day');
       $table->char('country', 2)->index();
       $table->string('region')->nullable()->index();
       $table->string('city');

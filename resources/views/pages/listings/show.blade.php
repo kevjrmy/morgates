@@ -39,11 +39,11 @@
             @if($listing->capacity)
               <span aria-hidden="true">·</span>
             @endif
-            <span>{{ $listing->min_duration }} {{ $listing->durationUnitLabel() }}{{ $listing->min_duration > 1 ? 's' : '' }} min.</span>
+            <span>{{ $listing->min_duration }} jour{{ $listing->min_duration > 1 ? 's' : '' }} min.</span>
           @endif
           @if ($listing->max_duration)
             <span aria-hidden="true">·</span>
-            <span>{{ $listing->max_duration }} {{ $listing->durationUnitLabel() }}{{ $listing->max_duration > 1 ? 's' : '' }} max.</span>
+            <span>{{ $listing->max_duration }} jour{{ $listing->max_duration > 1 ? 's' : '' }} max.</span>
           @endif
         </div>
       </section>

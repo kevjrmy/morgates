@@ -373,13 +373,13 @@
 
     .autocomplete-dropdown {
       position: absolute;
-      top: calc(100% + 0.5rem);
+      top: calc(100% + 0.45rem);
       left: 0;
-      width: 100%;
-      background: white;
-      border: 1.5px solid #eee;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      right: 0;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 14px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
       z-index: 50;
       overflow-y: auto;
       max-height: 320px;
@@ -392,13 +392,13 @@
 
     .autocomplete-item {
       width: 100%;
-      padding: 0.9rem 1.1rem;
+      padding: 0.85rem 1rem;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: block;
+      text-align: left;
       transition: background 0.15s;
-      border-bottom: 1px solid #f5f5f5;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      background: #fff;
     }
 
     .autocomplete-item:last-child {
@@ -411,14 +411,16 @@
     }
 
     .autocomplete-item .item-name {
+      display: block;
       font-size: 1rem;
       color: var(--clr-text-dark);
-      font-weight: 500;
+      font-weight: 700;
     }
 
     .autocomplete-item .item-region {
-      font-size: 0.78rem;
-      color: var(--clr-text-light);
+      display: block;
+      font-size: 0.82rem;
+      color: var(--clr-text-medium);
       margin-top: 0.15rem;
     }
 
@@ -623,8 +625,20 @@
               `,
               onSelect: (result) => {
                 input.value = result.name || ''
+                if (result.type === 'region' || result.type === 'department') {
+                  input.name = 'region'
+                } else {
+                  input.name = 'city'
+                }
                 input.dispatchEvent(new Event('input', { bubbles: true }))
               },
+            })
+            
+            input.addEventListener('input', (e) => {
+              // Reset to city if user types manually
+              if (e.isTrusted) {
+                input.name = 'city'
+              }
             })
           } else {
             initAutocomplete({

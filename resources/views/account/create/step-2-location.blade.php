@@ -39,22 +39,7 @@
           </div>
         </div>
 
-        {{-- Region --}}
-        <div class="lc-field">
-          <label for="region" class="lc-label">
-            Région ou Département
-            <span class="lc-label-optional">optionnel</span>
-          </label>
-          <input
-            type="text"
-            name="region"
-            id="region"
-            class="lc-input"
-            value="{{ old('region', $listing->region ?? '') }}"
-            placeholder="ex. PACA ou Bouches-du-Rhône"
-            maxlength="100"
-          >
-        </div>
+        <input type="hidden" name="region" id="region" value="{{ old('region', $listing->region ?? '') }}">
 
         {{-- City --}}
         <div class="lc-field lc-autocomplete" data-city-autocomplete>
@@ -117,12 +102,17 @@
             </button>
           </div>
 
-          <div class="lc-map-preview">
+          <div class="lc-map-preview" data-map-preview>
+            <div class="lc-map-placeholder" data-map-placeholder>
+              @svg('tabler-map-pin', ['class' => 'lc-map-placeholder-icon'])
+              <p>Recherchez un emplacement pour afficher la carte</p>
+            </div>
             <iframe
               title="Aperçu Google Maps"
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
               data-map-frame
+              style="display: none;"
             ></iframe>
           </div>
 
@@ -161,6 +151,41 @@
   <style>
     .lc-autocomplete {
       position: relative;
+    }
+
+    .lc-map-preview {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #f8fafc;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lc-map-preview iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .lc-map-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      color: var(--clr-text-light);
+      padding: 2rem;
+    }
+
+    .lc-map-placeholder-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      margin-bottom: 0.75rem;
+      opacity: 0.5;
     }
 
     .lc-autocomplete-list {
@@ -409,8 +434,15 @@
 
       const updateMap = (query, { syncSearch = true, persist = true } = {}) => {
         const cleanQuery = (query || '').trim();
-        if (!cleanQuery) return;
+        
+        if (!cleanQuery) {
+          frame.style.display = 'none';
+          picker.querySelector('[data-map-placeholder]').style.display = 'flex';
+          return;
+        }
 
+        frame.style.display = 'block';
+        picker.querySelector('[data-map-placeholder]').style.display = 'none';
         frame.src = mapEmbedUrl(cleanQuery);
 
         const nextUrl = mapSearchUrl(cleanQuery);
@@ -461,7 +493,7 @@
       if (initialQuery) {
         updateMap(initialQuery);
       } else {
-        updateMap('Paris, France', { syncSearch: false, persist: false });
+        updateMap('', { syncSearch: false, persist: false });
       }
     })();
 

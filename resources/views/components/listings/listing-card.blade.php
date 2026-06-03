@@ -26,7 +26,7 @@
         {{ $listing->capacity }} pers.
       @endif
       @if($listing->min_duration)
-        {{ $listing->capacity ? '·' : '' }} min. {{ $listing->min_duration }} {{ $listing->durationUnitLabel() }}{{ $listing->min_duration > 1 ? 's' : '' }}
+        {{ $listing->capacity ? '·' : '' }} min. {{ $listing->min_duration }} jour{{ $listing->min_duration > 1 ? 's' : '' }}
       @endif
     </p>
     <p class="listing-price">

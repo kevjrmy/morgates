@@ -329,7 +329,10 @@
   padding: 0.5rem 0 0;
   appearance: none;
   -moz-appearance: textfield;
-  pointer-events: none;
+}
+
+.lc-stepper-input:focus {
+  outline: none;
 }
 
 .lc-stepper-input::-webkit-outer-spin-button,

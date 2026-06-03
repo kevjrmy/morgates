@@ -1,23 +1,27 @@
 <?php
 
+use Illuminate\Http\Client\Pool;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ListingController;
+use App\Models\Destination;
+use App\Models\Listing;
 
 /**
  * Pages
  */
 /* Homepage */
 Route::get('/', function () {
-  $listings = \App\Models\Listing::latest()->get();
+  $listings = Listing::latest()->get();
   return view('pages.home', compact('listings'));
 })->name('home');
 
 /* Listings */
 Route::get('/annonces', function () {
-  $query = \App\Models\Listing::query();
+  $query = Listing::query();
 
   if (request('type')) {
     $query->where('type', request('type'));
@@ -27,7 +31,7 @@ Route::get('/annonces', function () {
     $city = trim(request('city'));
 
     if (request()->boolean('include_nearby')) {
-      $destination = \App\Models\Destination::query()
+      $destination = Destination::query()
         ->whereRaw('LOWER(name) = ?', [strtolower($city)])
         ->where('country', 'FR')
         ->whereNotNull('latitude')
@@ -46,10 +50,10 @@ Route::get('/annonces', function () {
             )) <= 20
           ", [$destination->latitude, $destination->longitude, $destination->latitude]);
       } else {
-        $query->where('city', $city);
+        $query->whereRaw('LOWER(city) = ?', [strtolower($city)]);
       }
     } else {
-      $query->where('city', $city);
+      $query->whereRaw('LOWER(city) = ?', [strtolower($city)]);
     }
   }
 
@@ -79,7 +83,6 @@ Route::get('/annonces', function () {
   if (request('price_unit')) {
     session(['price_unit' => request('price_unit')]);
   }
-  $priceUnit = request('price_unit') ?: session('price_unit', 'night');
 
   // Price filtering with unit normalization
   $priceMin = request('price_min');
@@ -139,7 +142,7 @@ Route::get('/api/listings/suggest', function () {
   $q = trim(request('q', ''));
   if (strlen($q) < 2) return response()->json([]);
 
-  $results = \App\Models\Listing::query()
+  $results = Listing::query()
     ->with('user:id,name,first_name,last_name,host_name')
     ->where(function ($query) use ($q) {
       $term = '%' . $q . '%';
@@ -167,23 +170,41 @@ Route::get('/api/listings/suggest', function () {
   return response()->json($results);
 })->name('api.listings.suggest');
 
-
 /* Listing city API (autocomplete) */
 Route::get('/api/listings/cities', function () {
   $q = trim(request('q', ''));
   if (strlen($q) < 2) return response()->json([]);
 
-  $cities = \App\Models\Destination::whereRaw('LOWER(name) LIKE ?', [strtolower($q) . '%'])
-    ->where('country', 'FR')
-    ->orderBy('name')
-    ->limit(8)
-    ->get(['name', 'region', 'latitude', 'longitude']);
+  $url = 'https://geo.api.gouv.fr';
+  $qEncoded = urlencode($q);
 
-  return response()->json($cities);
+  $responses = Http::pool(fn (Pool $pool) => [
+    $pool->get("$url/communes?nom=$qEncoded&fields=nom,region,departement&boost=population&limit=5"),
+    $pool->get("$url/departements?nom=$qEncoded&fields=nom,region&limit=3"),
+    $pool->get("$url/regions?nom=$qEncoded&fields=nom&limit=2"),
+  ]);
+
+  $communes = $responses[0]->ok() ? $responses[0]->json() : [];
+  $departements = $responses[1]->ok() ? $responses[1]->json() : [];
+  $regions = $responses[2]->ok() ? $responses[2]->json() : [];
+
+  $results = [];
+
+  foreach ($regions as $r) {
+    $results[] = ['type' => 'region', 'name' => $r['nom'], 'region' => 'Région'];
+  }
+  foreach ($departements as $d) {
+    $results[] = ['type' => 'department', 'name' => $d['nom'], 'region' => $d['region']['nom'] ?? 'Département'];
+  }
+  foreach ($communes as $c) {
+    $results[] = ['type' => 'city', 'name' => $c['nom'], 'region' => $c['departement']['nom'] ?? ($c['region']['nom'] ?? '')];
+  }
+
+  return response()->json($results);
 })->name('api.listings.cities');
 
 /* Listing */
-Route::get('/annonces/{listing:slug}', function (\App\Models\Listing $listing) {
+Route::get('/annonces/{listing:slug}', function (Listing $listing) {
   $listing->load('user');
   return view('pages.listings.show', compact('listing'));
 })->name('listing');

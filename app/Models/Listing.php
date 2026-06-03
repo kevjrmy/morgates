@@ -19,7 +19,6 @@ class Listing extends Model
     'capacity',
     'min_duration',
     'max_duration',
-    'duration_unit',
     'country',
     'region',
     'city',
@@ -79,29 +78,18 @@ class Listing extends Model
     };
   }
 
-  public function priceUnitLabel(): string
-  {
-    return match ($this->price_unit) {
-      'hour' => 'heure',
-      'half-day' => 'demi-journée',
-      'day' => 'jour',
-      'week' => 'semaine',
-      'month' => 'mois',
-      'contact' => 'sur demande',
-      default => 'jour',
-    };
-  }
-
-
-  public function durationUnitLabel(): string
-  {
-    return match ($this->duration_unit) {
-      'day' => 'jour',
-      'week' => 'semaine',
-      'month' => 'mois',
-      default => 'jour',
-    };
-  }
+    public function priceUnitLabel(): string
+    {
+      return match ($this->price_unit) {
+        'hour' => 'heure',
+        'half-day' => 'demi-journée',
+        'day' => 'jour',
+        'week' => 'semaine',
+        'month' => 'mois',
+        'contact' => 'sur demande',
+        default => 'jour',
+      };
+    }
 
   public function primaryContactUrl(): string
   {

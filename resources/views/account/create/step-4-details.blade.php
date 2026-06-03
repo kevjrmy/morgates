@@ -18,72 +18,60 @@
 
       <div class="lc-fields">
 
-        {{-- Min duration --}}
-        <div class="lc-field">
-          <label class="lc-label">Durée minimum</label>
-          <div class="lc-stepper">
-            <button type="button" class="lc-stepper-btn" data-target="min_duration" data-action="dec" aria-label="Diminuer">
-              @svg('tabler-minus')
-            </button>
-            <div class="lc-stepper-display">
-              <input
-                type="number"
-                name="min_duration"
-                id="min_duration"
-                class="lc-stepper-input"
-                value="{{ old('min_duration', $listing->min_duration ?? 1) }}"
-                min="1"
-                max="365"
-                readonly
-              >
-              <span class="lc-stepper-unit">unité(s)</span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 1rem;">
+          {{-- Min duration --}}
+          <div class="lc-field">
+            <label class="lc-label">Durée minimum</label>
+            <div class="lc-stepper">
+              <button type="button" class="lc-stepper-btn" data-target="min_duration" data-action="dec" aria-label="Diminuer">
+                @svg('tabler-minus')
+              </button>
+              <div class="lc-stepper-display">
+                <input
+                  type="number"
+                  name="min_duration"
+                  id="min_duration"
+                  class="lc-stepper-input"
+                  value="{{ old('min_duration', $listing->min_duration ?? 1) }}"
+                  min="1"
+                  max="365"
+                >
+                <span class="lc-stepper-unit">jour(s)</span>
+              </div>
+              <button type="button" class="lc-stepper-btn" data-target="min_duration" data-action="inc" aria-label="Augmenter">
+                @svg('tabler-plus')
+              </button>
             </div>
-            <button type="button" class="lc-stepper-btn" data-target="min_duration" data-action="inc" aria-label="Augmenter">
-              @svg('tabler-plus')
-            </button>
           </div>
-        </div>
 
-        {{-- Max duration --}}
-        <div class="lc-field">
-          <label class="lc-label">
-            Durée maximum
-            <span class="lc-label-optional">optionnel</span>
-          </label>
-          <div class="lc-stepper">
-            <button type="button" class="lc-stepper-btn" data-target="max_duration" data-action="dec" aria-label="Diminuer">
-              @svg('tabler-minus')
-            </button>
-            <div class="lc-stepper-display">
-              <input
-                type="number"
-                name="max_duration"
-                id="max_duration"
-                class="lc-stepper-input"
-                value="{{ old('max_duration', $listing->max_duration ?? '') }}"
-                min="1"
-                max="365"
-                readonly
-              >
-              <span class="lc-stepper-unit" id="max-duration-label">
-                {{ old('max_duration', $listing->max_duration ?? null) ? 'unité(s)' : 'Sans limite' }}
-              </span>
+          {{-- Max duration --}}
+          <div class="lc-field">
+            <label class="lc-label">
+              Durée maximum
+              <span class="lc-label-optional">optionnel</span>
+            </label>
+            <div class="lc-stepper">
+              <button type="button" class="lc-stepper-btn" data-target="max_duration" data-action="dec" aria-label="Diminuer">
+                @svg('tabler-minus')
+              </button>
+              <div class="lc-stepper-display">
+                <input
+                  type="number"
+                  name="max_duration"
+                  id="max_duration"
+                  class="lc-stepper-input"
+                  value="{{ old('max_duration', $listing->max_duration ?? '') }}"
+                  min="1"
+                  max="365"
+                >
+                <span class="lc-stepper-unit" id="max-duration-label">
+                  {{ old('max_duration', $listing->max_duration ?? null) ? 'jour(s)' : 'Sans limite' }}
+                </span>
+              </div>
+              <button type="button" class="lc-stepper-btn" data-target="max_duration" data-action="inc" aria-label="Augmenter">
+                @svg('tabler-plus')
+              </button>
             </div>
-            <button type="button" class="lc-stepper-btn" data-target="max_duration" data-action="inc" aria-label="Augmenter">
-              @svg('tabler-plus')
-            </button>
-          </div>
-        </div>
-
-        <div class="lc-field">
-          <label for="duration_unit" class="lc-label">Unité de durée</label>
-          <div class="lc-select-wrap">
-            <select name="duration_unit" id="duration_unit" class="lc-select">
-              <option value="day" {{ old('duration_unit', $listing->duration_unit ?? 'day') === 'day' ? 'selected' : '' }}>Jour</option>
-              <option value="week" {{ old('duration_unit', $listing->duration_unit ?? '') === 'week' ? 'selected' : '' }}>Semaine</option>
-              <option value="month" {{ old('duration_unit', $listing->duration_unit ?? '') === 'month' ? 'selected' : '' }}>Mois</option>
-            </select>
-            @svg('tabler-chevron-down', ['class' => 'lc-select-icon'])
           </div>
         </div>
 
@@ -174,9 +162,14 @@
         input.value = val || ''
 
         if (isMaxDuration) {
-          document.getElementById('max-duration-label').textContent = val ? 'unité(s)' : 'Sans limite'
+          document.getElementById('max-duration-label').textContent = val ? 'jour(s)' : 'Sans limite'
         }
       })
+    })
+
+    document.getElementById('max_duration').addEventListener('input', (e) => {
+      const val = parseInt(e.target.value) || 0
+      document.getElementById('max-duration-label').textContent = val ? 'jour(s)' : 'Sans limite'
     })
   </script>
 @endpush

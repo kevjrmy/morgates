@@ -89,7 +89,6 @@ class ListingController extends Controller
     $validated = $request->validate([
       'min_duration' => ['required', 'integer', 'min:1', 'max:365'],
       'max_duration' => ['nullable', 'integer', 'min:1', 'max:365'],
-      'duration_unit' => ['required', 'in:day,week,month'],
       'tags' => ['nullable', 'array'],
       'contact_email' => ['nullable', 'email', 'max:255'],
       'contact_phone' => ['nullable', 'string', 'max:50'],
@@ -140,7 +139,6 @@ class ListingController extends Controller
         'capacity' => $data['capacity'] ?? null,
         'min_duration' => $data['min_duration'] ?? null,
         'max_duration' => $data['max_duration'] ?? null,
-        'duration_unit' => $data['duration_unit'] ?? 'day',
         'country' => $data['country'] ?? 'FR',
         'region' => $data['region'] ?? null,
         'city' => $data['city'] ?? '',
