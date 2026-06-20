@@ -16,6 +16,17 @@ Step 1: Choose listing type
     <form action="{{ route('listings.create.type') }}" method="POST" class="lc-form">
       @csrf
 
+      {{-- Title --}}
+      <div class="lc-field">
+        <div class="lc-label-row">
+          <label for="title" class="lc-label">Titre de l'annonce</label>
+          <span class="lc-char-count" id="title-count">0/100</span>
+        </div>
+        <input type="text" name="title" id="title" class="lc-input" value="{{ old('title', $listing->title ?? '') }}"
+          placeholder="ex. Voilier 10m à Marseille, vue mer" required maxlength="100">
+        <p class="lc-field-hint">Un titre court et descriptif attire plus de visiteurs.</p>
+      </div>
+
       <div class="lc-type-grid">
         <label class="lc-type-card {{ old('type', $listing->type ?? '') === 'stays' ? 'selected' : '' }}">
           <input type="radio" name="type" value="stays" {{ old('type', $listing->type ?? '') === 'stays' ? 'checked' : '' }}
@@ -43,21 +54,30 @@ Step 1: Choose listing type
 
 @push('scripts')
   <script>
-    // Auto-select card styling on radio change
-    const nextBtn = document.querySelector('.lc-btn-next')
+    const nextBtn   = document.querySelector('.lc-btn-next')
+    const titleInput = document.getElementById('title')
+    const titleCount = document.getElementById('title-count')
 
-    const toggleNext = () => {
-      nextBtn.disabled = !document.querySelector('.lc-type-card input[type="radio"]:checked')
+    const checkValidity = () => {
+      const hasTitle = titleInput.value.trim() !== ''
+      const hasType  = !!document.querySelector('.lc-type-card input[type="radio"]:checked')
+      nextBtn.disabled = !(hasTitle && hasType)
     }
 
+    // Char counter
+    const updateCount = () => titleCount.textContent = `${titleInput.value.length}/100`
+    titleInput.addEventListener('input', () => { updateCount(); checkValidity() })
+    updateCount()
+
+    // Type card selection
     document.querySelectorAll('.lc-type-card input[type="radio"]').forEach(radio => {
       radio.addEventListener('change', () => {
         document.querySelectorAll('.lc-type-card').forEach(c => c.classList.remove('selected'))
         radio.closest('.lc-type-card').classList.add('selected')
-        toggleNext()
+        checkValidity()
       })
     })
 
-    toggleNext()
+    checkValidity()
   </script>
 @endpush

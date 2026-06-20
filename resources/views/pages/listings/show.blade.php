@@ -73,68 +73,69 @@
       {{-- Direct contact --}}
       <section class="listing-contact">
         <h2>Contact rapide</h2>
-        <ul class="contact-list" role="list">
-          @if($listing->contact_email)
-            <li>
-              <button type="button" class="contact-item" data-type="email" data-value="{{ $listing->contact_email }}">
-                <span class="contact-icon">@svg('tabler-mail')</span>
-                <span class="contact-label">Email</span>
-                <span class="contact-reveal" hidden>
-                  <span class="contact-value">{{ $listing->contact_email }}</span>
-                  <span class="contact-copy" title="Copier">@svg('tabler-copy')</span>
-                </span>
-              </button>
-            </li>
-          @endif
-          @if($listing->contact_phone)
-            <li>
-              <button type="button" class="contact-item" data-type="phone" data-value="{{ $listing->contact_phone }}">
-                <span class="contact-icon">@svg('tabler-phone')</span>
-                <span class="contact-label">Téléphone</span>
-                <span class="contact-reveal" hidden>
-                  <span class="contact-value">{{ $listing->contact_phone }}</span>
-                  <span class="contact-copy" title="Copier">@svg('tabler-copy')</span>
-                </span>
-              </button>
-            </li>
-          @endif
-          @if($listing->contact_whatsapp)
-            <li>
-              <button type="button" class="contact-item" data-type="whatsapp" data-href="https://wa.me/{{ preg_replace('/\D+/', '', $listing->contact_whatsapp) }}">
-                <span class="contact-icon">@svg('tabler-brand-whatsapp')</span>
-                <span class="contact-label">WhatsApp</span>
-                <span class="contact-reveal" hidden>
-                  <span class="contact-value">Ouvrir WhatsApp</span>
-                  <a class="contact-open" href="https://wa.me/{{ preg_replace('/\D+/', '', $listing->contact_whatsapp) }}" target="_blank" rel="noopener noreferrer" title="Ouvrir">@svg('tabler-external-link')</a>
-                </span>
-              </button>
-            </li>
-          @endif
-          @if($listing->contact_website)
-            <li>
-              <button type="button" class="contact-item" data-type="website" data-href="{{ $listing->contact_website }}">
-                <span class="contact-icon">@svg('tabler-world')</span>
-                <span class="contact-label">Web</span>
-                <span class="contact-reveal" hidden>
-                  <span class="contact-value">{{ parse_url($listing->contact_website, PHP_URL_HOST) }}</span>
-                  <a class="contact-open" href="{{ $listing->contact_website }}" target="_blank" rel="noopener noreferrer" title="Ouvrir">@svg('tabler-external-link')</a>
-                </span>
-              </button>
-            </li>
-          @endif
-          @unless($listing->contact_email || $listing->contact_phone || $listing->contact_whatsapp || $listing->contact_website)
-            <li>
-              <button type="button" class="contact-item" data-type="email" data-value="{{ $listing->user->email }}">
-                <span class="contact-icon">@svg('tabler-mail')</span>
-                <span class="contact-label">Email</span>
-                <span class="contact-reveal" hidden>
-                  <span class="contact-value">{{ $listing->user->email }}</span>
-                  <span class="contact-copy" title="Copier">@svg('tabler-copy')</span>
-                </span>
-              </button>
-            </li>
-          @endunless
-        </ul>
+        @php
+          $preferred = $listing->preferred_contact ?? 'email';
+          $channels  = [
+            'email'    => $listing->contact_email,
+            'phone'    => $listing->contact_phone,
+            'whatsapp' => $listing->contact_whatsapp,
+            'website'  => $listing->contact_website,
+          ];
+          $active = null;
+          if (!empty($channels[$preferred])) {
+            $active = $preferred;
+          } else {
+            foreach (['email', 'phone', 'whatsapp', 'website'] as $c) {
+              if (!empty($channels[$c])) { $active = $c; break; }
+            }
+          }
+        @endphp
+
+        @if($active === 'email')
+          <div class="contact-quick">
+            <span class="contact-quick-icon">@svg('tabler-mail')</span>
+            <span class="contact-quick-value">{{ $channels['email'] }}</span>
+            <div class="contact-quick-actions">
+              <button class="contact-action-btn" data-copy="{{ $channels['email'] }}" title="Copier">@svg('tabler-copy')</button>
+              <a class="contact-action-btn" href="mailto:{{ $channels['email'] }}" title="Envoyer un email">@svg('tabler-send')</a>
+            </div>
+          </div>
+        @elseif($active === 'phone')
+          <div class="contact-quick">
+            <span class="contact-quick-icon">@svg('tabler-phone')</span>
+            <span class="contact-quick-value">{{ $channels['phone'] }}</span>
+            <div class="contact-quick-actions">
+              <button class="contact-action-btn" data-copy="{{ $channels['phone'] }}" title="Copier">@svg('tabler-copy')</button>
+              <a class="contact-action-btn" href="tel:{{ $channels['phone'] }}" title="Appeler">@svg('tabler-phone-call')</a>
+            </div>
+          </div>
+        @elseif($active === 'whatsapp')
+          <div class="contact-quick">
+            <span class="contact-quick-icon">@svg('tabler-brand-whatsapp')</span>
+            <span class="contact-quick-value">{{ $channels['whatsapp'] }}</span>
+            <div class="contact-quick-actions">
+              <button class="contact-action-btn" data-copy="{{ $channels['whatsapp'] }}" title="Copier">@svg('tabler-copy')</button>
+              <a class="contact-action-btn" href="https://wa.me/{{ preg_replace('/\D+/', '', $channels['whatsapp']) }}" target="_blank" rel="noopener noreferrer" title="Ouvrir WhatsApp">@svg('tabler-external-link')</a>
+            </div>
+          </div>
+        @elseif($active === 'website')
+          <div class="contact-quick">
+            <span class="contact-quick-icon">@svg('tabler-world')</span>
+            <span class="contact-quick-value">{{ parse_url($channels['website'], PHP_URL_HOST) }}</span>
+            <div class="contact-quick-actions">
+              <a class="contact-action-btn" href="{{ $channels['website'] }}" target="_blank" rel="noopener noreferrer" title="Ouvrir le site">@svg('tabler-external-link')</a>
+            </div>
+          </div>
+        @else
+          <div class="contact-quick">
+            <span class="contact-quick-icon">@svg('tabler-mail')</span>
+            <span class="contact-quick-value">{{ $listing->user->email }}</span>
+            <div class="contact-quick-actions">
+              <button class="contact-action-btn" data-copy="{{ $listing->user->email }}" title="Copier">@svg('tabler-copy')</button>
+              <a class="contact-action-btn" href="mailto:{{ $listing->user->email }}" title="Envoyer un email">@svg('tabler-send')</a>
+            </div>
+          </div>
+        @endif
       </section>
 
       <hr class="listing-divider">
@@ -355,87 +356,75 @@
       border: 0;
     }
 
-    .contact-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .contact-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.5rem 0.85rem;
-      border-radius: 0.5rem;
-      background-color: var(--clr-tertiary);
-      border: none;
-      cursor: pointer;
-      transition: opacity 0.2s ease;
-      min-width: 5.5rem;
-    }
-
-    .contact-item:hover {
-      opacity: 0.8;
-    }
-
-    .contact-icon {
+    .contact-quick {
       display: flex;
       align-items: center;
-      flex-shrink: 0;
+      gap: 0.75rem;
+      padding: 0.85rem 1rem;
+      background: var(--clr-tertiary);
+      border-radius: 0.75rem;
     }
 
-    .contact-icon svg {
-      width: 1.1rem;
-      height: 1.1rem;
-    }
-
-    .contact-label {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--clr-text-dark);
-    }
-
-    .contact-reveal {
-      display: none;
-      align-items: center;
-      gap: 0.3rem;
-    }
-
-    .contact-item[data-state="open"] .contact-label {
-      display: none;
-    }
-
-    .contact-item[data-state="open"] .contact-reveal {
-      display: flex;
-    }
-
-    .contact-value {
-      font-size: 0.8rem;
-      color: var(--clr-text-dark);
-      font-weight: 600;
-    }
-
-    .contact-copy {
-      position: relative;
+    .contact-quick-icon {
       display: flex;
       align-items: center;
-      padding: 0.2rem;
-      cursor: pointer;
-      border-radius: 0.25rem;
-      transition: color 0.15s ease, opacity 0.15s ease;
       flex-shrink: 0;
       color: var(--clr-primary);
     }
 
-    .contact-copy:hover {
-      opacity: 0.7;
+    .contact-quick-icon svg {
+      width: 1.25rem;
+      height: 1.25rem;
     }
 
-    .contact-copy.copied {
+    .contact-quick-value {
+      flex: 1;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--clr-text-dark);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .contact-quick-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.15rem;
+      flex-shrink: 0;
+    }
+
+    .contact-action-btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.4rem;
+      border: none;
+      background: none;
+      color: var(--clr-text-light);
+      cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+      text-decoration: none;
+    }
+
+    .contact-action-btn:hover {
+      color: var(--clr-primary);
+      background: rgba(0, 68, 170, 0.06);
+    }
+
+    .contact-action-btn svg {
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+
+    .contact-action-btn.copied {
       color: var(--clr-success);
     }
 
-    .contact-copy.copied::after {
+    .contact-action-btn.copied::after {
       content: 'Copié ✓';
       position: absolute;
       right: 0;
@@ -453,45 +442,10 @@
       animation: copy-bubble 2s ease forwards;
     }
 
-    .contact-copy svg {
-      width: 0.95rem;
-      height: 0.95rem;
-    }
-
     @keyframes copy-bubble {
-      0% {
-        opacity: 0;
-        transform: translateY(0.25rem) scale(0.96);
-      }
-
-      15%,
-      70% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-
-      100% {
-        opacity: 0;
-        transform: translateY(-0.45rem) scale(0.98);
-      }
-    }
-
-    .contact-open {
-      display: flex;
-      align-items: center;
-      padding: 0.2rem;
-      border-radius: 0.25rem;
-      transition: opacity 0.15s ease;
-      flex-shrink: 0;
-    }
-
-    .contact-open:hover {
-      opacity: 0.7;
-    }
-
-    .contact-open svg {
-      width: 0.95rem;
-      height: 0.95rem;
+      0%          { opacity: 0; transform: translateY(0.25rem) scale(0.96); }
+      15%, 70%    { opacity: 1; transform: translateY(0) scale(1); }
+      100%        { opacity: 0; transform: translateY(-0.45rem) scale(0.98); }
     }
 
     /* Share */
@@ -618,16 +572,9 @@
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      padding: 0.85rem 1rem;
+      padding: 0.75rem 1rem;
       border-radius: 0.5rem;
       background-color: var(--clr-tertiary);
-      text-decoration: none;
-      color: var(--clr-text-dark);
-      transition: opacity 0.2s ease;
-    }
-
-    .contact-item-bottom:hover {
-      opacity: 0.85;
     }
 
     .contact-icon-bottom {
@@ -643,11 +590,20 @@
     }
 
     .contact-value-bottom {
-      font-size: 0.95rem;
+      flex: 1;
+      font-size: 0.9rem;
       font-weight: 500;
+      color: var(--clr-text-dark);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .contact-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.15rem;
+      flex-shrink: 0;
     }
 
     </style>
@@ -655,43 +611,14 @@
 
 @push('scripts')
   <script>
-    let openItem = null
-
-document.querySelectorAll('.contact-item').forEach(item => {
-  item.addEventListener('click', e => {
-    const copyBtn = e.target.closest('.contact-copy')
-    if (copyBtn) {
-      const value = item.dataset.value
-      if (value) {
-        navigator.clipboard.writeText(value).then(() => {
-          copyBtn.classList.add('copied')
-          setTimeout(() => copyBtn.classList.remove('copied'), 2000)
+    document.querySelectorAll('.contact-action-btn[data-copy]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        navigator.clipboard.writeText(btn.dataset.copy).then(() => {
+          btn.classList.add('copied')
+          setTimeout(() => btn.classList.remove('copied'), 2000)
         })
-      }
-      return
-    }
-
-    if (e.target.closest('.contact-open')) return
-
-    if (item.dataset.type === 'whatsapp' && item.dataset.href && item.dataset.state === 'open') {
-      window.open(item.dataset.href, '_blank', 'noopener')
-      return
-    }
-
-    if (openItem && openItem !== item) {
-      openItem.dataset.state = 'closed'
-    }
-    openItem = item
-    item.dataset.state = 'open'
-  })
-})
-
-document.addEventListener('click', e => {
-  if (!e.target.closest('.contact-item') && openItem) {
-    openItem.dataset.state = 'closed'
-    openItem = null
-  }
-})
+      })
+    })
 
 const descriptionText = document.getElementById('description-text')
 const btnReadmore = document.getElementById('btn-readmore')

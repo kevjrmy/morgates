@@ -1,10 +1,10 @@
 {{--
 listings/create/step-3-basics.blade.php
-Step 3: Title, price, capacity
+Step 3: price, capacity
 --}}
 @extends('layouts.listing-create')
 
-@section('title', 'Informations de base — Publier une annonce')
+@section('title', 'Prix et capacité — Publier une annonce')
 
 @section('content')
   @php
@@ -13,25 +13,13 @@ Step 3: Title, price, capacity
 
   <div class="lc-step">
     <div class="lc-step-header">
-      <h1 class="lc-title">Les informations essentielles</h1>
-      <p class="lc-subtitle">Ces détails apparaissent en premier dans les résultats de recherche.</p>
+      <h1 class="lc-title">Prix et capacité</h1>
     </div>
 
     <form action="{{ route('listings.create.basics') }}" method="POST" class="lc-form">
       @csrf
 
       <div class="lc-fields">
-
-        {{-- Title --}}
-        <div class="lc-field">
-          <div class="lc-label-row">
-            <label for="title" class="lc-label">Titre de l'annonce</label>
-            <span class="lc-char-count" id="title-count">0/100</span>
-          </div>
-          <input type="text" name="title" id="title" class="lc-input" value="{{ old('title', $listing->title ?? '') }}"
-            placeholder="ex. Voilier 10m à Marseille, vue mer" required maxlength="100">
-          <p class="lc-field-hint">Un titre court et descriptif attire plus de visiteurs.</p>
-        </div>
 
         {{-- Price & Unit --}}
         <div id="price_grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start;">
@@ -89,6 +77,64 @@ Step 3: Title, price, capacity
             <button type="button" class="lc-stepper-btn" data-target="capacity" data-action="inc" aria-label="Augmenter">
               @svg('tabler-plus')
             </button>
+          </div>
+        </div>
+
+        {{-- Min / Max duration --}}
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 1rem;">
+          {{-- Min duration --}}
+          <div class="lc-field">
+            <label class="lc-label">Durée minimum</label>
+            <div class="lc-stepper">
+              <button type="button" class="lc-stepper-btn" data-target="min_duration" data-action="dec" aria-label="Diminuer">
+                @svg('tabler-minus')
+              </button>
+              <div class="lc-stepper-display">
+                <input
+                  type="number"
+                  name="min_duration"
+                  id="min_duration"
+                  class="lc-stepper-input"
+                  value="{{ old('min_duration', $listing->min_duration ?? 1) }}"
+                  min="1"
+                  max="365"
+                >
+                <span class="lc-stepper-unit">jour(s)</span>
+              </div>
+              <button type="button" class="lc-stepper-btn" data-target="min_duration" data-action="inc" aria-label="Augmenter">
+                @svg('tabler-plus')
+              </button>
+            </div>
+          </div>
+
+          {{-- Max duration --}}
+          <div class="lc-field">
+            <label class="lc-label">
+              Durée maximum
+              <span class="lc-label-optional">optionnel</span>
+            </label>
+            <div class="lc-stepper">
+              <button type="button" class="lc-stepper-btn" data-target="max_duration" data-action="dec" aria-label="Diminuer">
+                @svg('tabler-minus')
+              </button>
+              <div class="lc-stepper-display">
+                <input
+                  type="number"
+                  name="max_duration"
+                  id="max_duration"
+                  class="lc-stepper-input"
+                  value="{{ old('max_duration', $listing->max_duration ?? '') }}"
+                  min="1"
+                  max="365"
+                >
+                <span class="lc-stepper-unit" id="max-duration-label">
+                  {{ old('max_duration', $listing->max_duration ?? null) ? 'jour(s)' : 'Sans limite' }}
+                </span>
+              </div>
+              <button type="button" class="lc-stepper-btn" data-target="max_duration" data-action="inc" aria-label="Augmenter">
+                @svg('tabler-plus')
+              </button>
+            </div>
           </div>
         </div>
 
@@ -188,12 +234,6 @@ Step 3: Title, price, capacity
 
 @push('scripts')
   <script>
-    // Char counter
-    const titleInput = document.getElementById('title')
-    const titleCount = document.getElementById('title-count')
-    const updateCount = () => titleCount.textContent = `${titleInput.value.length}/100`
-    titleInput.addEventListener('input', updateCount)
-    updateCount()
 
     // Price on request toggle
     const priceToggle = document.getElementById('price_contact_toggle')
@@ -244,17 +284,14 @@ Step 3: Title, price, capacity
       })
     })
 
-    // Enable/disable next button based on explicit rules
+    // Enable/disable next button
     const btnNext = document.querySelector('.lc-form .lc-btn-next')
-    
+
     const checkFormValidity = () => {
-      const isTitleValid = titleInput.value.trim() !== ''
       const isPriceValid = priceToggle.checked || priceAmount.value.trim() !== ''
-      
-      btnNext.disabled = !(isTitleValid && isPriceValid)
+      btnNext.disabled = !isPriceValid
     }
 
-    titleInput.addEventListener('input', checkFormValidity)
     priceAmount.addEventListener('input', checkFormValidity)
     priceToggle.addEventListener('change', checkFormValidity)
 

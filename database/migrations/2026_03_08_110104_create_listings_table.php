@@ -26,6 +26,8 @@ return new class extends Migration {
       $table->char('country', 2)->index();
       $table->string('region')->nullable()->index();
       $table->string('city');
+      $table->decimal('latitude', 9, 6)->nullable();
+      $table->decimal('longitude', 9, 6)->nullable();
       $table->json('tags')->nullable();
       $table->string('address')->nullable();
       $table->string('map_url')->nullable();
@@ -34,6 +36,7 @@ return new class extends Migration {
       $table->string('contact_whatsapp')->nullable();
       $table->string('contact_website')->nullable();
       $table->json('contact_social_links')->nullable();
+      $table->string('preferred_contact', 20)->default('email');
       $table->boolean('is_active')->default(true);
       $table->timestamps();
     });

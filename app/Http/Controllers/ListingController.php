@@ -39,10 +39,12 @@ class ListingController extends Controller
   public function storeType(Request $request)
   {
     $validated = $request->validate([
-      'type' => ['required', 'in:boats,stays'],
+      'type'  => ['required', 'in:boats,stays'],
+      'title' => ['required', 'string', 'max:100'],
     ]);
 
     $request->session()->put('listing_create.type', $validated['type']);
+    $request->session()->put('listing_create.title', $validated['title']);
     return redirect()->route('listings.create.index', ['step' => 2]);
   }
 
@@ -72,10 +74,11 @@ class ListingController extends Controller
       : ['day', 'week', 'month', 'contact'];
 
     $validated = $request->validate([
-      'title' => ['required', 'string', 'max:100'],
-      'price_amount' => ['nullable', 'numeric', 'min:1'],
-      'price_unit' => ['required', 'in:' . implode(',', $priceUnits)],
-      'capacity' => ['required', 'integer', 'min:1', 'max:50'],
+      'price_amount'  => ['nullable', 'numeric', 'min:1'],
+      'price_unit'    => ['required', 'in:' . implode(',', $priceUnits)],
+      'capacity'      => ['required', 'integer', 'min:1', 'max:50'],
+      'min_duration'  => ['required', 'integer', 'min:1', 'max:365'],
+      'max_duration'  => ['nullable', 'integer', 'min:1', 'max:365'],
     ]);
 
     foreach ($validated as $key => $value) {
@@ -87,13 +90,12 @@ class ListingController extends Controller
   public function storeDetails(Request $request)
   {
     $validated = $request->validate([
-      'min_duration' => ['required', 'integer', 'min:1', 'max:365'],
-      'max_duration' => ['nullable', 'integer', 'min:1', 'max:365'],
-      'tags' => ['nullable', 'array'],
-      'contact_email' => ['nullable', 'email', 'max:255'],
-      'contact_phone' => ['nullable', 'string', 'max:50'],
-      'contact_whatsapp' => ['nullable', 'string', 'max:50'],
-      'contact_website' => ['nullable', 'url', 'max:255'],
+      'tags'               => ['nullable', 'array'],
+      'contact_email'      => ['nullable', 'email', 'max:255'],
+      'contact_phone'      => ['nullable', 'string', 'max:50'],
+      'contact_whatsapp'   => ['nullable', 'string', 'max:50'],
+      'contact_website'    => ['nullable', 'url', 'max:255'],
+      'preferred_contact'  => ['required', 'in:email,phone,whatsapp,website'],
     ]);
 
     foreach ($validated as $key => $value) {
@@ -151,6 +153,7 @@ class ListingController extends Controller
         'contact_phone' => $data['contact_phone'] ?? null,
         'contact_whatsapp' => $data['contact_whatsapp'] ?? null,
         'contact_website' => $data['contact_website'] ?? null,
+        'preferred_contact' => $data['preferred_contact'] ?? 'email',
         'is_active' => true,
     ]);
 

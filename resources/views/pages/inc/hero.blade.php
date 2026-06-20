@@ -6,7 +6,7 @@
     </h1>
 
     <p class="hero-tagline">
-      Réservez directement avec l'hôte : zéro commission, zéro surprise.
+      Réservez directement avec l'hôte.
     </p>
 
     <x-ui.searchbar />

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Destination;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class ListingDestinationCacheTest extends TestCase
@@ -52,24 +53,14 @@ class ListingDestinationCacheTest extends TestCase
         ]);
     }
 
-    public function test_listing_cities_endpoint_returns_cached_listing_cities_only(): void
+    public function test_listing_cities_endpoint_returns_geo_api_results(): void
     {
-        Destination::create([
-            'name' => 'Vannes',
-            'type' => 'city',
-            'region' => 'Bretagne',
-            'country' => 'FR',
-            'latitude' => 47.6582,
-            'longitude' => -2.7608,
-        ]);
-
-        Destination::create([
-            'name' => 'Valencia',
-            'type' => 'city',
-            'region' => 'Comunitat Valenciana',
-            'country' => 'ES',
-            'latitude' => 39.4699,
-            'longitude' => -0.3763,
+        Http::fake([
+            '*communes?nom=Van*'     => Http::response([
+                ['nom' => 'Vannes', 'region' => ['nom' => 'Bretagne'], 'departement' => ['nom' => 'Morbihan']],
+            ]),
+            '*departements?nom=Van*' => Http::response([]),
+            '*regions?nom=Van*'      => Http::response([]),
         ]);
 
         $this
@@ -77,8 +68,9 @@ class ListingDestinationCacheTest extends TestCase
             ->assertOk()
             ->assertJsonCount(1)
             ->assertJsonFragment([
-                'name' => 'Vannes',
-                'region' => 'Bretagne',
+                'type'   => 'city',
+                'name'   => 'Vannes',
+                'region' => 'Morbihan',
             ]);
     }
 }

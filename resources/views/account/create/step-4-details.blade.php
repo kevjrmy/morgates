@@ -1,6 +1,6 @@
 {{--
   listings/create/step-4-details.blade.php
-  Step 4: Min/max duration, tags
+  Step 4: Tags, contact
 --}}
 @extends('layouts.listing-create')
 
@@ -16,90 +16,26 @@
     <form action="{{ route('listings.create.details') }}" method="POST" class="lc-form">
       @csrf
 
-      <div class="lc-fields">
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 1rem;">
-          {{-- Min duration --}}
-          <div class="lc-field">
-            <label class="lc-label">Durée minimum</label>
-            <div class="lc-stepper">
-              <button type="button" class="lc-stepper-btn" data-target="min_duration" data-action="dec" aria-label="Diminuer">
-                @svg('tabler-minus')
-              </button>
-              <div class="lc-stepper-display">
-                <input
-                  type="number"
-                  name="min_duration"
-                  id="min_duration"
-                  class="lc-stepper-input"
-                  value="{{ old('min_duration', $listing->min_duration ?? 1) }}"
-                  min="1"
-                  max="365"
-                >
-                <span class="lc-stepper-unit">jour(s)</span>
-              </div>
-              <button type="button" class="lc-stepper-btn" data-target="min_duration" data-action="inc" aria-label="Augmenter">
-                @svg('tabler-plus')
-              </button>
-            </div>
-          </div>
-
-          {{-- Max duration --}}
-          <div class="lc-field">
-            <label class="lc-label">
-              Durée maximum
-              <span class="lc-label-optional">optionnel</span>
+      {{-- Tags --}}
+      <div class="lc-field">
+        <label class="lc-label">
+          Équipements & caractéristiques
+          <span class="lc-label-optional">optionnel</span>
+        </label>
+        <div class="lc-tags">
+          @php
+            $listingType  = $listing->type ?? 'stays';
+            $availableTags = collect(config('tags'))->filter(fn($tag) => $tag['group'] === $listingType)->all();
+            $selectedTags  = old('tags', $listing->tags ?? []);
+          @endphp
+          @foreach($availableTags as $slug => $tag)
+            <label class="lc-tag {{ in_array($slug, $selectedTags) ? 'selected' : '' }}">
+              <input type="checkbox" name="tags[]" value="{{ $slug }}" {{ in_array($slug, $selectedTags) ? 'checked' : '' }}>
+              @svg('tabler-' . $tag['icon'])
+              {{ $tag['label'] }}
             </label>
-            <div class="lc-stepper">
-              <button type="button" class="lc-stepper-btn" data-target="max_duration" data-action="dec" aria-label="Diminuer">
-                @svg('tabler-minus')
-              </button>
-              <div class="lc-stepper-display">
-                <input
-                  type="number"
-                  name="max_duration"
-                  id="max_duration"
-                  class="lc-stepper-input"
-                  value="{{ old('max_duration', $listing->max_duration ?? '') }}"
-                  min="1"
-                  max="365"
-                >
-                <span class="lc-stepper-unit" id="max-duration-label">
-                  {{ old('max_duration', $listing->max_duration ?? null) ? 'jour(s)' : 'Sans limite' }}
-                </span>
-              </div>
-              <button type="button" class="lc-stepper-btn" data-target="max_duration" data-action="inc" aria-label="Augmenter">
-                @svg('tabler-plus')
-              </button>
-            </div>
-          </div>
+          @endforeach
         </div>
-
-        {{-- Tags --}}
-        <div class="lc-field">
-          <label class="lc-label">
-            Équipements & caractéristiques
-            <span class="lc-label-optional">optionnel</span>
-          </label>
-          <div class="lc-tags">
-            @php
-              $availableTags = ['wifi', 'piscine', 'parking', 'climatisation', 'animaux', 'vue mer', 'terrasse', 'barbecue', 'jacuzzi', 'accès plage'];
-              $selectedTags = old('tags', $listing->tags ?? []);
-            @endphp
-            @foreach($availableTags as $tag)
-              <label class="lc-tag {{ in_array($tag, $selectedTags) ? 'selected' : '' }}">
-                <input
-                  type="checkbox"
-                  name="tags[]"
-                  value="{{ $tag }}"
-                  {{ in_array($tag, $selectedTags) ? 'checked' : '' }}
-                >
-                {{ ucfirst($tag) }}
-              </label>
-            @endforeach
-          </div>
-        </div>
-
       </div>
 
       <div class="lc-fields" style="margin-top: 2rem;">
@@ -125,6 +61,27 @@
           <label for="contact_website" class="lc-label">Site web personnel</label>
           <input type="url" name="contact_website" id="contact_website" class="lc-input" value="{{ old('contact_website', $listing->contact_website ?? '') }}" placeholder="ex. https://monsite.com">
         </div>
+
+        {{-- Preferred contact --}}
+        @php $preferredSelected = old('preferred_contact', $listing->preferred_contact ?? 'email') @endphp
+        <div class="lc-field" style="margin-top: 0.5rem;">
+          <label class="lc-label">Canal de contact préféré</label>
+          <p class="lc-field-hint">Ce canal sera mis en avant sur votre annonce.</p>
+          <div class="lc-preferred-grid">
+            @foreach([
+              'email'    => ['icon' => 'mail',            'label' => 'Email'],
+              'phone'    => ['icon' => 'phone',           'label' => 'Téléphone'],
+              'whatsapp' => ['icon' => 'brand-whatsapp',  'label' => 'WhatsApp'],
+              'website'  => ['icon' => 'world',           'label' => 'Site web'],
+            ] as $value => $opt)
+              <label class="lc-preferred-opt {{ $preferredSelected === $value ? 'selected' : '' }}">
+                <input type="radio" name="preferred_contact" value="{{ $value }}" {{ $preferredSelected === $value ? 'checked' : '' }}>
+                @svg('tabler-' . $opt['icon'])
+                {{ $opt['label'] }}
+              </label>
+            @endforeach
+          </div>
+        </div>
       </div>
 
       <div class="lc-actions">
@@ -135,41 +92,76 @@
   </div>
 @endsection
 
+@push('styles')
+  <style>
+    .lc-tag {
+      gap: 0.35rem;
+    }
+    .lc-tag svg {
+      width: 1rem;
+      height: 1rem;
+      flex-shrink: 0;
+    }
+
+    .lc-preferred-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .lc-preferred-opt {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 0.875rem;
+      border: 0.5px solid #EBEBEB;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--clr-text-dark);
+      background: var(--clr-background);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+      user-select: none;
+    }
+
+    .lc-preferred-opt input[type="radio"] {
+      display: none;
+    }
+
+    .lc-preferred-opt svg {
+      width: 1.1rem;
+      height: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .lc-preferred-opt:hover {
+      border-color: var(--clr-secondary);
+    }
+
+    .lc-preferred-opt.selected {
+      border-color: var(--clr-primary);
+      background: rgba(0, 68, 170, 0.06);
+      color: var(--clr-primary);
+      font-weight: 600;
+    }
+  </style>
+@endpush
+
 @push('scripts')
   <script>
-    // Tag toggle styling
     document.querySelectorAll('.lc-tag input[type="checkbox"]').forEach(cb => {
       cb.addEventListener('change', () => {
         cb.closest('.lc-tag').classList.toggle('selected', cb.checked)
       })
     })
 
-    // Stepper — max_duration has a "Sans limite" zero state
-    document.querySelectorAll('.lc-stepper-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const input = document.getElementById(btn.dataset.target)
-        const isMaxDuration = btn.dataset.target === 'max_duration'
-        const min = parseInt(input.min) || 1
-        const max = parseInt(input.max) || 365
-        let val = parseInt(input.value) || 0
-
-        if (btn.dataset.action === 'inc') {
-          val = val === 0 ? min : Math.min(val + 1, max)
-        } else {
-          val = val <= min ? 0 : val - 1
-        }
-
-        input.value = val || ''
-
-        if (isMaxDuration) {
-          document.getElementById('max-duration-label').textContent = val ? 'jour(s)' : 'Sans limite'
-        }
+    document.querySelectorAll('.lc-preferred-opt input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.querySelectorAll('.lc-preferred-opt').forEach(opt => opt.classList.remove('selected'))
+        radio.closest('.lc-preferred-opt').classList.add('selected')
       })
-    })
-
-    document.getElementById('max_duration').addEventListener('input', (e) => {
-      const val = parseInt(e.target.value) || 0
-      document.getElementById('max-duration-label').textContent = val ? 'jour(s)' : 'Sans limite'
     })
   </script>
 @endpush

@@ -34,7 +34,6 @@
         <div class="form-group">
           <div class="form-label-row">
             <label for="password">Mot de passe</label>
-            {{-- <a href="{{ route('password.request') }}" class="form-label-link">Mot de passe oublié ?</a> --}}
           </div>
           <div class="input-password">
             <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password"

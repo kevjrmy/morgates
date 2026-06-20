@@ -2,46 +2,39 @@
 
 ## Short-Term MVP Features
 
-1. **Persist the listing creation flow**
-   - Save each step of `/mon-espace/publier` to a `Listing` record.
-   - Allow owners to publish instantly at the end of the flow.
-   - Include contact channel fields (email, phone, WhatsApp, website, social links) in the creation flow.
+1. **Implement listing photos**
+    - Decide MVP storage approach (evaluate Cloudinary).
+    - Keep upload UX lightweight and mobile-friendly.
+    - Add photo display and management in the listing edit view.
 
-2. **Implement listing photos**
-   - Decide MVP storage approach.
-   - Evaluate Cloudinary for production-ready image/photo storage.
-   - Keep upload UX lightweight and mobile-friendly.
+2. **Add basic admin dashboard for Loïs**
+    - Custom Blade area (no third-party admin package).
+    - Manage users and listings/content.
+    - Display basic KPIs: signups, total listings, active listings, contact clicks (if tracked).
 
-3. **Improve the owner dashboard**
-   - Show owner's listings with status (active/inactive).
-   - Add edit/delete and activate/deactivate actions.
-   - Make the dashboard mobile-first.
+3. **Add basic owner trust fields**
+    - Confirmation/verification email on registration.
+    - Require at least one contact detail before publishing.
+    - Keep requirements simple until trust and safety rules are clearer.
 
-4. **Add basic admin dashboard for Loïs**
-   - Manage users.
-   - Manage listings/content.
-   - Display basic KPIs: signups, total listings, active listings, contact clicks (if tracked).
+4. **Track key MVP metrics**
+    - Listing views.
+    - Contact clicks by channel (email, phone, WhatsApp, website).
+    - Owner signups.
+    - Published listings count.
 
-5. **Add basic owner trust fields**
-   - Confirmation/verification email on registration.
-   - Require at least one contact detail before publishing.
-   - Keep requirements simple until trust and safety rules are clearer.
+5. **Refine legal content**
+    - Terms of service page (currently placeholder).
+    - Privacy policy page (currently placeholder).
+    - Add simple marketplace content rules later.
 
-6. **Track key MVP metrics**
-   - Listing views.
-   - Contact clicks by channel (email, phone, WhatsApp, website).
-   - Owner signups.
-   - Published listings count.
+6. **Expand test coverage**
+    - Add feature tests for listing creation flow, filtering, and contact.
+    - Add unit tests for model helpers.
 
-7. **Refine legal content**
-   - Terms of service page (currently placeholder).
-   - Privacy policy page (currently placeholder).
-   - Add simple marketplace content rules later.
+## Backlog
 
-8. **Expand test coverage**
-   - Add feature tests for listing creation flow, filtering, and contact.
-   - Add unit tests for model helpers.
-
-
-## Perso
-- finir le UI de la page de profil puis le conecter avec le backend
+- Review location autocomplete UX on mobile (step 2 of listing creation).
+- Add `contact_social_links` to the listing creation flow and edit view.
+- Listing deactivate / delete actions from the account listings page.
+- Add optional links to external booking platforms (Airbnb, Booking.com, etc.) in the listing creation flow — for owners who are also listed elsewhere.

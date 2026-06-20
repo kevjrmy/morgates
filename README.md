@@ -6,7 +6,9 @@ The project is currently an MVP in active development.
 
 ## Documentation
 
-- `AGENTS.md`: project context, product direction, conventions, and implementation notes for Codex, Antigravity, and other coding agents.
+- `AGENTS.md`: project context, product direction, domain model, conventions, and implementation state for AI coding agents.
+- `.claude/rules/coding.md`: coding conventions and agent workflow rules.
+- `.claude/rules/design.md`: frontend and design rules.
 - `TODO.md`: current project TODO list.
 - `doc.md`: small deployment/dependency notes.
 

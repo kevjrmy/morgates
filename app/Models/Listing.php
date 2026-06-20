@@ -33,6 +33,7 @@ class Listing extends Model
     'contact_whatsapp',
     'contact_website',
     'contact_social_links',
+    'preferred_contact',
   ];
 
   protected static function booted(): void

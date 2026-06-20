@@ -1,26 +1,25 @@
 :root {
-  --clr-marine: #000080;
   --clr-blue: #0044aa;
   --clr-lightblue: #5599ff;
   --clr-softblue: #d5e5ff;
-  --clr-red: #d40000;
   --clr-transparent: rgba(255, 255, 255, 0.7);
 
   --clr-primary: var(--clr-blue);
   --clr-secondary: var(--clr-lightblue);
   --clr-tertiary: var(--clr-softblue);
+  --clr-success: #16a34a;
 
   --clr-background: #f9f9f9;
   --clr-text-dark: #232323;
   --clr-text-medium: #565454;
   --clr-text-light: #969faf;
+  --clr-text-primary: var(--clr-text-dark);
+  --clr-text-secondary: var(--clr-text-medium);
 
   --max-width: 768px;
   --line-height: 1.6;
   --border: 0.5px solid #EBEBEB;
   --box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.1);
-
-  --font-size-s: 0.875rem;
 
   --mobile-L: 425px;
 }

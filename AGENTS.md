@@ -38,7 +38,7 @@ If a boat is rented as a classic overnight stay instead of for sailing/touring, 
 
 Internal DB enum values and their French UI labels:
 - `boats` → `Bateau`
-- `stays` → `Séjour`
+- `stays` → `Hébergement`
 
 ## Contact Model
 Morgates does not include internal messaging, chat, or email forms in the MVP. Visitors contact owners directly through owner-provided contact channels.
@@ -75,19 +75,6 @@ Currently out of scope for the MVP:
 
 This scope can evolve, but default to keeping the MVP lightweight and direct-contact focused.
 
-## Brand Direction
-Morgates should feel:
-- calm
-- local
-- accessible
-- indie
-- direct
-- autonomous
-- trustful
-- secure
-- reliable
-- intuitive
-
 ## Data Ownership And Visitor Flow
 The goal is to send visitors to owner channels as fast as possible. Morgates should help visitors discover a relevant listing and then make the owner's direct contact options obvious.
 
@@ -117,7 +104,10 @@ Detailed prohibited listing types, regions, owner behavior rules, and claim rule
 - Listings index: `/annonces`
 - Listing detail pages: `/annonces/{listing:slug}`
 - Authentication: `/connexion`, `/inscription`, `/deconnexion`
-- Account area: `/mon-espace`
+- Account dashboard: `/mon-espace`
+- Account listings: `/mon-espace/annonces`
+- Account listings edit: `/mon-espace/annonces/{listing}/modifier`
+- Account profile: `/mon-espace/profil`
 - Account subscriptions: `/mon-espace/abonnements`
 - Account onboarding: `/bienvenue`
 - Listing creation flow: `/mon-espace/publier`
@@ -125,27 +115,31 @@ Detailed prohibited listing types, regions, owner behavior rules, and claim rule
 - Contact page: `/contact`
 
 ## Domain Model
-The main domain entity is `Listing`.
 
-Listings belong to a user and currently include fields for:
+### Listing
+The main domain entity. Listings belong to a user and include:
 - `type` (enum: `boats`, `stays`)
 - `title`, `slug`, `description`
 - `photos` (JSON array)
 - `price_amount` (decimal), `price_unit` (enum: `hour`, `half-day`, `day`, `week`, `month`, `contact`)
 - `capacity` (unsigned small int)
-- `min_duration`, `max_duration`, `duration_unit` (enum: `day`, `week`, `month`)
+- `min_duration`, `max_duration` (integers, always in **days**)
 - `country` (char 2), `region`, `city`, `address`
-- `map_url` (Google Maps URL; the model derives a Google Maps embed URL from it via `getMapEmbedUrlAttribute()`)
+- `latitude`, `longitude` (floats, from Google Maps autocomplete)
+- `map_url` (Google Maps URL; the model derives a Google Maps embed URL via `getMapEmbedUrlAttribute()`)
 - `tags` (JSON array; resolved via `config/tags.php` through `resolveTags()`)
 - `is_active` (boolean)
 - `contact_email`, `contact_phone`, `contact_whatsapp`, `contact_website`, `contact_social_links` (JSON)
 
-The model exposes helper methods: `typeLabel()`, `priceUnitLabel()`, `durationUnitLabel()`, `primaryContactUrl()`, `resolveTags()`, `getMapEmbedUrlAttribute()`.
+Helper methods: `typeLabel()`, `priceUnitLabel()`, `primaryContactUrl()`, `resolveTags()`, `getMapEmbedUrlAttribute()`.
 
-Listing routes use the `slug` as the route key.
+Slug is auto-generated on save via the `booted()` hook using `generateUniqueSlug()`. Route key is `slug`.
+
+### Destination
+A supporting lookup entity auto-populated from listing location data. Stores known cities/places with coordinates to power location autocomplete. Fields: `name`, `type`, `region`, `country`, `latitude`, `longitude`. Not user-facing. Created automatically by `ListingController::storePhotos()` when a listing with `city` + `latitude` is saved.
 
 ## Tags System
-Tags are defined in `config/tags.php` as a flat associative array keyed by slug. Each entry has `icon` and `label` fields. The `icon` must be a valid Tabler Icon name (rendered via the `blade-tabler-icons` package). There are two groups of tags: stay tags and boat tags. Tags are stored as a JSON array of slugs on each listing and resolved via `Listing::resolveTags()`.
+Tags are defined in `config/tags.php` as a flat associative array keyed by slug. Each entry has `group`, `icon`, and `label` fields. `group` is either `stays` or `boats` and controls which tags appear in step 4 of the creation flow based on the listing type. The `icon` must be a valid Tabler Icon name (rendered via the `blade-tabler-icons` package). Tags are stored as a JSON array of slugs on each listing and resolved via `Listing::resolveTags()`.
 
 ## Current Implementation State
 - Public listing browsing and filtering exist.
@@ -162,28 +156,33 @@ Tags are defined in `config/tags.php` as a flat associative array keyed by slug.
 - Login, registration, logout, and account access exist.
 - Registration validates email uniqueness and strong passwords.
 - User onboarding exists for name, photo, phone, country, and bio.
-- Account dashboard (`/mon-espace`) shows the owner's listings.
+- Account dashboard (`/mon-espace`) shows a summary for the owner.
+- Account listings page (`/mon-espace/annonces`) shows the owner's listings with status and edit actions.
+- Account profile page (`/mon-espace/profil`) lets owners edit their profile fields inline.
 - Account subscriptions page (`/mon-espace/abonnements`) exists with placeholder plan data.
 - Legal pages (privacy, terms, about) and a contact page exist with placeholder content.
-- Listing creation is scaffolded as a six-step Blade flow:
-  1. type
-  2. location
-  3. basics
-  4. details
-  5. description
-  6. photos
-- The listing creation controller redirects between steps but does **not** persist listing data yet.
+- Listing creation is a fully functional six-step Blade flow that persists data to the database:
+  1. **Type** — listing type (`boats`/`stays`) and title; stored to session
+  2. **Location** — country, region, city, address, coordinates, map URL; stored to session
+  3. **Basics** — price, price unit, capacity, min/max duration (days); stored to session
+  4. **Details** — tags, contact channels (email, phone, WhatsApp, website); stored to session
+  5. **Description** — free-text description; stored to session
+  6. **Photos** — final step; creates the `Listing` record from session data, optionally auto-creates a `Destination` record, clears the session, redirects to account
+- Photo upload in step 6 is not yet implemented (placeholder only).
+- Location autocomplete in step 2 uses a Google Maps API integration.
 
 ## Important Files
-- `routes/web.php`: main web routes.
-- `app/Models/Listing.php`: listing model, fillable fields, casts, and helper methods.
+- `routes/web.php`: all web routes.
+- `app/Models/Listing.php`: listing model, fillable fields, casts, slug generation, and helper methods.
+- `app/Models/Destination.php`: destination lookup model with search scopes.
 - `app/Http/Controllers/AuthController.php`: login, registration, logout.
-- `app/Http/Controllers/AccountController.php`: account dashboard and subscriptions page.
+- `app/Http/Controllers/AccountController.php`: account dashboard, listings, profile, subscriptions, and listing edit.
 - `app/Http/Controllers/OnboardingController.php`: account onboarding saves.
-- `app/Http/Controllers/ListingController.php`: listing creation flow (steps).
+- `app/Http/Controllers/ListingController.php`: listing creation flow (6 steps + session persistence + final DB write).
 - `config/tags.php`: tag definitions (slug → icon + French label).
 - `resources/views/pages/`: public pages (home, listings index, listing show, legal, contact).
 - `resources/views/account/`: private account pages and listing creation step views.
+- `resources/views/account/create/`: the six listing creation step views.
 - `resources/views/components/`: reusable Blade components (filter panel, search modal, listing cards, tags, etc.).
 - `resources/views/components/ui/`: generic reusable UI components (buttons, etc.).
 - `resources/views/layouts/`: Blade layouts.
@@ -191,69 +190,39 @@ Tags are defined in `config/tags.php` as a flat associative array keyed by slug.
 - `database/migrations/`: database schema.
 - `database/seeders/`: seed data.
 
+## Conventions
+Coding conventions are in `.claude/rules/coding.md`.
+Frontend and design rules are in `.claude/rules/design.md`.
+
 ## Development Commands
 - Run backend tests: `php artisan test`
 - Run frontend build: `npm run build`
 - Run the full dev workflow: `composer run dev`
 - Run only Vite dev server: `npm run dev`
 
-## Coding Conventions
-- Prefer Laravel conventions and existing local patterns.
-- Use Blade templates and existing layouts/components before adding new abstractions.
-- Keep changes scoped to the requested task.
-- Keep code, code comments, class names, function names, and variable names in English.
-- Keep visible UI text in French.
-- Do not add large dependencies without a clear reason.
-- Avoid unrelated refactors.
-- Preserve existing uncommitted user work.
-- Avoid semicolons in JavaScript.
-
-## Frontend Direction
-- Build the real app experience, not a marketing landing page, unless explicitly requested.
-- Keep marketplace screens efficient, scannable, and practical.
-- Focus on vertical/mobile design first. Desktop responsive/horizontal layouts will be designed later.
-- It is acceptable to take interaction and layout inspiration from Airbnb, while keeping Morgates' distinct direct-contact positioning.
-- Wallapop is another strong inspiration because it connects buyers and sellers directly, which is close to Morgates' visitor-owner relation model.
-- Keep the interface lightweight and easy to load.
-- Use non-invasive, smooth, short animations. The interface should communicate calmness, not hurry.
-- Prefer intuitive UI/UX over impressive or flashy design.
-- Use the CSS variables defined in `resources/css/app.css` as much as possible and keep UI styling consistent with them.
-- Use vanilla CSS and vanilla JavaScript.
-- Prefer scoped CSS and scoped JavaScript at the view or component template level.
-- Put CSS or JavaScript in shared files only when it is reused across multiple views/components.
-- Reuse existing CSS files and layout structure where they already match the intended scope.
-- Make forms, filters, listing cards, and account flows responsive on mobile and desktop.
-
 ## Known TODOs
-- Persist the listing creation flow (save each step to a `Listing` record).
-- Implement production-ready image upload/storage (evaluate Cloudinary).
-- Improve the owner dashboard: show listings with status, edit/delete/activate actions.
-- Add basic admin dashboard for Loïs (users, listings, basic KPIs).
+- Implement production-ready image upload/storage for listing photos (evaluate Cloudinary). Deferred — core listing logic is the current priority.
+- Add photo display and management in the account listing edit view.
+- Add basic admin dashboard for Loïs (users, listings, basic KPIs) — will be a custom Blade area, no third-party admin package.
 - Add owner trust fields: confirmation email, required contact details before publishing.
 - Track key MVP metrics: listing views, contact clicks by channel, owner signups, published listings.
 - Refine legal page content (privacy, terms).
 - Expand test coverage beyond the default/example tests.
-
-## Agent Workflow Notes
-- Start by checking `git status --short`.
-- Treat uncommitted changes as user work unless clearly generated by the current task.
-- Read the relevant route, controller, model, Blade view, and CSS before editing.
-- Run `php artisan test` for backend changes when feasible.
-- Run `npm run build` for frontend/CSS/Blade asset changes when feasible.
-- If tests or builds cannot be run, report that clearly in the final response.
+- Review and improve location autocomplete UX on mobile (step 2).
 
 ## Local Development Notes
 - Kevin usually runs `php artisan serve` from the IDE terminal during development.
 - Kevin usually has the Vite dev server/build watcher running from the IDE, so agents should not run `npm run build` unless explicitly needed or requested.
 
-## Hostinger premium plan
-- Project will be powered by Hostinger with their premium plan:
-`Storage: 20 GB SSD storage (some sources note 25 GB, but 20 GB is the standard listed spec). 
-RAM: 2 GB of memory. 
-CPU: 1 CPU core.
-Websites: Host up to 3 websites. 
-Bandwidth: Unlimited bandwidth.
-PHP Workers: 40 workers. 
-Databases: 10 databases with a 3 GB size limit. 
-Inodes: 400,000 files and directories.`
-- Therefore we need to be extra careful because MVP has to be able to run smoothly there at least until reaching ~3000 users, then we'll upgrade
+## Hostinger Premium Plan
+Project will be powered by Hostinger with their premium plan:
+- Storage: 20 GB SSD
+- RAM: 2 GB
+- CPU: 1 core
+- Websites: up to 3
+- Bandwidth: unlimited
+- PHP Workers: 40
+- Databases: 10 (3 GB size limit each)
+- Inodes: 400,000
+
+The MVP must run smoothly there up to ~3,000 users before needing an upgrade. Prefer lightweight, low-memory implementations.
