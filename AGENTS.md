@@ -163,7 +163,7 @@ Tags are defined in `config/tags.php` as a flat associative array keyed by slug.
 - Legal pages (privacy, terms, about) and a contact page exist with placeholder content.
 - Listing creation is a fully functional six-step Blade flow that persists data to the database:
   1. **Type** — listing type (`boats`/`stays`) and title; stored to session
-  2. **Location** — country, region, city, address, coordinates, map URL; stored to session
+  2. **Location** — country, region, city, address, coordinates, map URL; stored to session. City autocomplete uses the official French government API `https://geo.api.gouv.fr/communes` (FR only). Address autocomplete uses the official Base Adresse Nationale API `https://api-adresse.data.gouv.fr/search/`, scoped to the selected city via `citycode` (INSEE code from the commune API). Both APIs are free, keyless, and only active for FR. For other countries, both fields are free text.
   3. **Basics** — price, price unit, capacity, min/max duration (days); stored to session
   4. **Details** — tags, contact channels (email, phone, WhatsApp, website); stored to session
   5. **Description** — free-text description; stored to session

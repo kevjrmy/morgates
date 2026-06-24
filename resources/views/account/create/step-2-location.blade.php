@@ -29,7 +29,6 @@
                   {{ $country['flag'] }} {{ $country['label'] }}
                 </option>
               @endforeach
-              {{-- Fallback if config not available yet --}}
               @if(!config('countries'))
                 <option value="FR" {{ old('country', $listing->country ?? '') === 'FR' ? 'selected' : '' }}>🇫🇷 France</option>
                 <option value="ES" {{ old('country', $listing->country ?? '') === 'ES' ? 'selected' : '' }}>🇪🇸 Espagne</option>
@@ -62,11 +61,8 @@
         </div>
 
         {{-- Address --}}
-        <div class="lc-field">
-          <label for="address" class="lc-label">
-            Adresse
-            <span class="lc-label-optional">optionnel</span>
-          </label>
+        <div class="lc-field lc-autocomplete" data-address-autocomplete>
+          <label for="address" class="lc-label">Adresse</label>
           <input
             type="text"
             name="address"
@@ -75,37 +71,36 @@
             value="{{ old('address', $listing->address ?? '') }}"
             placeholder="ex. 12 rue du Port"
             maxlength="255"
+            required
+            autocomplete="off"
           >
-          <p class="lc-field-hint">L'adresse exacte ne sera partagée qu'après réservation.</p>
+          <div class="lc-autocomplete-list" id="address-suggestions"></div>
         </div>
 
-        {{-- Map picker --}}
-        <div class="lc-field lc-map-picker" data-map-picker>
-          <div class="lc-map-picker-header">
-            <label for="map_search" class="lc-label">Position sur Google Maps</label>
-            <p class="lc-field-hint">Saisissez l'emplacement à afficher aux visiteurs. Vous pouvez rester vague si vous ne souhaitez pas montrer l'adresse exacte.</p>
+        {{-- Show exact address toggle --}}
+        <div class="lc-field lc-toggle-field">
+          <div class="lc-toggle-row">
+            <div class="lc-toggle-text">
+              <span class="lc-label">Afficher l'adresse exacte</span>
+              <p class="lc-field-hint">Les visiteurs verront votre adresse complète sur l'annonce.</p>
+            </div>
+            <label class="lc-toggle" aria-label="Afficher l'adresse exacte aux visiteurs">
+              <input type="checkbox" name="show_exact_address" id="show_exact_address" value="1"
+                {{ old('show_exact_address', $listing->show_exact_address ?? false) ? 'checked' : '' }}>
+              <span class="lc-toggle-track"></span>
+            </label>
           </div>
+        </div>
 
-          <div class="lc-map-search-row">
-            <input
-              type="search"
-              id="map_search"
-              class="lc-input"
-              value="{{ old('map_search') }}"
-              placeholder="ex. Mandelieu-la-Napoule, Port de Cannes, Calanque de Sormiou"
-              autocomplete="off"
-              data-map-search
-            >
-            <button type="button" class="lc-map-refresh" data-map-refresh>
-              @svg('tabler-search')
-              Rechercher
-            </button>
-          </div>
+        {{-- Map preview (auto-generated from address + city) --}}
+        <div class="lc-field lc-map-picker" data-map-picker>
+          <label class="lc-label">Aperçu de la carte</label>
+          <p class="lc-field-hint">Généré automatiquement depuis votre adresse et votre ville.</p>
 
           <div class="lc-map-preview" data-map-preview>
             <div class="lc-map-placeholder" data-map-placeholder>
               @svg('tabler-map-pin', ['class' => 'lc-map-placeholder-icon'])
-              <p>Recherchez un emplacement pour afficher la carte</p>
+              <p>Complétez l'adresse pour afficher la carte</p>
             </div>
             <iframe
               title="Aperçu Google Maps"
@@ -124,17 +119,6 @@
             data-map-url
           >
 
-          <details class="lc-map-manual">
-            <summary>Coller un lien Google Maps manuellement</summary>
-            <input
-              type="url"
-              class="lc-input"
-              value="{{ old('map_url', $listing->map_url ?? '') }}"
-              placeholder="ex. https://goo.gl/maps/..."
-              maxlength="255"
-              data-map-manual-url
-            >
-          </details>
         </div>
 
       </div>
@@ -151,41 +135,6 @@
   <style>
     .lc-autocomplete {
       position: relative;
-    }
-
-    .lc-map-preview {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      background: #f8fafc;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 12px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .lc-map-preview iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
-
-    .lc-map-placeholder {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      color: var(--clr-text-light);
-      padding: 2rem;
-    }
-
-    .lc-map-placeholder-icon {
-      width: 2.5rem;
-      height: 2.5rem;
-      margin-bottom: 0.75rem;
-      opacity: 0.5;
     }
 
     .lc-autocomplete-list {
@@ -236,8 +185,114 @@
       color: var(--clr-text-medium);
       font-size: 0.82rem;
     }
+
+    /* Toggle */
+    .lc-toggle-field {
+      border: 0.5px solid #EBEBEB;
+      border-radius: 0.625rem;
+      padding: 0.875rem 1rem;
+    }
+
+    .lc-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .lc-toggle-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .lc-toggle {
+      position: relative;
+      flex-shrink: 0;
+      width: 2.75rem;
+      height: 1.5rem;
+      cursor: pointer;
+      display: block;
+    }
+
+    .lc-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .lc-toggle-track {
+      position: absolute;
+      inset: 0;
+      background: #D1D5DB;
+      border-radius: 99px;
+      transition: background 0.2s;
+    }
+
+    .lc-toggle-track::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 1.125rem;
+      height: 1.125rem;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .lc-toggle input:checked + .lc-toggle-track {
+      background: var(--clr-primary);
+    }
+
+    .lc-toggle input:checked + .lc-toggle-track::after {
+      transform: translateX(1.25rem);
+    }
+
+    /* Map */
+    .lc-map-picker {
+      gap: 0.75rem;
+    }
+
+    .lc-map-preview {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #f8fafc;
+      border: 0.5px solid #EBEBEB;
+      border-radius: 0.625rem;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lc-map-preview iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .lc-map-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      color: var(--clr-text-light);
+      padding: 2rem;
+    }
+
+    .lc-map-placeholder-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      margin-bottom: 0.75rem;
+      opacity: 0.5;
+    }
   </style>
 @endpush
+
 @push('scripts')
   <script>
     (() => {
@@ -249,7 +304,7 @@
         '"': '&quot;',
       }[char]))
 
-      function initAutocomplete({ input, list, fetchSuggestions, renderItem, onSelect }) {
+      function initAutocomplete({ input, list, fetchSuggestions, renderItem, onSelect, onResults }) {
         if (!input || !list) return
 
         let items = []
@@ -290,6 +345,8 @@
               close()
               return
             }
+
+            if (onResults) onResults(items, query)
 
             if (!items.length) {
               close()
@@ -340,7 +397,26 @@
       const latitudeInput = document.getElementById('latitude')
       const longitudeInput = document.getElementById('longitude')
       const cityList = document.getElementById('city-suggestions')
+      const addressInput = document.getElementById('address')
+      const addressList = document.getElementById('address-suggestions')
       const cache = new Map()
+
+      let cityCode = ''
+
+      const updateAddressAvailability = () => {
+        const isFR = countryInput.value === 'FR'
+        const cityReady = isFR ? !!cityCode : cityInput.value.trim() !== ''
+
+        if (cityReady) {
+          addressInput.disabled = false
+          addressInput.placeholder = 'ex. 12 rue du Port'
+        } else {
+          addressInput.disabled = true
+          addressInput.placeholder = "Sélectionnez d'abord une ville"
+          addressInput.value = ''
+          addressInput.setCustomValidity('')
+        }
+      }
 
       const updateCityAvailability = () => {
         const country = countryInput.value
@@ -352,18 +428,36 @@
           regionInput.value = ''
           latitudeInput.value = ''
           longitudeInput.value = ''
+          cityCode = ''
+          addressInput.value = ''
+          addressInput.setCustomValidity('')
         }
+        updateAddressAvailability()
       }
 
       countryInput.addEventListener('change', () => {
+        cityInput.value = ''
+        cityInput.setCustomValidity('')
+        regionInput.value = ''
         latitudeInput.value = ''
         longitudeInput.value = ''
+        cityCode = ''
+        addressInput.value = ''
+        addressInput.setCustomValidity('')
         updateCityAvailability()
+        cityInput.dispatchEvent(new Event('change', { bubbles: true }))
       })
 
       cityInput.addEventListener('input', () => {
         latitudeInput.value = ''
         longitudeInput.value = ''
+        cityCode = ''
+        addressInput.value = ''
+        addressInput.setCustomValidity('')
+        updateAddressAvailability()
+        if (countryInput.value === 'FR') {
+          cityInput.setCustomValidity('Veuillez sélectionner une ville dans la liste')
+        }
       })
 
       initAutocomplete({
@@ -378,7 +472,7 @@
           const timeout = setTimeout(() => controller.abort(), 3000)
 
           try {
-            const response = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(query)}&fields=nom,region,departement,centre&boost=population&limit=8`, {
+            const response = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(query)}&fields=nom,region,departement,centre,code&boost=population&limit=8`, {
               signal: controller.signal,
             })
             if (!response.ok) return []
@@ -398,103 +492,153 @@
         onSelect: (result) => {
           cityInput.value = result.nom || ''
           regionInput.value = result.region?.nom || ''
+          cityCode = result.code || ''
           countryInput.value = 'FR'
+          cityInput.setCustomValidity('')
           cityInput.dispatchEvent(new Event('change', { bubbles: true }))
           latitudeInput.value = result.centre?.coordinates?.[1] ?? ''
           longitudeInput.value = result.centre?.coordinates?.[0] ?? ''
+          addressInput.value = ''
+          addressInput.setCustomValidity('')
+          updateAddressAvailability()
+        },
+        onResults: (results, query) => {
+          const match = results.find(r => r.nom.toLowerCase() === query.toLowerCase())
+          if (match) {
+            cityCode = match.code || ''
+            regionInput.value = match.region?.nom || ''
+            latitudeInput.value = match.centre?.coordinates?.[1] ?? ''
+            longitudeInput.value = match.centre?.coordinates?.[0] ?? ''
+            cityInput.setCustomValidity('')
+          }
+          updateAddressAvailability()
         },
       })
 
+      initAutocomplete({
+        input: addressInput,
+        list: addressList,
+        fetchSuggestions: async (query) => {
+          if (countryInput.value !== 'FR' || !cityCode) return []
+
+          const controller = new AbortController()
+          const timeout = setTimeout(() => controller.abort(), 3000)
+
+          try {
+            const response = await fetch(
+              `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&citycode=${cityCode}&limit=6`,
+              { signal: controller.signal }
+            )
+            if (!response.ok) return []
+            const data = await response.json()
+            return data.features || []
+          } catch {
+            return []
+          } finally {
+            clearTimeout(timeout)
+          }
+        },
+        renderItem: (feature) => `
+          <span class="lc-autocomplete-name">${escapeHtml(feature.properties.name)}</span>
+          <span class="lc-autocomplete-region">${escapeHtml(feature.properties.postcode)}</span>
+        `,
+        onSelect: (feature) => {
+          addressInput.value = feature.properties.name || ''
+          addressInput.setCustomValidity('')
+          addressInput.dispatchEvent(new Event('change', { bubbles: true }))
+        },
+      })
+
+      addressInput.addEventListener('input', () => {
+        if (countryInput.value === 'FR') {
+          addressInput.setCustomValidity('Veuillez sélectionner une adresse dans la liste')
+        }
+      })
+
       updateCityAvailability()
+
+      // Edit/session flow: city + coordinates pre-filled but cityCode not stored — fetch it once
+      if (countryInput.value === 'FR' && cityInput.value && latitudeInput.value) {
+        fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(cityInput.value)}&fields=code&boost=population&limit=1`)
+          .then(r => r.json())
+          .then(results => {
+            if (results[0]?.code) {
+              cityCode = results[0].code
+              updateAddressAvailability()
+            }
+          })
+          .catch(() => {})
+      }
     })();
 
     (() => {
-      const picker = document.querySelector('[data-map-picker]');
-      if (!picker) return;
+      const picker = document.querySelector('[data-map-picker]')
+      if (!picker) return
 
-      const searchInput = picker.querySelector('[data-map-search]');
-      const mapUrlInput = picker.querySelector('[data-map-url]');
-      const manualUrlInput = picker.querySelector('[data-map-manual-url]');
-      const frame = picker.querySelector('[data-map-frame]');
-      const refreshButton = picker.querySelector('[data-map-refresh]');
+      const mapUrlInput = picker.querySelector('[data-map-url]')
+      const frame = picker.querySelector('[data-map-frame]')
+      const placeholder = picker.querySelector('[data-map-placeholder]')
+      const placeholderText = placeholder?.querySelector('p')
+      const exactToggle = document.getElementById('show_exact_address')
+      const cityInput = document.getElementById('city')
+      const addressInput = document.getElementById('address')
 
-      const mapSearchUrl = (query) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-      const mapEmbedUrl = (query) => `https://maps.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+      const mapEmbedUrl = (query) => `https://maps.google.com/maps?q=${encodeURIComponent(query)}&output=embed`
+      const mapSearchUrl = (query) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
 
-      const queryFromUrl = (url) => {
-        if (!url) return '';
-
-        try {
-          const parsedUrl = new URL(url);
-          return parsedUrl.searchParams.get('query') || parsedUrl.searchParams.get('q') || '';
-        } catch (error) {
-          return '';
-        }
-      };
-
-      const updateMap = (query, { syncSearch = true, persist = true } = {}) => {
-        const cleanQuery = (query || '').trim();
-        
-        if (!cleanQuery) {
-          frame.style.display = 'none';
-          picker.querySelector('[data-map-placeholder]').style.display = 'flex';
-          return;
-        }
-
-        frame.style.display = 'block';
-        picker.querySelector('[data-map-placeholder]').style.display = 'none';
-        frame.src = mapEmbedUrl(cleanQuery);
-
-        const nextUrl = mapSearchUrl(cleanQuery);
-        if (persist && nextUrl.length <= 255) {
-          mapUrlInput.value = nextUrl;
-          manualUrlInput.value = nextUrl;
-        }
-
-        if (syncSearch) {
-          searchInput.value = cleanQuery;
-        }
-      };
-
-      const updateFromSearch = () => {
-        updateMap(searchInput.value, { syncSearch: false });
-      };
-
-      const updateFromManualUrl = () => {
-        const url = manualUrlInput.value.trim();
-        if (!url) return;
-
-        mapUrlInput.value = url;
-
-        const manualQuery = queryFromUrl(url);
-        if (manualQuery) {
-          frame.src = mapEmbedUrl(manualQuery);
-          searchInput.value = manualQuery;
-        }
-      };
-
-      searchInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          updateFromSearch();
-        }
-      });
-
-      searchInput.addEventListener('blur', updateFromSearch);
-      refreshButton.addEventListener('click', updateFromSearch);
-      manualUrlInput.addEventListener('input', updateFromManualUrl);
-      picker.closest('form')?.addEventListener('submit', () => {
-        if (searchInput.value.trim()) {
-          updateFromSearch();
-        }
-      });
-
-      const initialQuery = searchInput.value || queryFromUrl(mapUrlInput.value);
-      if (initialQuery) {
-        updateMap(initialQuery);
-      } else {
-        updateMap('', { syncSearch: false, persist: false });
+      const buildQuery = () => {
+        const address = (addressInput?.value || '').trim()
+        const city = (cityInput?.value || '').trim()
+        if (address && city) return `${address}, ${city}`
+        return ''
       }
+
+      const showPlaceholder = (text) => {
+        frame.style.display = 'none'
+        frame.src = ''
+        placeholder.style.display = 'flex'
+        if (placeholderText && text) placeholderText.textContent = text
+      }
+
+      const showMap = (query, { persist = true } = {}) => {
+        const clean = (query || '').trim()
+        if (!clean) {
+          showPlaceholder('Complétez l\'adresse pour afficher la carte')
+          return
+        }
+        frame.style.display = 'block'
+        placeholder.style.display = 'none'
+        frame.src = mapEmbedUrl(clean)
+        const nextUrl = mapSearchUrl(clean)
+        if (persist && nextUrl.length <= 255) {
+          mapUrlInput.value = nextUrl
+        }
+      }
+
+      const refresh = () => {
+        if (!exactToggle?.checked) {
+          picker.style.display = 'none'
+          frame.src = ''
+          return
+        }
+        picker.style.display = ''
+        showMap(buildQuery())
+      }
+
+      let debounceTimer = null
+      const debouncedRefresh = () => {
+        clearTimeout(debounceTimer)
+        debounceTimer = setTimeout(refresh, 500)
+      }
+
+      exactToggle?.addEventListener('change', refresh)
+      cityInput?.addEventListener('change', refresh)
+      cityInput?.addEventListener('input', refresh)
+      addressInput?.addEventListener('change', refresh)
+      addressInput?.addEventListener('blur', refresh)
+      addressInput?.addEventListener('input', debouncedRefresh)
+
+      refresh()
     })();
 
     (() => {

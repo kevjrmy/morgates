@@ -634,21 +634,6 @@
   border: 0;
 }
 
-.lc-map-manual {
-  border-top: 0.5px solid #EBEBEB;
-  padding-top: 0.75rem;
-}
-
-.lc-map-manual summary {
-  color: var(--clr-text-medium);
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.lc-map-manual .lc-input {
-  margin-top: 0.75rem;
-}
 
 @media (max-width: 520px) {
   .lc-map-search-row {

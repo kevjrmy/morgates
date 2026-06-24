@@ -25,6 +25,7 @@ class Listing extends Model
     'latitude',
     'longitude',
     'address',
+    'show_exact_address',
     'map_url',
     'is_active',
     'tags',
@@ -58,6 +59,7 @@ class Listing extends Model
     'latitude' => 'float',
     'longitude' => 'float',
     'is_active' => 'boolean',
+    'show_exact_address' => 'boolean',
   ];
 
   public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo

@@ -18,11 +18,11 @@
       </li>
       <li>
         @svg('tabler-currency-euro-off', ['class' => 'hero-trust-icon'])
-        <span>Sans surcoût</span>
+        <span>Sans frais</span>
       </li>
       <li>
-        @svg('mdi-map-marker-outline', ['class' => 'hero-trust-icon'])
-        <span>Toute l'Europe</span>
+        @svg('tabler-home-star', ['class' => 'hero-trust-icon'])
+        <span>Hébergement & bateaux</span>
       </li>
     </ul>
   </div>

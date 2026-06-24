@@ -1,3 +1,15 @@
+#header {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--max-width);
+  z-index: 100;
+  background-color: var(--clr-background);
+  border-bottom: var(--border);
+}
+
 .header-nav {
   display: flex;
   align-items: center;

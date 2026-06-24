@@ -56,7 +56,8 @@ class ListingController extends Controller
       'city' => ['required', 'string', 'max:100'],
       'latitude' => ['nullable', 'numeric'],
       'longitude' => ['nullable', 'numeric'],
-      'address' => ['nullable', 'string', 'max:255'],
+      'address' => ['required', 'string', 'max:255'],
+      'show_exact_address' => ['nullable', 'boolean'],
       'map_url' => ['nullable', 'url', 'max:255'],
     ]);
 
@@ -148,6 +149,7 @@ class ListingController extends Controller
         'longitude' => $data['longitude'] ?? null,
         'tags' => $data['tags'] ?? [],
         'address' => $data['address'] ?? null,
+        'show_exact_address' => $data['show_exact_address'] ?? false,
         'map_url' => $data['map_url'] ?? null,
         'contact_email' => $data['contact_email'] ?? null,
         'contact_phone' => $data['contact_phone'] ?? null,

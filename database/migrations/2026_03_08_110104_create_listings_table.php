@@ -30,6 +30,7 @@ return new class extends Migration {
       $table->decimal('longitude', 9, 6)->nullable();
       $table->json('tags')->nullable();
       $table->string('address')->nullable();
+      $table->boolean('show_exact_address')->default(false);
       $table->string('map_url')->nullable();
       $table->string('contact_email')->nullable();
       $table->string('contact_phone')->nullable();

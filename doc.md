@@ -5,7 +5,6 @@
 
 ## Loïs et moi: travail à faire + notes personnelles
 
-- Hero: icones -> sans frais / toute l'Europe
 - Réservez sans commission ni frais de service intermédiaires. + directement avec l'hôte
 - Réservez en direct avec l'hôte via différents canaux de contacts. -> vous pouvez contacter l'hôte via différents canaux de contact
 - à "explorer": parcourez simplement
