@@ -99,7 +99,7 @@ Step 3: price, capacity
                   min="1"
                   max="365"
                 >
-                <span class="lc-stepper-unit">jour(s)</span>
+                <span class="lc-stepper-unit" id="min-duration-label">jour(s)</span>
               </div>
               <button type="button" class="lc-stepper-btn" data-target="min_duration" data-action="inc" aria-label="Augmenter">
                 @svg('tabler-plus')
@@ -234,8 +234,6 @@ Step 3: price, capacity
 
 @push('scripts')
   <script>
-
-    // Price on request toggle
     const priceToggle = document.getElementById('price_contact_toggle')
     const priceGrid   = document.getElementById('price_grid')
     const priceAmount = document.getElementById('price_amount')
@@ -269,8 +267,26 @@ Step 3: price, capacity
       }
     }
 
-    priceToggle.addEventListener('change', togglePriceFields)
-    togglePriceFields()
+    // Duration unit labels reactive to price_unit
+    const unitLabels = {
+      'hour':     'heure(s)',
+      'half-day': 'heure(s)',
+      'day':      'jour(s)',
+      'week':     'semaine(s)',
+      'month':    'mois',
+    }
+
+    const minDurationLabel = document.getElementById('min-duration-label')
+    const maxDurationLabel = document.getElementById('max-duration-label')
+    const maxDurationInput = document.getElementById('max_duration')
+
+    const getActiveUnit = () => priceToggle.checked ? (previousUnit || 'day') : (priceUnit.value || 'day')
+
+    const updateDurationLabels = () => {
+      const label = unitLabels[getActiveUnit()] || 'jour(s)'
+      if (minDurationLabel) minDurationLabel.textContent = label
+      if (maxDurationLabel) maxDurationLabel.textContent = maxDurationInput.value ? label : 'Sans limite'
+    }
 
     // Stepper buttons
     document.querySelectorAll('.lc-stepper-btn').forEach(btn => {
@@ -281,8 +297,17 @@ Step 3: price, capacity
         let val = parseInt(input.value) || min
         val = btn.dataset.action === 'inc' ? Math.min(val + 1, max) : Math.max(val - 1, min)
         input.value = val
+        if (btn.dataset.target === 'max_duration') updateDurationLabels()
       })
     })
+
+    priceToggle.addEventListener('change', togglePriceFields)
+    priceToggle.addEventListener('change', updateDurationLabels)
+    priceUnit.addEventListener('change', updateDurationLabels)
+    maxDurationInput.addEventListener('input', updateDurationLabels)
+
+    togglePriceFields()
+    updateDurationLabels()
 
     // Enable/disable next button
     const btnNext = document.querySelector('.lc-form .lc-btn-next')
