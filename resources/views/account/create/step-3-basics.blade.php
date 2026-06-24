@@ -138,6 +138,8 @@ Step 3: price, capacity
           </div>
         </div>
 
+        <p id="duration-error" class="lc-field-error" style="display:none;">La durée minimum doit être inférieure à la durée maximum.</p>
+
       </div>
 
       <div class="lc-actions">
@@ -229,6 +231,12 @@ Step 3: price, capacity
       opacity: 0.4;
       pointer-events: none;
     }
+
+    .lc-field-error {
+      font-size: 0.8rem;
+      color: #dc2626;
+      margin-top: -0.25rem;
+    }
   </style>
 @endpush
 
@@ -278,7 +286,9 @@ Step 3: price, capacity
 
     const minDurationLabel = document.getElementById('min-duration-label')
     const maxDurationLabel = document.getElementById('max-duration-label')
+    const minDurationInput = document.getElementById('min_duration')
     const maxDurationInput = document.getElementById('max_duration')
+    const durationError    = document.getElementById('duration-error')
 
     const getActiveUnit = () => priceToggle.checked ? (previousUnit || 'day') : (priceUnit.value || 'day')
 
@@ -286,6 +296,16 @@ Step 3: price, capacity
       const label = unitLabels[getActiveUnit()] || 'jour(s)'
       if (minDurationLabel) minDurationLabel.textContent = label
       if (maxDurationLabel) maxDurationLabel.textContent = maxDurationInput.value ? label : 'Sans limite'
+    }
+
+    const isDurationValid = () => {
+      const minVal = parseInt(minDurationInput.value) || 1
+      const maxVal = parseInt(maxDurationInput.value)
+      return !maxVal || minVal < maxVal
+    }
+
+    const updateDurationError = () => {
+      durationError.style.display = isDurationValid() ? 'none' : 'block'
     }
 
     // Stepper buttons
@@ -298,6 +318,10 @@ Step 3: price, capacity
         val = btn.dataset.action === 'inc' ? Math.min(val + 1, max) : Math.max(val - 1, min)
         input.value = val
         if (btn.dataset.target === 'max_duration') updateDurationLabels()
+        if (btn.dataset.target === 'min_duration' || btn.dataset.target === 'max_duration') {
+          updateDurationError()
+          checkFormValidity()
+        }
       })
     })
 
@@ -314,12 +338,15 @@ Step 3: price, capacity
 
     const checkFormValidity = () => {
       const isPriceValid = priceToggle.checked || priceAmount.value.trim() !== ''
-      btnNext.disabled = !isPriceValid
+      btnNext.disabled = !isPriceValid || !isDurationValid()
     }
 
     priceAmount.addEventListener('input', checkFormValidity)
     priceToggle.addEventListener('change', checkFormValidity)
+    minDurationInput.addEventListener('input', () => { updateDurationError(); checkFormValidity() })
+    maxDurationInput.addEventListener('input', () => { updateDurationError(); checkFormValidity() })
 
+    updateDurationError()
     checkFormValidity()
   </script>
 @endpush

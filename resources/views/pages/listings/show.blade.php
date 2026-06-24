@@ -75,17 +75,20 @@
         <h2>Contact rapide</h2>
         @php
           $preferred = $listing->preferred_contact ?? 'email';
+          $social    = $listing->contact_social_links ?? [];
           $channels  = [
-            'email'    => $listing->contact_email,
-            'phone'    => $listing->contact_phone,
-            'whatsapp' => $listing->contact_whatsapp,
-            'website'  => $listing->contact_website,
+            'email'     => $listing->contact_email,
+            'phone'     => $listing->contact_phone,
+            'whatsapp'  => $listing->contact_whatsapp,
+            'website'   => $listing->contact_website,
+            'instagram' => $social['instagram'] ?? null,
+            'messenger' => $social['messenger'] ?? null,
           ];
           $active = null;
           if (!empty($channels[$preferred])) {
             $active = $preferred;
           } else {
-            foreach (['email', 'phone', 'whatsapp', 'website'] as $c) {
+            foreach (array_keys($channels) as $c) {
               if (!empty($channels[$c])) { $active = $c; break; }
             }
           }
@@ -124,6 +127,22 @@
             <span class="contact-quick-value">{{ parse_url($channels['website'], PHP_URL_HOST) }}</span>
             <div class="contact-quick-actions">
               <a class="contact-action-btn" href="{{ $channels['website'] }}" target="_blank" rel="noopener noreferrer" title="Ouvrir le site">@svg('tabler-external-link')</a>
+            </div>
+          </div>
+        @elseif($active === 'instagram')
+          <div class="contact-quick">
+            <span class="contact-quick-icon">@svg('tabler-brand-instagram')</span>
+            <span class="contact-quick-value">{{ parse_url($channels['instagram'], PHP_URL_HOST) . parse_url($channels['instagram'], PHP_URL_PATH) }}</span>
+            <div class="contact-quick-actions">
+              <a class="contact-action-btn" href="{{ $channels['instagram'] }}" target="_blank" rel="noopener noreferrer" title="Ouvrir Instagram">@svg('tabler-external-link')</a>
+            </div>
+          </div>
+        @elseif($active === 'messenger')
+          <div class="contact-quick">
+            <span class="contact-quick-icon">@svg('tabler-brand-messenger')</span>
+            <span class="contact-quick-value">{{ parse_url($channels['messenger'], PHP_URL_HOST) . parse_url($channels['messenger'], PHP_URL_PATH) }}</span>
+            <div class="contact-quick-actions">
+              <a class="contact-action-btn" href="{{ $channels['messenger'] }}" target="_blank" rel="noopener noreferrer" title="Ouvrir Messenger">@svg('tabler-external-link')</a>
             </div>
           </div>
         @else

@@ -2,13 +2,16 @@
 
 @php
   $preferred  = $listing->preferred_contact ?? 'email';
+  $social     = $listing->contact_social_links ?? [];
   $channelMap = [
-    'email'    => $listing->contact_email,
-    'phone'    => $listing->contact_phone,
-    'whatsapp' => $listing->contact_whatsapp,
-    'website'  => $listing->contact_website,
+    'email'     => $listing->contact_email,
+    'phone'     => $listing->contact_phone,
+    'whatsapp'  => $listing->contact_whatsapp,
+    'website'   => $listing->contact_website,
+    'instagram' => $social['instagram'] ?? null,
+    'messenger' => $social['messenger'] ?? null,
   ];
-  $order  = array_values(array_unique(array_merge([$preferred], ['email', 'phone', 'whatsapp', 'website'])));
+  $order  = array_values(array_unique(array_merge([$preferred], array_keys($channelMap))));
   $hasAny = array_filter($channelMap);
 @endphp
 
@@ -52,6 +55,20 @@
               <div class="contact-item-actions">
                 <a class="contact-action-btn" href="{{ $channelMap['website'] }}"
                    target="_blank" rel="noopener noreferrer" title="Ouvrir le site">@svg('tabler-external-link')</a>
+              </div>
+            @elseif($channel === 'instagram')
+              <span class="contact-icon-bottom">@svg('tabler-brand-instagram')</span>
+              <span class="contact-value-bottom">{{ parse_url($channelMap['instagram'], PHP_URL_HOST) . parse_url($channelMap['instagram'], PHP_URL_PATH) }}</span>
+              <div class="contact-item-actions">
+                <a class="contact-action-btn" href="{{ $channelMap['instagram'] }}"
+                   target="_blank" rel="noopener noreferrer" title="Ouvrir Instagram">@svg('tabler-external-link')</a>
+              </div>
+            @elseif($channel === 'messenger')
+              <span class="contact-icon-bottom">@svg('tabler-brand-messenger')</span>
+              <span class="contact-value-bottom">{{ parse_url($channelMap['messenger'], PHP_URL_HOST) . parse_url($channelMap['messenger'], PHP_URL_PATH) }}</span>
+              <div class="contact-item-actions">
+                <a class="contact-action-btn" href="{{ $channelMap['messenger'] }}"
+                   target="_blank" rel="noopener noreferrer" title="Ouvrir Messenger">@svg('tabler-external-link')</a>
               </div>
             @endif
           </li>

@@ -13,3 +13,5 @@
 - voir "position rechercher" sur téléphone depuis le formulaire de création listing
 - Logements et bateau (section "Comment ça marche") / "Choisissez comment réserver en direct avec l'hôte" (mettre en avant que tu as le choix) / Choisissez votre mode de réservation avec l'hôte + possibilité de ne pas avoir de comission ni frais de services intermédiaire
 - Capicité minimale -> capacité
+
+claude --resume 4ac01d87-5232-4878-b16f-e016851de339

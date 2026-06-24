@@ -96,28 +96,24 @@ class Listing extends Model
 
   public function primaryContactUrl(): string
   {
-    if ($this->contact_email) {
-      return 'mailto:' . $this->contact_email;
-    }
+    $social = $this->contact_social_links ?? [];
 
-    if ($this->contact_phone) {
-      return 'tel:' . $this->contact_phone;
-    }
+    $url = match ($this->preferred_contact) {
+      'email'     => $this->contact_email    ? 'mailto:' . $this->contact_email : null,
+      'phone'     => $this->contact_phone    ? 'tel:' . $this->contact_phone : null,
+      'whatsapp'  => $this->contact_whatsapp ? 'https://wa.me/' . preg_replace('/\D+/', '', $this->contact_whatsapp) : null,
+      'website'   => $this->contact_website  ?: null,
+      'instagram' => $social['instagram']    ?? null,
+      'messenger' => $social['messenger']    ?? null,
+      default     => null,
+    };
 
-    if ($this->contact_whatsapp) {
-      return 'https://wa.me/' . preg_replace('/\D+/', '', $this->contact_whatsapp);
-    }
-
-    if ($this->contact_website) {
-      return $this->contact_website;
-    }
-
-    return 'mailto:' . $this->user->email;
+    return $url ?? 'mailto:' . $this->user->email;
   }
 
   public function resolveTags(): array
   {
-    $map = config('tags') ?? [];
+    $map = collect(config('tags', []))->collapse()->all();
     return collect($this->tags ?? [])->map(fn($tag) => [
       'icon' => $map[$tag]['icon'] ?? 'tag',
       'label' => $map[$tag]['label'] ?? $tag,

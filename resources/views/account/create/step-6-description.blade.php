@@ -1,6 +1,6 @@
 {{--
-  listings/create/step-5-description.blade.php
-  Step 5: Free-text description
+  listings/create/step-6-description.blade.php
+  Step 6: Free-text description
 --}}
 @extends('layouts.listing-create')
 
@@ -35,7 +35,7 @@
       </div>
 
       <div class="lc-actions">
-        <a href="{{ route('listings.create.index', ['step' => 4]) }}" class="lc-btn-back">Retour</a>
+        <a href="{{ route('listings.create.index', ['step' => 5]) }}" class="lc-btn-back">Retour</a>
         <button type="submit" class="lc-btn-next">Continuer</button>
       </div>
     </form>

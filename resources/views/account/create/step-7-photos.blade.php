@@ -1,6 +1,6 @@
 {{--
-  listings/create/step-6-photos.blade.php
-  Step 6: Photos — placeholder for MVP
+  listings/create/step-7-photos.blade.php
+  Step 7: Photos — placeholder for MVP
 --}}
 @extends('layouts.listing-create')
 
@@ -23,7 +23,7 @@
       </div>
 
       <div class="lc-actions">
-        <a href="{{ route('listings.create.index', ['step' => 5]) }}" class="lc-btn-back">Retour</a>
+        <a href="{{ route('listings.create.index', ['step' => 6]) }}" class="lc-btn-back">Retour</a>
         <button type="submit" class="lc-btn-next lc-btn-publish">
           @svg('tabler-check')
           Publier l'annonce

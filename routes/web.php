@@ -271,6 +271,7 @@ Route::middleware('auth')->prefix('mon-espace/publier')->name('listings.create.'
   Route::post('/localisation', [ListingController::class, 'storeLocation'])->name('location');
   Route::post('/informations', [ListingController::class, 'storeBasics'])->name('basics');
   Route::post('/details', [ListingController::class, 'storeDetails'])->name('details');
+  Route::post('/contact', [ListingController::class, 'storeContact'])->name('contact');
   Route::post('/description', [ListingController::class, 'storeDescription'])->name('description');
   Route::post('/photos', [ListingController::class, 'storePhotos'])->name('photos');
 });
