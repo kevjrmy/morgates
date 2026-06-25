@@ -9,6 +9,7 @@ class AccountController extends Controller
 {
   private const CLEARABLE_PROFILE_FIELDS = [
     'host_name',
+    'company_name',
     'phone',
     'country',
     'bio',
@@ -52,6 +53,25 @@ class AccountController extends Controller
     $user->update($this->normalizeProfileData($data));
 
     return redirect()->route('account.profile')->with('success', 'Votre profil a été mis à jour.');
+  }
+
+  public function updateIdentity(Request $request)
+  {
+    $user = $request->user();
+    $isCompany = $request->input('account_type') === 'company';
+
+    $data = $request->validate([
+      'account_type' => ['required', 'in:individual,company'],
+      'first_name' => [$isCompany ? 'nullable' : 'required', 'string', 'max:255'],
+      'last_name' => ['nullable', 'string', 'max:255'],
+      'company_name' => [$isCompany ? 'required' : 'nullable', 'string', 'max:255'],
+      'host_name' => ['nullable', 'string', 'max:255'],
+      'bio' => ['nullable', 'string', 'max:1000'],
+    ]);
+
+    $user->update($this->normalizeProfileData($data));
+
+    return redirect()->route('account.profile')->with('success', 'Profil mise à jour.');
   }
 
   public function updateProfileField(Request $request, string $field)
@@ -100,9 +120,13 @@ class AccountController extends Controller
 
   private function profileValidationRules($user): array
   {
+    $isCompany = ($user->account_type ?? 'individual') === 'company';
+
     return [
-      'first_name' => ['required', 'string', 'max:255'],
+      'account_type' => ['sometimes', 'in:individual,company'],
+      'first_name' => [$isCompany ? 'nullable' : 'required', 'string', 'max:255'],
       'last_name' => ['nullable', 'string', 'max:255'],
+      'company_name' => [$isCompany ? 'required' : 'nullable', 'string', 'max:255'],
       'host_name' => ['nullable', 'string', 'max:255'],
       'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
       'phone' => ['nullable', 'string', 'max:20'],
@@ -118,10 +142,25 @@ class AccountController extends Controller
       $data['email'] = strtolower($data['email']);
     }
 
-    if (array_key_exists('first_name', $data) || array_key_exists('last_name', $data)) {
-      $firstName = $data['first_name'] ?? auth()->user()?->first_name;
-      $lastName = $data['last_name'] ?? auth()->user()?->last_name;
+    $user = auth()->user();
+    $isCompany = isset($data['account_type'])
+      ? $data['account_type'] === 'company'
+      : ($user?->account_type === 'company');
+
+    if ($isCompany) {
+      if (array_key_exists('company_name', $data)) {
+        $data['name'] = $data['company_name'] ?: null;
+      }
+    } elseif (array_key_exists('first_name', $data) || array_key_exists('last_name', $data)) {
+      $firstName = $data['first_name'] ?? $user?->first_name;
+      $lastName = $data['last_name'] ?? $user?->last_name;
       $data['name'] = trim(collect([$firstName, $lastName])->filter()->implode(' ')) ?: null;
+    }
+
+    foreach (['first_name', 'last_name', 'company_name', 'host_name'] as $field) {
+      if (array_key_exists($field, $data)) {
+        $data[$field] = filled($data[$field]) ? $data[$field] : null;
+      }
     }
 
     if (array_key_exists('country', $data)) {
@@ -137,7 +176,8 @@ class AccountController extends Controller
 
   private function profileCompletion($user): int
   {
-    $missingFields = collect(['first_name', 'phone', 'country', 'bio'])
+    $nameField = $user->isCompany() ? 'company_name' : 'first_name';
+    $missingFields = collect([$nameField, 'phone', 'country', 'bio'])
       ->filter(fn($field) => empty($user->$field))
       ->count();
 

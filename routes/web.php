@@ -249,6 +249,7 @@ Route::middleware('auth')->group(function () {
   Route::get('/mon-espace/annonces/{listing}/modifier', [AccountController::class, 'editListing'])->name('account.listings.edit');
   Route::get('/mon-espace/profil', [AccountController::class, 'profile'])->name('account.profile');
   Route::put('/mon-espace/profil', [AccountController::class, 'updateProfile'])->name('account.profile.update');
+  Route::put('/mon-espace/profil/identite', [AccountController::class, 'updateIdentity'])->name('account.profile.identity.update');
   Route::put('/mon-espace/profil/{field}', [AccountController::class, 'updateProfileField'])->name('account.profile.field.update');
   Route::delete('/mon-espace/profil/{field}', [AccountController::class, 'clearProfileField'])->name('account.profile.clear');
   Route::get('/mon-espace/abonnements', [AccountController::class, 'subscriptions'])->name('account.subscriptions.index');

@@ -14,8 +14,10 @@ return new class extends Migration {
       /* Classic */
       $table->id();
       $table->string('name')->nullable();
+      $table->enum('account_type', ['individual', 'company'])->default('individual');
       $table->string('first_name')->nullable();
       $table->string('last_name')->nullable();
+      $table->string('company_name')->nullable();
       $table->string('host_name')->nullable();
       $table->string('email')->unique();
       $table->timestamp('email_verified_at')->nullable();

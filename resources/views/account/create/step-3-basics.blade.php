@@ -67,7 +67,7 @@ Step 3: price, capacity
 
         {{-- Capacity --}}
         <div class="lc-field">
-          <label class="lc-label">Capacité maximum</label>
+          <label class="lc-label">Capacité</label>
           <div class="lc-stepper">
             <button type="button" class="lc-stepper-btn" data-target="capacity" data-action="dec" aria-label="Diminuer">
               @svg('tabler-minus')

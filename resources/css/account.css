@@ -386,6 +386,10 @@
   gap: 1.5rem;
 }
 
+#account-page.account-profile-page {
+  padding-bottom: 7rem;
+}
+
 .account-profile-hero {
   display: flex;
   justify-content: center;
@@ -408,6 +412,106 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.account-type-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.account-type-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  border: 0.5px solid #EBEBEB;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--clr-text-muted);
+  background: var(--clr-background);
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  user-select: none;
+}
+
+.account-type-card input[type="radio"] {
+  display: none;
+}
+
+.account-type-card svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
+.account-type-card.is-selected {
+  border-color: var(--clr-primary);
+  color: var(--clr-primary);
+  background: color-mix(in srgb, var(--clr-primary) 6%, transparent);
+}
+
+.account-profile-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.account-profile-form input,
+.account-profile-form textarea {
+  width: 100%;
+  min-width: 0;
+  border: 0.5px solid #DADADA;
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.8rem;
+  background: #fff;
+  color: var(--clr-text-dark);
+  font: inherit;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.account-profile-form textarea {
+  min-height: 8rem;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.account-profile-form input:focus,
+.account-profile-form textarea:focus {
+  border-color: var(--clr-primary);
+}
+
+.account-profile-form-field {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.account-profile-form-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--clr-text-medium);
+}
+
+.account-profile-form-label-hint {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--clr-text-light);
+}
+
+.field-error {
+  font-size: 0.75rem;
+  color: var(--clr-danger, #e53e3e);
+}
+
+.account-section-divider {
+  border: none;
+  border-top: 0.5px solid #EBEBEB;
+  margin: 0.25rem 0;
 }
 
 .account-profile-fields {
@@ -493,7 +597,7 @@
   position: fixed;
   inset: auto 0 0;
   width: 100%;
-  max-width: 32rem;
+  max-width: 720px;
   margin: 0 auto;
   max-height: min(82vh, 36rem);
   padding: 0;
@@ -1092,6 +1196,42 @@
   height: 1rem;
   color: var(--clr-text-light);
   transition: color 0.2s;
+}
+
+.profile-save-float {
+  position: fixed;
+  bottom: 1.5rem;
+  right: max(1.5rem, calc((100vw - 720px) / 2 + 1.5rem));
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.25rem;
+  background: var(--clr-primary);
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.profile-save-float svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+}
+
+.profile-save-float:disabled {
+  background: #C8C8C8;
+  cursor: not-allowed;
+}
+
+.profile-save-float:not(:disabled):hover {
+  filter: brightness(1.07);
 }
 
 @media (min-width: 720px) {

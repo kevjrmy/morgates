@@ -93,7 +93,7 @@
 
       {{-- Capacity stepper --}}
       <div class="filter-section">
-        <h3 class="filter-section-label">Capacité minimale</h3>
+        <h3 class="filter-section-label">Capacité</h3>
         <div class="capacity-stepper">
           <button type="button" class="stepper-btn" id="capacity-decrement" aria-label="Diminuer">
             @svg('mdi-minus')

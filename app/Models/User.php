@@ -19,8 +19,10 @@ class User extends Authenticatable
    */
   protected $fillable = [
     'name',
+    'account_type',
     'first_name',
     'last_name',
+    'company_name',
     'host_name',
     'email',
     'password',
@@ -59,12 +61,21 @@ class User extends Authenticatable
     return $this->display_host_name ?? $value;
   }
 
+  public function isCompany(): bool
+  {
+    return $this->account_type === 'company';
+  }
+
   public function getDisplayHostNameAttribute(): ?string
   {
     $rawName = $this->getRawOriginal('name');
 
     if (filled($this->host_name)) {
       return $this->host_name;
+    }
+
+    if ($this->isCompany()) {
+      return $this->company_name ?: $rawName ?: null;
     }
 
     if (filled($this->first_name) && filled($this->last_name)) {
@@ -82,12 +93,20 @@ class User extends Authenticatable
   {
     $rawName = $this->getRawOriginal('name');
 
+    if ($this->isCompany()) {
+      return $this->company_name ?: $this->host_name ?: $rawName ?: null;
+    }
+
     return $this->first_name ?: $this->host_name ?: $rawName ?: null;
   }
 
   public function getFullNameAttribute(): ?string
   {
     $rawName = $this->getRawOriginal('name');
+
+    if ($this->isCompany()) {
+      return $this->company_name ?: $rawName ?: null;
+    }
 
     return trim(collect([$this->first_name, $this->last_name])->filter()->implode(' ')) ?: ($rawName ?: null);
   }

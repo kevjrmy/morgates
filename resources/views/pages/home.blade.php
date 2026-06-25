@@ -4,11 +4,11 @@
   <main>
     @include('pages.inc.hero')
 
-    @if($listings->where('type', 'stays')->isNotEmpty())
+    @if ($listings->where('type', 'stays')->isNotEmpty())
       <section class="listings-section">
         <h2>Logements récemment ajoutés</h2>
         <div class="listings-scroll">
-          @foreach($listings->where('type', 'stays')->take(5) as $listing)
+          @foreach ($listings->where('type', 'stays')->take(5) as $listing)
             <x-home.listing-card :listing="$listing" />
           @endforeach
           <x-home.listing-card :more="route('listings', ['type' => 'stays'])" />
@@ -16,11 +16,11 @@
       </section>
     @endif
 
-    @if($listings->where('type', 'boats')->isNotEmpty())
+    @if ($listings->where('type', 'boats')->isNotEmpty())
       <section class="listings-section">
         <h2>Bateaux récemment ajoutés</h2>
         <div class="listings-scroll">
-          @foreach($listings->where('type', 'boats')->take(5) as $listing)
+          @foreach ($listings->where('type', 'boats')->take(5) as $listing)
             <x-home.listing-card :listing="$listing" />
           @endforeach
           <x-home.listing-card :more="route('listings', ['type' => 'boats'])" />
@@ -31,7 +31,8 @@
     <section class="how-it-works">
       <div class="how-it-works-header">
         <h2>Comment ça marche ?</h2>
-        <p>Morgates simplifie la mise en relation directe entre voyageurs et hôtes.</p>
+        <p>Trouvez un logement ou un bateau, contactez l'hôte directement et réservez à votre façon.</p>
+
       </div>
 
       <div class="steps-grid">
@@ -40,23 +41,25 @@
             @svg('mdi-magnify')
           </div>
           <h3>Explorez</h3>
-          <p>Parcourez une sélection d'hébergements et de bateaux.</p>
+          <p>Parcourez simplement les differentes offres.</p>
         </div>
 
         <div class="step">
           <div class="step-icon">
-            @svg('mdi-account-voice')
+            @svg('tabler-messages')
           </div>
-          <h3>Contactez</h3>
-          <p>Réservez en direct avec l'hôte via différents canaux de contacts.</p>
+          <h3>Choisissez</h3>
+          <p>Contactez l'hôte directement via le canal de votre choix.
+          </p>
         </div>
+
 
         <div class="step">
           <div class="step-icon">
             @svg('mdi-check-decagram-outline')
           </div>
           <h3>Profitez</h3>
-          <p>Réservez sans commission ni frais de service intermédiaires.</p>
+          <p>Réservez en direct avec l'hôte, sans commission ni frais intermédiaires.</p>
         </div>
       </div>
 
