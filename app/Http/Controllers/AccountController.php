@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class AccountController extends Controller
@@ -23,14 +25,14 @@ class AccountController extends Controller
 
   public function listings()
   {
-    $listings = auth()->user()->listings()->latest()->get();
+    $listings = Auth::user()->listings()->latest()->get();
 
     return view('account.listings.index', compact('listings'));
   }
 
   public function editListing(\App\Models\Listing $listing)
   {
-    if ($listing->user_id !== auth()->id()) {
+    if ($listing->user_id !== Auth::id()) {
       abort(403);
     }
 
@@ -39,7 +41,7 @@ class AccountController extends Controller
 
   public function profile()
   {
-    $user = auth()->user();
+    $user = Auth::user();
     $profileCompletion = $this->profileCompletion($user);
 
     return view('account.profile.profile', compact('user', 'profileCompletion'));
@@ -48,9 +50,9 @@ class AccountController extends Controller
   public function updateProfile(Request $request)
   {
     $user = $request->user();
-    $data = $request->validate($this->profileValidationRules($user));
+    $data = $request->validate($this->profileValidationRules($user, $request->input('account_type')));
 
-    $user->update($this->normalizeProfileData($data));
+    $user->update($this->normalizeProfileData($data, $user));
 
     return redirect()->route('account.profile')->with('success', 'Votre profil a été mis à jour.');
   }
@@ -69,9 +71,9 @@ class AccountController extends Controller
       'bio' => ['nullable', 'string', 'max:1000'],
     ]);
 
-    $user->update($this->normalizeProfileData($data));
+    $user->update($this->normalizeProfileData($data, $user));
 
-    return redirect()->route('account.profile')->with('success', 'Profil mise à jour.');
+    return redirect()->route('account.profile')->with('success', 'Profil mis à jour.');
   }
 
   public function updateProfileField(Request $request, string $field)
@@ -85,7 +87,7 @@ class AccountController extends Controller
       $field => $rules[$field],
     ]);
 
-    $user->update($this->normalizeProfileData($data));
+    $user->update($this->normalizeProfileData($data, $user));
 
     return redirect()->route('account.profile')->with('success', 'La valeur a été mise à jour.');
   }
@@ -98,6 +100,10 @@ class AccountController extends Controller
       $field => $field === 'locale' ? $this->defaultValueFor($field) : null,
     ];
 
+    if ($field === 'company_name') {
+      $data['name'] = null;
+    }
+
     $request->user()->update($data);
 
     return redirect()->route('account.profile')->with('success', 'La valeur a été supprimée.');
@@ -105,7 +111,7 @@ class AccountController extends Controller
 
   public function subscriptions()
   {
-    $user = auth()->user();
+    $user = Auth::user();
     $listings = $user->listings()->latest()->get();
 
     $plan = [
@@ -118,9 +124,9 @@ class AccountController extends Controller
     return view('account.subscriptions.index', compact('listings', 'plan'));
   }
 
-  private function profileValidationRules($user): array
+  private function profileValidationRules(User $user, ?string $incomingAccountType = null): array
   {
-    $isCompany = ($user->account_type ?? 'individual') === 'company';
+    $isCompany = ($incomingAccountType ?? $user->account_type ?? 'individual') === 'company';
 
     return [
       'account_type' => ['sometimes', 'in:individual,company'],
@@ -136,13 +142,13 @@ class AccountController extends Controller
     ];
   }
 
-  private function normalizeProfileData(array $data): array
+  private function normalizeProfileData(array $data, ?User $user = null): array
   {
     if (array_key_exists('email', $data)) {
       $data['email'] = strtolower($data['email']);
     }
 
-    $user = auth()->user();
+    $user ??= Auth::user();
     $isCompany = isset($data['account_type'])
       ? $data['account_type'] === 'company'
       : ($user?->account_type === 'company');
@@ -174,7 +180,7 @@ class AccountController extends Controller
     return $data;
   }
 
-  private function profileCompletion($user): int
+  private function profileCompletion(User $user): int
   {
     $nameField = $user->isCompany() ? 'company_name' : 'first_name';
     $missingFields = collect([$nameField, 'phone', 'country', 'bio'])

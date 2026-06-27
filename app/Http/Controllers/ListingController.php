@@ -45,6 +45,12 @@ class ListingController extends Controller
       'title' => ['required', 'string', 'max:100'],
     ]);
 
+    $previousType = $request->session()->get('listing_create.type');
+
+    if ($previousType && $previousType !== $validated['type']) {
+      $request->session()->forget('listing_create');
+    }
+
     $request->session()->put('listing_create.type', $validated['type']);
     $request->session()->put('listing_create.title', $validated['title']);
     return redirect()->route('listings.create.index', ['step' => 2]);

@@ -5,7 +5,6 @@
 
 ## Loïs et moi: travail à faire + notes personnelles
 
-- ajout possibilité que l'hôte soit une entreprise
 - liens web (multiples?) sur page profil
 - voir "position rechercher" sur téléphone depuis le formulaire de création listing
 
