@@ -33,12 +33,15 @@
           'regles'      => 'Règles',
         ];
 
-        $grouped = collect($availableTags)->groupBy('category');
+        $grouped = [];
+        foreach ($availableTags as $slug => $tag) {
+          $grouped[$tag['category']][$slug] = $tag;
+        }
       @endphp
 
       <div class="lc-tag-groups">
         @foreach($categoryOrder as $catKey => $catLabel)
-          @if($grouped->has($catKey))
+          @if(isset($grouped[$catKey]))
             <div class="lc-tag-group">
               <h2 class="lc-tag-group-title">{{ $catLabel }}</h2>
               <div class="lc-tags">
@@ -56,7 +59,7 @@
       </div>
 
       <div class="lc-actions">
-        <a href="{{ route('listings.create.index', ['step' => 3]) }}" class="lc-btn-back">Retour</a>
+        <a href="{{ route('listings.create.index', ['step' => 3]) }}" class="lc-btn-back">@svg('tabler-arrow-left') Retour</a>
         <button type="submit" class="lc-btn-next">Continuer</button>
       </div>
     </form>

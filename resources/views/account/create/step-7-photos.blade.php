@@ -23,7 +23,7 @@
       </div>
 
       <div class="lc-actions">
-        <a href="{{ route('listings.create.index', ['step' => 6]) }}" class="lc-btn-back">Retour</a>
+        <a href="{{ route('listings.create.index', ['step' => 6]) }}" class="lc-btn-back">@svg('tabler-arrow-left') Retour</a>
         <button type="submit" class="lc-btn-next lc-btn-publish">
           @svg('tabler-check')
           Publier l'annonce

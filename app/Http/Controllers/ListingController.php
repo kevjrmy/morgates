@@ -38,6 +38,12 @@ class ListingController extends Controller
     ]);
   }
 
+  public function cancelCreate(Request $request)
+  {
+    $request->session()->forget('listing_create');
+    return redirect()->route('account');
+  }
+
   public function storeType(Request $request)
   {
     $validated = $request->validate([

@@ -33,27 +33,6 @@ Step 1: Choose listing type, then title (two-phase JS flow)
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  .lc-phase-back {
-    background: none;
-    border: none;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    font-size: 0.875rem;
-    color: var(--clr-text-light);
-    cursor: pointer;
-    transition: color 0.15s;
-  }
-
-  .lc-phase-back:hover {
-    color: var(--clr-text-medium);
-  }
-
-  .lc-phase-back svg {
-    width: 1rem;
-    height: 1rem;
-  }
 </style>
 @endpush
 
@@ -92,11 +71,6 @@ Step 1: Choose listing type, then title (two-phase JS flow)
       <input type="hidden" name="type" id="type-value" value="{{ old('type', $listing->type ?? '') }}">
 
       <div id="phase-title" class="lc-phase lc-phase-hidden">
-        <button type="button" id="btn-back" class="lc-phase-back">
-          @svg('tabler-arrow-left')
-          Retour
-        </button>
-
         <div class="lc-step-header">
           <h1 class="lc-title">Donnez un titre à votre annonce</h1>
           <p class="lc-subtitle">Un bon titre attire plus de visiteurs.</p>
@@ -113,6 +87,7 @@ Step 1: Choose listing type, then title (two-phase JS flow)
         </div>
 
         <div class="lc-actions">
+          <button type="button" id="btn-back" class="lc-btn-back">@svg('tabler-arrow-left') Retour</button>
           <button type="submit" class="lc-btn-next" id="btn-next" disabled>Continuer</button>
         </div>
       </div>

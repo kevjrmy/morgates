@@ -31,6 +31,10 @@
   flex-shrink: 0;
   color: var(--clr-text-medium);
   transition: color 0.2s;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .lc-cancel:hover {
@@ -510,6 +514,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.375rem;
   padding: 0.875rem 1.25rem;
   border: 0.5px solid #EBEBEB;
   border-radius: 0.625rem;
@@ -648,4 +653,87 @@
     aspect-ratio: 4 / 3;
     min-height: 13rem;
   }
+}
+
+/* ── Cancel confirmation modal ──────────────────────────────── */
+
+.lc-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.lc-modal-overlay.lc-modal-closed {
+  display: none;
+}
+
+.lc-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.lc-modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  background: var(--clr-background);
+  border-radius: 1rem 1rem 0 0;
+  padding: 1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lc-modal-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--clr-text-dark);
+}
+
+.lc-modal-body {
+  font-size: 0.875rem;
+  color: var(--clr-text-medium);
+  margin-bottom: 0.5rem;
+}
+
+.lc-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lc-modal-actions form {
+  display: contents;
+}
+
+.lc-modal-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem;
+  border-radius: 0.625rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s;
+}
+
+.lc-modal-btn:hover {
+  opacity: 0.85;
+}
+
+.lc-modal-btn--stay {
+  background: var(--clr-primary);
+  color: #fff;
+}
+
+.lc-modal-btn--leave {
+  background: none;
+  color: var(--clr-text-medium);
 }

@@ -143,7 +143,7 @@ Step 3: price, capacity
       </div>
 
       <div class="lc-actions">
-        <a href="{{ route('listings.create.index', ['step' => 2]) }}" class="lc-btn-back">Retour</a>
+        <a href="{{ route('listings.create.index', ['step' => 2]) }}" class="lc-btn-back">@svg('tabler-arrow-left') Retour</a>
         <button type="submit" class="lc-btn-next" disabled>Continuer</button>
       </div>
     </form>

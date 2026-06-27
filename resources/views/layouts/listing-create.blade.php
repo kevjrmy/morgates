@@ -26,9 +26,10 @@ Shared layout for the listing creation multi-step form
 
     {{-- Top bar --}}
     <header class="lc-header">
-      <a href="{{ route('account') }}" class="lc-cancel" aria-label="Annuler">
+      <button type="button" class="lc-cancel" aria-label="Annuler"
+        onclick="document.getElementById('lc-cancel-modal').classList.remove('lc-modal-closed')">
         @svg('tabler-x')
-      </a>
+      </button>
       <div class="lc-progress">
         <div class="lc-progress-fill" style="width: {{ ($step / $totalSteps) * 100 }}%"></div>
       </div>
@@ -41,6 +42,24 @@ Shared layout for the listing creation multi-step form
       @yield('content')
     </main>
 
+  </div>
+
+  {{-- Cancel confirmation modal --}}
+  <div id="lc-cancel-modal" class="lc-modal-overlay lc-modal-closed">
+    <div class="lc-modal-backdrop"
+      onclick="document.getElementById('lc-cancel-modal').classList.add('lc-modal-closed')"></div>
+    <div class="lc-modal-card" role="dialog" aria-modal="true" aria-labelledby="lc-modal-title">
+      <p class="lc-modal-title" id="lc-modal-title">Quitter la création ?</p>
+      <p class="lc-modal-body">Votre progression sera perdue.</p>
+      <div class="lc-modal-actions">
+        <button type="button" class="lc-modal-btn lc-modal-btn--stay"
+          onclick="document.getElementById('lc-cancel-modal').classList.add('lc-modal-closed')">Continuer</button>
+        <form action="{{ route('listings.create.cancel') }}" method="POST">
+          @csrf
+          <button type="submit" class="lc-modal-btn lc-modal-btn--leave">Quitter</button>
+        </form>
+      </div>
+    </div>
   </div>
 
   @stack('scripts')

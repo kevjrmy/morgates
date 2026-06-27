@@ -35,7 +35,7 @@
       </div>
 
       <div class="lc-actions">
-        <a href="{{ route('listings.create.index', ['step' => 5]) }}" class="lc-btn-back">Retour</a>
+        <a href="{{ route('listings.create.index', ['step' => 5]) }}" class="lc-btn-back">@svg('tabler-arrow-left') Retour</a>
         <button type="submit" class="lc-btn-next">Continuer</button>
       </div>
     </form>

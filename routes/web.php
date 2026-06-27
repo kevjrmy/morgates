@@ -268,6 +268,7 @@ Route::middleware('auth')->prefix('bienvenue')->name('onboarding.')->group(funct
 /* Listing creation */
 Route::middleware('auth')->prefix('mon-espace/publier')->name('listings.create.')->group(function () {
   Route::get('/', [ListingController::class, 'create'])->name('index');
+  Route::post('/annuler', [ListingController::class, 'cancelCreate'])->name('cancel');
   Route::post('/type', [ListingController::class, 'storeType'])->name('type');
   Route::post('/localisation', [ListingController::class, 'storeLocation'])->name('location');
   Route::post('/informations', [ListingController::class, 'storeBasics'])->name('basics');
