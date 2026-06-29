@@ -9,7 +9,7 @@ The project is currently an MVP in active development.
 - `AGENTS.md`: project context, product direction, domain model, conventions, and implementation state for AI coding agents.
 - `.claude/rules/coding.md`: coding conventions and agent workflow rules.
 - `.claude/rules/design.md`: frontend and design rules.
-- `TODO.md`: current project TODO list.
+- `TODO.md`: current project TODO list (`todo.md`).
 - `doc.md`: small deployment/dependency notes.
 
 For AI/code agents: read `AGENTS.md` before making changes.

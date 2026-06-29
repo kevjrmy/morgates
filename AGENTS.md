@@ -48,9 +48,10 @@ The `Listing` model stores the following contact fields:
 - `contact_phone`
 - `contact_whatsapp`
 - `contact_website`
-- `contact_social_links` (JSON array)
+- `contact_social_links` (JSON array; keys: `instagram`, `messenger`)
+- `preferred_contact` (enum: `email`, `phone`, `whatsapp`, `website`, `instagram`, `messenger`)
 
-The model has a `primaryContactUrl()` helper that returns the best available contact link in order: email → phone → WhatsApp → website → owner email fallback.
+The model has a `primaryContactUrl()` helper that returns the URL for the owner's chosen `preferred_contact` channel, falling back to the account email if that channel is empty.
 
 The contact experience should make the owner's direct channels clear and accessible without adding Morgates as an intermediary.
 
@@ -109,12 +110,25 @@ Detailed prohibited listing types, regions, owner behavior rules, and claim rule
 - Account listings edit: `/mon-espace/annonces/{listing}/modifier`
 - Account profile: `/mon-espace/profil`
 - Account subscriptions: `/mon-espace/abonnements`
-- Account onboarding: `/bienvenue`
-- Listing creation flow: `/mon-espace/publier`
+- Account profile field updates: `PUT /mon-espace/profil`, `PUT /mon-espace/profil/identite`, `PUT /mon-espace/profil/{field}`, `DELETE /mon-espace/profil/{field}`
+- Account onboarding: `/bienvenue` (multi-step: name, photo, phone, country, bio)
+- Listing creation flow: `/mon-espace/publier` (7 steps via `?step=`)
+- Listing suggest API: `/api/listings/suggest` (title/owner autocomplete)
+- City/region search API: `/api/listings/cities` (French geo API proxy)
 - Legal pages: `/confidentialite`, `/conditions-utilisation`, `/a-propos`
 - Contact page: `/contact`
 
 ## Domain Model
+
+### User
+Owners and visitors share the same `User` model. Key profile fields:
+- `account_type` (enum: `individual`, `company`)
+- `first_name`, `last_name`, `company_name`, `host_name`
+- `email`, `password`, `phone`, `profile_picture`, `bio`, `country`, `locale`
+
+Helper accessors: `display_host_name` (public host label), `greeting_name`, `full_name`, `isCompany()`.
+
+Display name logic: `host_name` override → company name for companies → `First L.` format for individuals → legacy `name` fallback.
 
 ### Listing
 The main domain entity. Listings belong to a user and include:
@@ -122,14 +136,17 @@ The main domain entity. Listings belong to a user and include:
 - `title`, `slug`, `description`
 - `photos` (JSON array)
 - `price_amount` (decimal), `price_unit` (enum: `hour`, `half-day`, `day`, `week`, `month`, `contact`)
+- Allowed price units vary by type: boats allow `hour`, `half-day`, `day`, `week`, `month`, `contact`; stays allow `day`, `week`, `month`, `contact`
 - `capacity` (unsigned small int)
 - `min_duration`, `max_duration` (integers, always in **days**)
 - `country` (char 2), `region`, `city`, `address`
-- `latitude`, `longitude` (floats, from Google Maps autocomplete)
-- `map_url` (Google Maps URL; the model derives a Google Maps embed URL via `getMapEmbedUrlAttribute()`)
+- `latitude`, `longitude` (floats; populated from French government geo APIs in step 2 for FR)
+- `show_exact_address` (boolean; controls whether the full address is shown publicly)
+- `map_url` (optional Google Maps URL; the model derives a Google Maps embed URL via `getMapEmbedUrlAttribute()`)
 - `tags` (JSON array; resolved via `config/tags.php` through `resolveTags()`)
 - `is_active` (boolean)
 - `contact_email`, `contact_phone`, `contact_whatsapp`, `contact_website`, `contact_social_links` (JSON)
+- `preferred_contact` (owner's primary contact channel for CTAs)
 
 Helper methods: `typeLabel()`, `priceUnitLabel()`, `primaryContactUrl()`, `resolveTags()`, `getMapEmbedUrlAttribute()`.
 
@@ -139,37 +156,43 @@ Slug is auto-generated on save via the `booted()` hook using `generateUniqueSlug
 A supporting lookup entity auto-populated from listing location data. Stores known cities/places with coordinates to power location autocomplete. Fields: `name`, `type`, `region`, `country`, `latitude`, `longitude`. Not user-facing. Created automatically by `ListingController::storePhotos()` when a listing with `city` + `latitude` is saved.
 
 ## Tags System
-Tags are defined in `config/tags.php` as a flat associative array keyed by slug. Each entry has `group`, `icon`, and `label` fields. `group` is either `stays` or `boats` and controls which tags appear in step 4 of the creation flow based on the listing type. The `icon` must be a valid Tabler Icon name (rendered via the `blade-tabler-icons` package). Tags are stored as a JSON array of slugs on each listing and resolved via `Listing::resolveTags()`.
+Tags are defined in `config/tags.php` under three keys: `common`, `stays`, and `boats`. Each tag slug maps to `icon`, `label`, and `category` fields. Step 4 of the creation flow merges `common` + type-specific tags (`stays` or `boats`). The `icon` must be a valid Tabler Icon name (rendered via the `blade-tabler-icons` package). Tags are stored as a JSON array of slugs on each listing and resolved via `Listing::resolveTags()`.
 
 ## Current Implementation State
 - Public listing browsing and filtering exist.
+- Search modal supports three tabs: stays by city, boats by port/city, and name/owner search.
 - Listing filtering on `/annonces` supports:
   - `type` (enum filter)
-  - `city` (exact match)
+  - `city` (case-insensitive exact match by default)
+  - `include_nearby` (optional; when set with `city`, expands to listings within 20 km via haversine distance using cached `Destination` coordinates)
   - `region` (exact match)
-  - `q` (free text: title, description, city, owner name)
+  - `q` (free text: title, description, city, owner first/last/host name)
   - `tag` (JSON contains)
-  - `price_min` / `price_max` with `price_unit` normalization (weekly equivalent)
+  - `price_min` / `price_max` with weekly-equivalent normalization; `contact`-priced listings are excluded from numeric range and sorted to the bottom
+  - `price_unit` (persisted in session for filter UI state)
   - `capacity` (minimum capacity)
   - `sort` (`price_asc`, `price_desc`; defaults to latest)
-- Listing detail page (`/annonces/{listing:slug}`) is fully built out with photos, map embed, tags, owner info, and contact channels.
+- JSON APIs: `/api/listings/suggest` (listing/owner autocomplete) and `/api/listings/cities` (communes/départements/régions via `geo.api.gouv.fr`).
+- Listing detail page (`/annonces/{listing:slug}`) is fully built out with photos, map embed, tags, owner info, preferred contact CTA, and a contact bottom sheet.
 - Login, registration, logout, and account access exist.
-- Registration validates email uniqueness and strong passwords.
+- Registration validates email uniqueness and strong passwords; throttled to 5 attempts/minute.
 - User onboarding exists for name, photo, phone, country, and bio.
 - Account dashboard (`/mon-espace`) shows a summary for the owner.
 - Account listings page (`/mon-espace/annonces`) shows the owner's listings with status and edit actions.
-- Account profile page (`/mon-espace/profil`) lets owners edit their profile fields inline.
+- Account listing edit page (`/mon-espace/annonces/{listing}/modifier`) has a full UI (info, pricing, location, contact, status) but the save endpoint is not wired yet (`form action="#"`).
+- Account profile page (`/mon-espace/profil`) supports individual/company identity, inline field editing via modals, profile completion tracking, and per-field clear/update endpoints.
 - Account subscriptions page (`/mon-espace/abonnements`) exists with placeholder plan data.
 - Legal pages (privacy, terms, about) and a contact page exist with placeholder content.
-- Listing creation is a fully functional six-step Blade flow that persists data to the database:
-  1. **Type** — listing type (`boats`/`stays`) and title; stored to session
-  2. **Location** — country, region, city, address, coordinates, map URL; stored to session. City autocomplete uses the official French government API `https://geo.api.gouv.fr/communes` (FR only). Address autocomplete uses the official Base Adresse Nationale API `https://api-adresse.data.gouv.fr/search/`, scoped to the selected city via `citycode` (INSEE code from the commune API). Both APIs are free, keyless, and only active for FR. For other countries, both fields are free text.
-  3. **Basics** — price, price unit, capacity, min/max duration (days); stored to session
-  4. **Details** — tags, contact channels (email, phone, WhatsApp, website); stored to session
-  5. **Description** — free-text description; stored to session
-  6. **Photos** — final step; creates the `Listing` record from session data, optionally auto-creates a `Destination` record, clears the session, redirects to account
-- Photo upload in step 6 is not yet implemented (placeholder only).
-- Location autocomplete in step 2 uses a Google Maps API integration.
+- Listing creation is a fully functional seven-step Blade flow that persists data to the database:
+  1. **Type** — listing type (`boats`/`stays`) and title; stored to session. Changing type clears prior session data.
+  2. **Location** — country, region, city, address, coordinates, `show_exact_address`, map URL; stored to session. City autocomplete uses `https://geo.api.gouv.fr/communes` (FR only). Address autocomplete uses `https://api-adresse.data.gouv.fr/search/` scoped to the selected city via INSEE `citycode`. Both APIs are free, keyless, and only active for FR. For other countries, both fields are free text. Map preview uses a Google Maps embed URL built from coordinates/address (no Google Maps API key required).
+  3. **Basics** — price, price unit (type-dependent options), capacity, min/max duration (days); stored to session
+  4. **Details** — tags only; stored to session
+  5. **Contact** — contact channels (email, phone, WhatsApp, website, Instagram, Messenger), `preferred_contact`, FR/ES phone validation; at least one channel required; stored to session
+  6. **Description** — free-text description; stored to session
+  7. **Photos** — placeholder UI; submitting creates the `Listing` record from session data, optionally auto-creates a `Destination` record, clears the session, redirects to account
+- Photo upload in step 7 is not yet implemented (placeholder only; listings are published without photos).
+- Feature tests exist for city/nearby search (`ListingSearchTest`) and destination caching/API (`ListingDestinationCacheTest`).
 
 ## Important Files
 - `routes/web.php`: all web routes.
@@ -178,17 +201,21 @@ Tags are defined in `config/tags.php` as a flat associative array keyed by slug.
 - `app/Http/Controllers/AuthController.php`: login, registration, logout.
 - `app/Http/Controllers/AccountController.php`: account dashboard, listings, profile, subscriptions, and listing edit.
 - `app/Http/Controllers/OnboardingController.php`: account onboarding saves.
-- `app/Http/Controllers/ListingController.php`: listing creation flow (6 steps + session persistence + final DB write).
-- `config/tags.php`: tag definitions (slug → icon + French label).
+- `app/Http/Controllers/ListingController.php`: listing creation flow (7 steps + session persistence + final DB write).
+- `app/Models/User.php`: user model, account type, and display name accessors.
+- `config/tags.php`: tag definitions (`common` / `stays` / `boats` → icon + French label + category).
 - `resources/views/pages/`: public pages (home, listings index, listing show, legal, contact).
 - `resources/views/account/`: private account pages and listing creation step views.
-- `resources/views/account/create/`: the six listing creation step views.
-- `resources/views/components/`: reusable Blade components (filter panel, search modal, listing cards, tags, etc.).
+- `resources/views/account/create/`: the seven listing creation step views.
+- `resources/views/account/profile/`: profile page and partials (identity, languages, contact).
+- `resources/views/components/`: reusable Blade components (filter panel, search modal, listing cards, tags, contact bottom sheet, etc.).
 - `resources/views/components/ui/`: generic reusable UI components (buttons, etc.).
 - `resources/views/layouts/`: Blade layouts.
 - `resources/css/`: application CSS entry points.
 - `database/migrations/`: database schema.
 - `database/seeders/`: seed data.
+- `tests/Feature/ListingSearchTest.php`: city filter and nearby search tests.
+- `tests/Feature/ListingDestinationCacheTest.php`: destination caching and cities API tests.
 
 ## Conventions
 Coding conventions are in `.claude/rules/coding.md`.
@@ -201,14 +228,16 @@ Frontend and design rules are in `.claude/rules/design.md`.
 - Run only Vite dev server: `npm run dev`
 
 ## Known TODOs
-- Implement production-ready image upload/storage for listing photos (evaluate Cloudinary). Deferred — core listing logic is the current priority.
-- Add photo display and management in the account listing edit view.
-- Add basic admin dashboard for Loïs (users, listings, basic KPIs) — will be a custom Blade area, no third-party admin package.
+See `todo.md` for the full prioritized list. Highlights:
+- Implement production-ready image upload/storage for listing photos (evaluate Cloudinary).
+- Wire the account listing edit save endpoint and add photo display/management there.
+- Add basic admin dashboard for Loïs (users, listings, basic KPIs) — custom Blade area, no third-party admin package.
 - Add owner trust fields: confirmation email, required contact details before publishing.
 - Track key MVP metrics: listing views, contact clicks by channel, owner signups, published listings.
 - Refine legal page content (privacy, terms).
-- Expand test coverage beyond the default/example tests.
+- Expand test coverage (creation flow, contact, listing edit).
 - Review and improve location autocomplete UX on mobile (step 2).
+- Add `preferred_contact` and social links to the listing edit view.
 
 ## Local Development Notes
 - Kevin usually runs `php artisan serve` from the IDE terminal during development.

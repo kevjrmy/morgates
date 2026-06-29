@@ -19,9 +19,14 @@
 - Validate only at system boundaries (user input, external APIs). Trust internal code and framework guarantees.
 - Route key for `Listing` is `slug` (defined via `getRouteKeyName()`).
 - Listing types are `boats` and `stays` (DB enum values). UI labels: `Bateau`, `Hébergement`.
+- Price units depend on listing type: boats allow `hour`, `half-day`, `day`, `week`, `month`, `contact`; stays allow `day`, `week`, `month`, `contact`.
 - Duration fields (`min_duration`, `max_duration`) are always in **days** — there is no `duration_unit` column.
 - The `Listing` model auto-generates its slug on save via the `booted()` hook. Do not set slugs manually in controllers unless handling creation uniqueness explicitly.
+- Listings have a `preferred_contact` field and `contact_social_links` JSON (`instagram`, `messenger`). `primaryContactUrl()` respects the preferred channel.
 - The `Destination` model is auto-populated from listing location data when `city` + `latitude` are present. It is not a user-facing entity.
+- Tags live in `config/tags.php` under `common`, `stays`, and `boats` keys. Step 4 merges `common` + type-specific tags.
+- Listing creation is a 7-step session flow (`ListingController::$totalSteps = 7`): type → location → basics → details (tags) → contact → description → photos.
+- `User` has `account_type` (`individual`/`company`) and display name accessors (`display_host_name`, `greeting_name`, `full_name`, `isCompany()`).
 
 ## JavaScript
 - No semicolons.
