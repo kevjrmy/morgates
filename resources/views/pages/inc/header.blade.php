@@ -6,6 +6,29 @@
 
     <a href="{{ route('home') }}" class="header-brand" aria-label="Accueil Morgates">MORGATES</a>
 
+    <nav class="header-links" aria-label="Navigation principale">
+      <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Accueil</a>
+      <a href="{{ route('listings') }}"
+        class="{{ request()->routeIs('listings', 'listing') && !request('type') ? 'active' : '' }}">Annonces</a>
+      <a href="{{ route('listings', ['type' => 'boats']) }}"
+        class="{{ request()->routeIs('listings') && request('type') === 'boats' ? 'active' : '' }}">Bateaux</a>
+      <a href="{{ route('listings', ['type' => 'stays']) }}"
+        class="{{ request()->routeIs('listings') && request('type') === 'stays' ? 'active' : '' }}">Hébergements</a>
+      <a href="{{ route('listings.create.index') }}"
+        class="{{ request()->routeIs('listings.create.*') ? 'active' : '' }}">Publier</a>
+      <a href="{{ route('account') }}" class="{{ request()->routeIs('account*') ? 'active' : '' }}">Mon espace</a>
+    </nav>
+
+    <div class="header-auth">
+      @auth
+        <a href="{{ route('account') }}" class="header-auth-avatar" aria-label="Mon espace">
+          {{ strtoupper(substr(auth()->user()->greeting_name, 0, 1)) }}
+        </a>
+      @else
+        <a href="{{ route('login') }}" class="header-auth-btn">Connexion</a>
+      @endauth
+    </div>
+
     <button type="button" id="drawer-toggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="drawer">
       @svg('tabler-menu', ['color' => 'var(--clr-primary)'])
     </button>
@@ -18,7 +41,10 @@
 {{-- Drawer --}}
 <aside id="drawer" aria-label="Menu de navigation" aria-hidden="true">
   <div class="drawer-header">
-    <img src="{{ asset('images/logo.svg') }}" alt="Morgates logo" height="40" width="40">
+    <a href="{{ route('home') }}" class="drawer-brand" aria-label="Accueil Morgates">
+      <img src="{{ asset('images/logo.svg') }}" alt="" height="36" width="36">
+      <span>MORGATES</span>
+    </a>
     <button type="button" id="drawer-close" aria-label="Fermer le menu">
       @svg('tabler-x')
     </button>

@@ -12,7 +12,7 @@ The project is currently an MVP in active development.
 - `TODO.md`: current project TODO list (`todo.md`).
 - `doc.md`: small deployment/dependency notes.
 
-For AI/code agents: read `AGENTS.md` before making changes.
+For AI/code agents: read `AGENTS.md` before making changes. After relevant work, proactively update context files (`AGENTS.md`, `todo.md`, `.claude/rules/`) so they stay accurate: see **Context Files Maintenance** in `AGENTS.md`.
 
 ## Tech Stack
 

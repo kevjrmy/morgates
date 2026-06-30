@@ -4,13 +4,13 @@
 --}}
 @extends('layouts.listing-create')
 
-@section('title', 'Détails — Publier une annonce')
+@section('title', 'Détails - Publier une annonce')
 
 @section('content')
   <div class="lc-step">
     <div class="lc-step-header">
       <h1 class="lc-title">Équipements & caractéristiques</h1>
-      <p class="lc-subtitle">Cochez ce qui correspond à votre bien — les voyageurs s'en servent pour filtrer leurs recherches.</p>
+      <p class="lc-subtitle">Cochez ce qui correspond à votre bien : les voyageurs s'en servent pour filtrer leurs recherches.</p>
     </div>
 
     <form action="{{ route('listings.create.details') }}" method="POST" class="lc-form">

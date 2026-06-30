@@ -13,7 +13,7 @@
 
     <ul class="hero-trust" role="list">
       <li>
-        @svg('mdi-shield-check-outline', ['class' => 'hero-trust-icon'])
+        @svg('tabler-shield-check', ['class' => 'hero-trust-icon'])
         <span>Contact direct</span>
       </li>
       <li>
@@ -92,8 +92,11 @@
   <style>
     #hero {
       position: relative;
-      background: linear-gradient(160deg, #e8f0ff 0%, #f0f5ff 45%, var(--clr-background) 100%);
-      padding: 2.5rem 1.5rem 0;
+      background: linear-gradient(160deg,
+        color-mix(in srgb, var(--clr-tertiary) 55%, white) 0%,
+        color-mix(in srgb, var(--clr-tertiary) 22%, var(--clr-background)) 45%,
+        var(--clr-background) 100%);
+      padding: 2.5rem 1.25rem 0;
       overflow: hidden;
     }
 
@@ -111,8 +114,8 @@
     /* Title */
     #hero h1 {
       color: var(--clr-text-dark);
-      font-size: clamp(2.2rem, 8vw, 3.5rem);
-      font-weight: 800;
+      font-size: clamp(2rem, 8vw, 3rem);
+      font-weight: 700;
       line-height: 1.15;
       letter-spacing: -0.02em;
     }
@@ -159,7 +162,7 @@
       gap: 0.35rem;
       font-size: 0.8rem;
       font-weight: 600;
-      color: var(--clr-text-medium);
+      color: var(--clr-text-dark);
     }
 
     .hero-trust-icon {

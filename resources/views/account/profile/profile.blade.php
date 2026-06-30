@@ -1,6 +1,6 @@
 @extends('layouts.account')
 
-@section('title', 'Mon profil — Morgates')
+@section('title', 'Mon profil - Morgates')
 
 @section('content')
   <main id="account-page" class="account-profile-page">
@@ -68,6 +68,41 @@
       modal.addEventListener('click', (event) => {
         if (event.target === modal) modal.close()
       })
+    })
+
+    document.querySelectorAll('.account-bottom-sheet:not(.account-actions-sheet)').forEach((modal) => {
+      let startY = 0
+      let dragY = 0
+      let dragging = false
+
+      modal.addEventListener('touchstart', e => {
+        startY = e.touches[0].clientY
+        dragY = startY
+        dragging = true
+        modal.style.transition = 'none'
+      }, { passive: true })
+
+      modal.addEventListener('touchmove', e => {
+        if (!dragging) return
+        dragY = e.touches[0].clientY
+        const delta = Math.max(0, dragY - startY)
+        modal.style.transform = `translateY(${delta}px)`
+      }, { passive: true })
+
+      const endDrag = () => {
+        if (!dragging) return
+        dragging = false
+        modal.style.transition = ''
+        if (dragY - startY > 100) {
+          modal.close()
+        } else {
+          modal.style.transform = ''
+        }
+      }
+
+      modal.addEventListener('touchend', endDrag)
+      modal.addEventListener('touchcancel', endDrag)
+      modal.addEventListener('close', () => { modal.style.transform = '' })
     })
 
   </script>

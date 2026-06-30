@@ -1,6 +1,6 @@
 @extends('layouts.listing')
 
-@section('title', $listing->title . ' — Morgates')
+@section('title', $listing->title . ' - Morgates')
 @section('description', Str::limit($listing->description, 150))
 
 @section('content')
@@ -223,6 +223,7 @@
 @push('styles')
   <style>
     #listing-page {
+      margin-top: calc(-1 * var(--header-height));
       padding-bottom: calc(2rem + 130px);
     }
 
@@ -536,7 +537,7 @@
       right: 0;
       background-color: #fff;
       border-radius: 1rem 1rem 0 0;
-      padding: 1.5rem 1.25rem 2rem;
+      padding: 0 1.25rem 2rem;
       transform: translateY(100%);
       transition: transform 0.3s ease;
       max-height: 80vh;
@@ -548,37 +549,35 @@
     }
 
     .bottom-sheet-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      width: 2rem;
-      height: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--clr-text-light);
-      border-radius: 50%;
-      transition: background-color 0.15s ease;
+      display: none;
     }
 
-    .bottom-sheet-close:hover {
-      background-color: var(--clr-tertiary);
-    }
+    @media (min-width: 640px) {
+      .bottom-sheet-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--clr-text-light);
+        border-radius: 50%;
+        transition: background-color 0.15s ease;
+      }
 
-    .bottom-sheet-close svg {
-      width: 1.5rem;
-      height: 1.5rem;
-    }
+      .bottom-sheet-close:hover {
+        background-color: var(--clr-tertiary);
+      }
 
-    .bottom-sheet-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--clr-text-dark);
-      margin-bottom: 1.25rem;
-      padding-right: 2rem;
+      .bottom-sheet-close svg {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
     }
 
     .contact-list-bottom {
@@ -594,6 +593,15 @@
       padding: 0.75rem 1rem;
       border-radius: 0.5rem;
       background-color: var(--clr-tertiary);
+    }
+
+    .contact-item-bottom--primary {
+      background: color-mix(in srgb, var(--clr-primary) 13%, var(--clr-tertiary));
+      border: 1px solid color-mix(in srgb, var(--clr-primary) 45%, transparent);
+    }
+
+    .contact-item-bottom--primary .contact-value-bottom {
+      font-weight: 700;
     }
 
     .contact-icon-bottom {
@@ -623,6 +631,38 @@
       align-items: center;
       gap: 0.15rem;
       flex-shrink: 0;
+    }
+
+    .contact-item-secondary[hidden] { display: none !important }
+
+    .contact-expand-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      width: 100%;
+      padding: 0.5rem 0.25rem;
+      border: none;
+      background: none;
+      color: var(--clr-text-medium);
+      font: inherit;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+
+    .contact-expand-btn:hover {
+      color: var(--clr-text-dark);
+    }
+
+    .contact-expand-btn svg {
+      width: 1rem;
+      height: 1rem;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+
+    .contact-expand-btn.is-expanded svg {
+      transform: rotate(180deg);
     }
 
     </style>
@@ -677,6 +717,9 @@ if (descriptionText && btnReadmore) {
 const btnContactOpen = document.getElementById('btn-contact-open')
 const contactBottomSheet = document.getElementById('contact-bottom-sheet')
 const bottomSheetClose = contactBottomSheet?.querySelector('.bottom-sheet-close')
+const panel = contactBottomSheet?.querySelector('.bottom-sheet-panel')
+const contactExpandBtn = document.getElementById('contact-expand-btn')
+const contactSecondaryItems = document.querySelectorAll('.contact-item-secondary')
 
 function openBottomSheet() {
   contactBottomSheet.hidden = false
@@ -686,6 +729,23 @@ function openBottomSheet() {
 function closeBottomSheet() {
   contactBottomSheet.hidden = true
   document.body.style.overflow = ''
+  if (panel) panel.style.transform = ''
+  if (contactExpandBtn) {
+    contactExpandBtn.classList.remove('is-expanded')
+    contactExpandBtn.querySelector('span').textContent =
+      `Voir ${contactSecondaryItems.length} autre${contactSecondaryItems.length > 1 ? 's' : ''} moyen${contactSecondaryItems.length > 1 ? 's' : ''} de contact`
+    contactSecondaryItems.forEach(item => { item.hidden = true })
+  }
+}
+
+if (contactExpandBtn) {
+  contactExpandBtn.addEventListener('click', () => {
+    const isExpanded = contactExpandBtn.classList.toggle('is-expanded')
+    contactSecondaryItems.forEach(item => { item.hidden = !isExpanded })
+    contactExpandBtn.querySelector('span').textContent = isExpanded
+      ? 'Masquer'
+      : `Voir ${contactSecondaryItems.length} autre${contactSecondaryItems.length > 1 ? 's' : ''} moyen${contactSecondaryItems.length > 1 ? 's' : ''} de contact`
+  })
 }
 
 if (btnContactOpen && contactBottomSheet) {
@@ -706,6 +766,37 @@ if (btnContactOpen && contactBottomSheet) {
   })
 }
 
+if (panel) {
+  let startY = 0
+  let dragY = 0
+  let dragging = false
+
+  panel.addEventListener('touchstart', e => {
+    startY = e.touches[0].clientY
+    dragY = startY
+    dragging = true
+    panel.style.transition = 'none'
+  }, { passive: true })
+
+  panel.addEventListener('touchmove', e => {
+    if (!dragging) return
+    dragY = e.touches[0].clientY
+    const delta = Math.max(0, dragY - startY)
+    panel.style.transform = `translateY(${delta}px)`
+  }, { passive: true })
+
+  panel.addEventListener('touchend', () => {
+    if (!dragging) return
+    dragging = false
+    panel.style.transition = ''
+    if (dragY - startY > 100) {
+      closeBottomSheet()
+    } else {
+      panel.style.transform = ''
+    }
+  })
+}
+
 const btnShare = document.getElementById('btn-share')
 if (btnShare) {
   btnShare.addEventListener('click', async () => {
@@ -716,7 +807,7 @@ if (btnShare) {
       try {
         await navigator.share({ title, url })
       } catch (e) {
-        // user cancelled — do nothing
+        // user cancelled - do nothing
       }
     } else {
       try {

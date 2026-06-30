@@ -4,7 +4,7 @@
 --}}
 @extends('layouts.listing-create')
 
-@section('title', 'Contact — Publier une annonce')
+@section('title', 'Contact - Publier une annonce')
 
 @section('content')
   <div class="lc-step">

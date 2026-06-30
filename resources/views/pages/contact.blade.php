@@ -1,124 +1,140 @@
 @extends('layouts.app')
 
+@section('title', 'Contact - Morgates')
+
 @section('content')
   <main class="contact-page">
-    <div class="contact-container">
-      <h1>Contactez-nous</h1>
-      <p>Une question ? Une suggestion ? Nous sommes à votre écoute pour vous aider.</p>
-      
-      <div class="contact-methods">
-        <div class="contact-method">
-          <div class="icon-circle">
-            @svg('mdi-email-outline')
-          </div>
-          <h3>Email</h3>
-          <p><a href="mailto:contact@morgates.com">contact@morgates.com</a></p>
+
+    <section class="contact-hero">
+      <h1>Une question ?</h1>
+      <p class="contact-tagline">Choisissez le canal qui vous convient, on vous répond directement.</p>
+    </section>
+
+    <section class="contact-methods">
+      <a href="mailto:contact@morgates.com" class="contact-method">
+        <div class="contact-method-icon">
+          @svg('tabler-mail')
         </div>
-        
-        <div class="contact-method">
-          <div class="icon-circle">
-            @svg('mdi-whatsapp')
-          </div>
-          <h3>WhatsApp</h3>
-          <p><a href="https://wa.me/33600000000">Discuter avec nous</a></p>
+        <div class="contact-method-body">
+          <span class="contact-method-label">Email</span>
+          <span class="contact-method-value">contact@morgates.com</span>
         </div>
-      </div>
-    </div>
+        @svg('tabler-chevron-right', ['class' => 'contact-method-chevron'])
+      </a>
+
+      <a href="https://wa.me/33600000000" target="_blank" rel="noopener noreferrer" class="contact-method">
+        <div class="contact-method-icon">
+          @svg('tabler-brand-whatsapp')
+        </div>
+        <div class="contact-method-body">
+          <span class="contact-method-label">WhatsApp</span>
+          <span class="contact-method-value">Discuter avec nous</span>
+        </div>
+        @svg('tabler-chevron-right', ['class' => 'contact-method-chevron'])
+      </a>
+    </section>
+
   </main>
 @endsection
 
 @push('styles')
   <style>
     .contact-page {
-      padding: 4rem 1.5rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 70vh;
-    }
-    
-    .contact-container {
-      text-align: center;
-      max-width: 600px;
-      width: 100%;
-    }
-    
-    .contact-container h1 {
-      font-size: 2.25rem;
-      font-weight: 800;
-      color: var(--clr-text-dark);
-      margin-bottom: 1rem;
-      letter-spacing: -0.02em;
-    }
-    
-    .contact-container p {
-      color: var(--clr-text-medium);
-      font-size: 1.1rem;
-      margin-bottom: 3.5rem;
-      line-height: 1.6;
-    }
-    
-    .contact-methods {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-    
-    .contact-method {
-      background: white;
-      padding: 2.5rem 2rem;
-      border-radius: 32px;
-      border: 1px solid rgba(0, 68, 170, 0.05);
-      box-shadow: 0 15px 35px -5px rgba(0, 68, 170, 0.05);
+      padding: 2rem 1.25rem 4rem;
       display: flex;
       flex-direction: column;
+      gap: 2rem;
+    }
+
+    .contact-hero {
+      padding-top: 1.5rem;
+    }
+
+    .contact-hero h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--clr-text-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .contact-tagline {
+      font-size: 0.95rem;
+      color: var(--clr-text-medium);
+      line-height: 1.6;
+    }
+
+    .contact-methods {
+      display: flex;
+      flex-direction: column;
+      border: 0.5px solid #EBEBEB;
+      border-radius: 0.875rem;
+      overflow: hidden;
+      box-shadow: var(--box-shadow);
+    }
+
+    .contact-method {
+      display: flex;
       align-items: center;
-      gap: 0.75rem;
-      transition: transform 0.3s ease;
+      gap: 0.875rem;
+      padding: 1rem 1.125rem;
+      background: var(--clr-background);
+      border-bottom: 0.5px solid #EBEBEB;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .contact-method:last-child {
+      border-bottom: none;
     }
 
     .contact-method:hover {
-      transform: translateY(-5px);
+      background: #FAFAFA;
     }
-    
-    .icon-circle {
-      width: 64px;
-      height: 64px;
-      background: var(--clr-softblue);
-      color: var(--clr-primary);
-      border-radius: 22px;
+
+    .contact-method-icon {
+      flex-shrink: 0;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.625rem;
+      background: color-mix(in srgb, var(--clr-primary) 10%, transparent);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 0.5rem;
-    }
-    
-    .icon-circle svg {
-      width: 30px;
-      height: 30px;
-    }
-    
-    .contact-method h3 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--clr-text-dark);
-    }
-    
-    .contact-method a {
       color: var(--clr-primary);
-      font-weight: 700;
-      text-decoration: none;
-      font-size: 1.05rem;
     }
 
-    .contact-method a:hover {
-      text-decoration: underline;
+    .contact-method-icon svg {
+      width: 1.25rem;
+      height: 1.25rem;
     }
-    
-    @media (min-width: 640px) {
-      .contact-methods {
-        grid-template-columns: 1fr 1fr;
-      }
+
+    .contact-method-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .contact-method-label {
+      font-size: 0.72rem;
+      color: var(--clr-text-light);
+    }
+
+    .contact-method-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--clr-text-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .contact-method-chevron {
+      flex-shrink: 0;
+      width: 1rem;
+      height: 1rem;
+      color: #D0D0D0;
     }
   </style>
 @endpush

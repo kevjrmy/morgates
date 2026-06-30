@@ -16,8 +16,8 @@
     @if(!empty($listing->photos) && count($listing->photos) > 0)
       <img src="{{ $listing->photos[0] }}" alt="{{ $listing->title }}">
     @else
-      <div class="listing-card-photo-fallback" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background-color: var(--color-surface-2, #f3f4f6); color: var(--color-text-muted, #9ca3af);">
-        @svg('tabler-photo-off', ['style' => 'width: 32px; height: 32px; opacity: 0.5;'])
+      <div class="listing-card-photo-fallback">
+        @svg('tabler-photo-off')
       </div>
     @endif
   </div>
@@ -42,11 +42,11 @@
 <style>
   .listings-scroll {
     display: flex;
-    gap: 1rem;
+    gap: 0.875rem;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    padding: 0.5rem 1.5rem 1.5rem 0;
+    padding: 0.5rem 1.25rem 1.25rem 0;
     scrollbar-width: none;
   }
 
@@ -55,12 +55,15 @@
   }
 
   .listing-card {
-    flex: 0 0 75vw;
-    max-width: 320px;
+    flex: 0 0 72vw;
+    max-width: 300px;
     scroll-snap-align: center;
-    border-radius: 1rem;
+    border-radius: 0.875rem;
+    border: 0.5px solid #EBEBEB;
     background: var(--clr-background);
     box-shadow: var(--box-shadow);
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
   }
 
   .listing-card:first-child {
@@ -71,81 +74,104 @@
     scroll-snap-align: end;
   }
 
+  .listing-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    border-color: #D5D5D5;
+  }
+
   .listing-card-photo {
     width: 100%;
     aspect-ratio: 4 / 3;
     overflow: hidden;
-    border-radius: 1rem 1rem 0 0;
   }
 
   .listing-card-photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: transform 0.25s ease;
   }
 
   .listing-card:hover .listing-card-photo img {
     transform: scale(1.03);
   }
 
+  .listing-card-photo-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef2f8;
+    color: #b0bfd5;
+  }
+
+  .listing-card-photo-fallback svg {
+    width: 1.75rem;
+    height: 1.75rem;
+    opacity: 0.6;
+  }
+
   .listing-card-body {
-    padding: 0.75rem;
+    padding: 0.75rem 0.875rem;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
   }
 
   .listing-card-city {
-    font-size: 0.75rem;
-    color: var(--clr-text-medium);
+    font-size: 0.68rem;
+    color: var(--clr-text-light);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
+    font-weight: 600;
   }
 
   .listing-card-title {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: var(--clr-text-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .listing-card-price {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     color: var(--clr-text-medium);
-    margin-top: 0.25rem;
+    margin-top: 0.2rem;
   }
 
   .listing-card-price-from {
-    font-size: 0.75rem;
-    color: var(--clr-text-medium);
-    font-weight: 400;
+    font-size: 0.72rem;
+    color: var(--clr-text-light);
   }
 
   .listing-card-price-value {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 700;
     color: var(--clr-text-dark);
   }
 
   .listing-card-price-unit {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--clr-text-medium);
   }
 
   .listing-card--more {
-    border: 1px solid var(--clr-primary);
+    border: 0.5px solid #DADADA;
     display: flex;
     align-items: center;
     justify-content: center;
-    aspect-ratio: 3 / 2;
-    color: var(--clr-primary);
-    transition: background-color 0.2s ease;
-    background: transparent;
+    color: var(--clr-text-medium);
+    transition: border-color 0.15s ease, color 0.15s ease;
+    background: var(--clr-background);
     box-shadow: none;
   }
 
   .listing-card--more:hover {
-    background-color: rgba(0, 0, 0, 0.03);
+    border-color: var(--clr-primary);
+    color: var(--clr-primary);
   }
 
   .listing-card-more-inner {
@@ -154,7 +180,12 @@
     align-items: center;
     gap: 0.5rem;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .listing-card-more-inner svg {
+    width: 1.5rem;
+    height: 1.5rem;
   }
 </style>
 @endpush

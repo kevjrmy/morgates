@@ -2,7 +2,7 @@
 <html lang="fr">
 
 <head>
-  <title>@yield('title', 'Mon espace — Morgates')</title>
+  <title>@yield('title', 'Mon espace - Morgates')</title>
   <meta charset="UTF-8">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

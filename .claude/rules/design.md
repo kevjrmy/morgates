@@ -21,7 +21,7 @@ Avoid: flashy, busy, platform-y, intermediary-heavy aesthetics.
 
 ## CSS & Styling
 - Use the CSS variables defined in `resources/css/app.css` as much as possible.
-- Vanilla CSS and vanilla JavaScript only — no UI frameworks or component libraries.
+- Vanilla CSS and vanilla JavaScript only; no UI frameworks or component libraries.
 - Prefer scoped CSS at the view or component level using `@push('styles')`.
 - Put CSS in shared files only when reused across multiple views/components.
 - Reuse existing CSS files and layout structure where they already match the intended scope.
@@ -35,7 +35,14 @@ Avoid: flashy, busy, platform-y, intermediary-heavy aesthetics.
 - Prefer intuitive UI/UX over impressive or flashy interactions.
 - Use stepper inputs, toggle switches, and card selectors where they suit the context (see listing creation steps for patterns).
 
+## Readability
+- Navigation links, labels, and any actionable text must use `--clr-text-dark` as the base color. Never use `--clr-text-medium` or `--clr-text-light` on text the user needs to read and act on.
+- `--clr-text-medium` is for supporting text: metadata, hints, subtitles, secondary info.
+- `--clr-text-light` is for decorative or de-emphasized elements: timestamps, eyebrows, section labels, placeholders, disabled states.
+- When reducing font size, compensate with `font-weight: 600` or `--clr-text-dark` to preserve legibility. Never reduce both size and color weight simultaneously.
+
 ## Copy
 - All user-facing copy in French.
+- Do **not** use em dashes (`—`) in user-facing copy. Use a colon, comma, hyphen (`-`), slash, or rephrase instead.
 - Keep visible strings easy to extract into Laravel translation files later.
 - Avoid duplicating hard-coded text across unrelated templates.

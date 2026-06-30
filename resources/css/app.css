@@ -115,3 +115,12 @@ svg {
   width: 1.5rem;
   vertical-align: middle;
 }
+
+/* Bottom sheet drag handle */
+.sheet-handle {
+  width: 2.5rem;
+  height: 0.25rem;
+  background: #E0E0E0;
+  border-radius: 99px;
+  margin: 0.625rem auto 1rem;
+}

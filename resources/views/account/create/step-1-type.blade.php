@@ -4,7 +4,7 @@ Step 1: Choose listing type, then title (two-phase JS flow)
 --}}
 @extends('layouts.listing-create')
 
-@section('title', 'Type de bien — Publier une annonce')
+@section('title', 'Type de bien - Publier une annonce')
 
 @push('styles')
 <style>

@@ -117,8 +117,9 @@ class AccountController extends Controller
     $plan = [
       'name' => 'Plan Découverte',
       'status' => 'Actif',
+      'billing_cycle' => 'monthly', // 'monthly' | 'yearly'
       'ends_at' => now()->addMonth()->locale('fr')->translatedFormat('d F Y'),
-      'publication_limit' => 3,
+      'publication_limit' => 10,
     ];
 
     return view('account.subscriptions.index', compact('listings', 'plan'));

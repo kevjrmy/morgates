@@ -609,6 +609,20 @@
   box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.18);
 }
 
+.account-bottom-sheet:not(.account-actions-sheet) {
+  transition: transform 0.3s ease;
+}
+
+.account-bottom-sheet:not(.account-actions-sheet)::before {
+  content: '';
+  display: block;
+  width: 2.5rem;
+  height: 0.25rem;
+  background: #E0E0E0;
+  border-radius: 99px;
+  margin: 0.625rem auto 1rem;
+}
+
 .account-bottom-sheet::backdrop {
   background: rgba(0, 0, 0, 0.32);
 }
@@ -618,8 +632,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 1rem 0.75rem;
+  padding: 0.625rem 1rem 0.75rem;
   border-bottom: 0.5px solid #EBEBEB;
+}
+
+.account-actions-sheet .account-bottom-sheet-header {
+  padding-top: 1rem;
 }
 
 .account-bottom-sheet-header span {

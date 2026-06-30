@@ -42,4 +42,4 @@
 
 - Review location autocomplete UX on mobile (step 2 of listing creation).
 - Listing deactivate / delete actions from the account listings page.
-- Add optional links to external booking platforms (Airbnb, Booking.com, etc.) in the listing creation flow — for owners who are also listed elsewhere.
+- Add optional links to external booking platforms (Airbnb, Booking.com, etc.) in the listing creation flow: for owners who are also listed elsewhere.

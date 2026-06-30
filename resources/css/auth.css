@@ -24,6 +24,8 @@
 
 .auth-header img {
   height: 3rem;
+  width: 3rem;
+  flex-shrink: 0;
   border: 2px solid var(--clr-primary);
   border-radius: 50%;
   margin-bottom: 0.5rem;

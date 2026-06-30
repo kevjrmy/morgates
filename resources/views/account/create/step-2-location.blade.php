@@ -4,7 +4,7 @@
 --}}
 @extends('layouts.listing-create')
 
-@section('title', 'Localisation — Publier une annonce')
+@section('title', 'Localisation - Publier une annonce')
 
 @section('content')
   <div class="lc-step">
@@ -557,7 +557,7 @@
 
       updateCityAvailability()
 
-      // Edit/session flow: city + coordinates pre-filled but cityCode not stored — fetch it once
+      // Edit/session flow: city + coordinates pre-filled but cityCode not stored - fetch it once
       if (countryInput.value === 'FR' && cityInput.value && latitudeInput.value) {
         fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(cityInput.value)}&fields=code&boost=population&limit=1`)
           .then(r => r.json())

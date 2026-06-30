@@ -81,7 +81,7 @@
                 min="0">
               <span class="price-field-currency">€</span>
             </div>
-            <span class="price-dash">—</span>
+            <span class="price-dash">-</span>
             <div class="price-field">
               <input type="number" name="price_max" id="price-max" placeholder="Max" value="{{ request('price_max') }}"
                 min="0">

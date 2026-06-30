@@ -4,7 +4,7 @@ Step 3: price, capacity
 --}}
 @extends('layouts.listing-create')
 
-@section('title', 'Prix et capacité — Publier une annonce')
+@section('title', 'Prix et capacité - Publier une annonce')
 
 @section('content')
   @php

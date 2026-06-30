@@ -1,6 +1,6 @@
 @extends('layouts.account')
 
-@section('title', 'Mes annonces — Morgates')
+@section('title', 'Mes annonces - Morgates')
 
 @push('styles')
 <style>

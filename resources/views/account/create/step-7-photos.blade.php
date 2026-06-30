@@ -1,10 +1,10 @@
 {{--
   listings/create/step-7-photos.blade.php
-  Step 7: Photos — placeholder for MVP
+  Step 7: Photos - placeholder for MVP
 --}}
 @extends('layouts.listing-create')
 
-@section('title', 'Photos — Publier une annonce')
+@section('title', 'Photos - Publier une annonce')
 
 @section('content')
   <div class="lc-step">

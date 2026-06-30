@@ -1,6 +1,6 @@
 @extends('layouts.account')
 
-@section('title', 'Modifier l\'annonce — Morgates')
+@section('title', 'Modifier l\'annonce - Morgates')
 
 @push('styles')
 @vite(['resources/css/listing-create.css'])

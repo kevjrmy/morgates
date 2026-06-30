@@ -11,22 +11,24 @@
     'instagram' => $social['instagram'] ?? null,
     'messenger' => $social['messenger'] ?? null,
   ];
-  $order  = array_values(array_unique(array_merge([$preferred], array_keys($channelMap))));
-  $hasAny = array_filter($channelMap);
+  $order          = array_values(array_unique(array_merge([$preferred], array_keys($channelMap))));
+  $hasAny         = array_filter($channelMap);
+  $filled         = array_values(array_filter($order, fn($ch) => !empty($channelMap[$ch])));
+  $hiddenCount    = max(0, count($filled) - 4);
 @endphp
 
 <div class="bottom-sheet-overlay" id="contact-bottom-sheet" hidden>
   <div class="bottom-sheet-panel">
+    <div class="sheet-handle"></div>
     <button type="button" class="bottom-sheet-close" aria-label="Fermer">
       @svg('tabler-x')
     </button>
 
-    <h2 class="bottom-sheet-title">Contacter directement</h2>
-
     <ul class="contact-list-bottom" role="list">
-      @foreach($order as $channel)
-        @if(!empty($channelMap[$channel]))
-          <li class="contact-item-bottom">
+      @foreach($filled as $i => $channel)
+          @php $isPrimary = $channel === $preferred; $isHidden = $i >= 4; @endphp
+          <li class="contact-item-bottom {{ $isPrimary ? 'contact-item-bottom--primary' : '' }} {{ $isHidden ? 'contact-item-secondary' : '' }}"
+              @if($isHidden) hidden @endif>
             @if($channel === 'email')
               <span class="contact-icon-bottom">@svg('tabler-mail')</span>
               <span class="contact-value-bottom">{{ $channelMap['email'] }}</span>
@@ -72,8 +74,16 @@
               </div>
             @endif
           </li>
-        @endif
       @endforeach
+
+      @if($hiddenCount > 0)
+        <li>
+          <button type="button" class="contact-expand-btn" id="contact-expand-btn">
+            @svg('tabler-chevron-down')
+            <span>Voir {{ $hiddenCount }} autre{{ $hiddenCount > 1 ? 's' : '' }} moyen{{ $hiddenCount > 1 ? 's' : '' }} de contact</span>
+          </button>
+        </li>
+      @endif
 
       @if(!$hasAny)
         <li class="contact-item-bottom">

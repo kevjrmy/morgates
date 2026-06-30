@@ -38,7 +38,7 @@
       <div class="steps-grid">
         <div class="step">
           <div class="step-icon">
-            @svg('mdi-magnify')
+            @svg('tabler-search')
           </div>
           <h3>Explorez</h3>
           <p>Parcourez simplement les differentes offres.</p>
@@ -56,7 +56,7 @@
 
         <div class="step">
           <div class="step-icon">
-            @svg('mdi-check-decagram-outline')
+            @svg('tabler-circle-check')
           </div>
           <h3>Profitez</h3>
           <p>Réservez en direct avec l'hôte, sans commission ni frais intermédiaires.</p>
@@ -94,36 +94,33 @@
     }
 
     .how-it-works {
-      background: linear-gradient(180deg, transparent, rgba(213, 229, 255, 0.35) 40%, rgba(213, 229, 255, 0.15) 70%, transparent);
-      padding: 1.5rem;
+      background: color-mix(in srgb, var(--clr-tertiary) 18%, var(--clr-background));
+      padding: 2.5rem 1.25rem;
       text-align: center;
     }
 
     .how-it-works-header {
-      text-align: center;
-      margin-bottom: 3rem;
+      margin-bottom: 2rem;
     }
 
     .how-it-works-header h2 {
-      font-size: 1.85rem;
-      font-weight: 800;
+      font-size: 1.375rem;
+      font-weight: 700;
       color: var(--clr-text-dark);
       margin-bottom: 0.5rem;
     }
 
     .how-it-works-header p {
       color: var(--clr-text-medium);
-      font-size: 1rem;
-      max-width: 400px;
+      font-size: 0.9rem;
+      max-width: 26rem;
       margin: 0 auto;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     .steps-grid {
       display: grid;
-      gap: 1.5rem;
-      max-width: 1000px;
-      margin: 0 auto;
+      gap: 0.875rem;
       grid-template-columns: 1fr;
     }
 
@@ -132,79 +129,70 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
-      gap: 0.75rem;
-      padding: 1.5rem;
-      background: white;
-      border-radius: 20px;
-      border: 1px solid rgba(0, 68, 170, 0.06);
-      box-shadow: 0 8px 20px -6px rgba(0, 68, 170, 0.06);
-      position: relative;
-      transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+      gap: 0.625rem;
+      padding: 1.375rem 1.25rem;
+      background: var(--clr-background);
+      border-radius: 0.875rem;
+      border: 0.5px solid #EBEBEB;
+      box-shadow: var(--box-shadow);
     }
 
     .step-icon {
-      width: 48px;
-      height: 48px;
-      background: var(--clr-primary);
-      color: white;
-      border-radius: 14px;
+      width: 2.75rem;
+      height: 2.75rem;
+      background: color-mix(in srgb, var(--clr-primary) 10%, transparent);
+      color: var(--clr-primary);
+      border-radius: 0.625rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.3s ease, background 0.3s ease;
+      margin-bottom: 0.25rem;
     }
 
     .step-icon svg {
-      width: 24px;
-      height: 24px;
+      width: 1.35rem;
+      height: 1.35rem;
     }
 
     .step h3 {
-      font-size: 1.15rem;
+      font-size: 0.975rem;
       font-weight: 700;
       color: var(--clr-text-dark);
-      letter-spacing: -0.01em;
     }
 
     .step p {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--clr-text-medium);
       line-height: 1.6;
-      max-width: 260px;
+      max-width: 18rem;
     }
 
-    @media (min-width: 768px) {
+    @media (min-width: 560px) {
       .steps-grid {
         grid-template-columns: repeat(3, 1fr);
-        gap: 1.25rem;
+        gap: 0.875rem;
       }
 
-      .how-it-works {
-        padding: 6rem 1.5rem;
+      .step p {
+        max-width: none;
       }
     }
 
     .footer-cta {
-      margin-top: 1.5rem;
-      display: block;
-      font-size: 0.9rem;
+      display: inline-block;
+      margin-top: 1.75rem;
+      font-size: 0.875rem;
       color: var(--clr-text-medium);
-      transition: all 0.3s ease;
-    }
-
-    .footer-cta:hover {
-      box-shadow: 0 8px 20px -8px rgba(0, 68, 170, 0.1);
-      border-color: rgba(0, 68, 170, 0.15);
-      transform: translateY(-4px);
-
-      span {
-        text-decoration: underline;
-      }
     }
 
     .footer-cta span {
       color: var(--clr-primary);
-      font-weight: 700;
+      font-weight: 600;
+    }
+
+    .footer-cta:hover span {
+      text-decoration: underline;
+      text-underline-offset: 2px;
     }
   </style>
 @endpush

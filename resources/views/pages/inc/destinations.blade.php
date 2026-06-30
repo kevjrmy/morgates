@@ -52,25 +52,23 @@
 @push('styles')
   <style>
     #destinations {
-      padding: 0 1rem;
+      padding: 0 1.25rem;
     }
 
     .destinations-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto;
-      gap: 0.75rem;
+      gap: 0.625rem;
     }
 
     .destination-card {
       position: relative;
-      border-radius: 1rem;
+      border-radius: 0.875rem;
       overflow: hidden;
       aspect-ratio: 1 / 1;
       cursor: pointer;
     }
 
-    /* First card spans full width */
     .destination-card:first-child {
       grid-column: 1 / -1;
       aspect-ratio: 16 / 9;
@@ -80,44 +78,39 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.4s ease;
+      transition: transform 0.3s ease;
     }
 
     .destination-card:hover img {
-      transform: scale(1.05);
+      transform: scale(1.04);
     }
 
     .destination-card-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 60%);
-      transition: opacity 0.3s ease;
-    }
-
-    .destination-card:hover .destination-card-overlay {
-      opacity: 0.8;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.52) 0%, transparent 55%);
     }
 
     .destination-card-label {
       position: absolute;
-      bottom: 0.85rem;
-      left: 0.85rem;
+      bottom: 0.875rem;
+      left: 0.875rem;
       color: #fff;
       font-weight: 600;
-      font-size: 1rem;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+      font-size: 0.95rem;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     }
 
     .destination-card:first-child .destination-card-label {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
     }
 
     .destination-card-count {
       display: block;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 400;
       opacity: 0.85;
-      margin-top: 0.1rem;
+      margin-top: 0.125rem;
     }
   </style>
 @endpush

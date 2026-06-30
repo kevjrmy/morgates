@@ -1,6 +1,6 @@
 @extends('layouts.auth')
 
-@section('title', 'Connexion — Morgates')
+@section('title', 'Connexion - Morgates')
 @section('description', 'Connectez-vous à votre compte Morgates.')
 
 @section('content')
@@ -34,6 +34,7 @@
         <div class="form-group">
           <div class="form-label-row">
             <label for="password">Mot de passe</label>
+            <a href="{{ route('password.request') }}" class="form-label-link">Mot de passe oublié ?</a>
           </div>
           <div class="input-password">
             <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password"

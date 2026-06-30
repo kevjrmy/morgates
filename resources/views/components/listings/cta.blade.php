@@ -1,23 +1,25 @@
 @props(['listing'])
 
 <div class="contact-bar">
-  <div class="contact-price-wrapper">
-    <div class="contact-price">
-      @if($listing->price_amount)
-        <span class="price-prefix">À partir de</span>
-        <span class="price-amount">{{ number_format($listing->price_amount, 0, ',', ' ') }} €</span>
-        <span class="price-label">/ {{ $listing->priceUnitLabel() }} *</span>
-      @else
-        <span class="price-amount">Prix sur demande</span>
-      @endif
+  <div class="contact-bar-top">
+    <div class="contact-price-wrapper">
+      <div class="contact-price">
+        @if($listing->price_amount)
+          <span class="price-prefix">À partir de</span>
+          <span class="price-amount">{{ number_format($listing->price_amount, 0, ',', ' ') }} €</span>
+          <span class="price-label">/ {{ $listing->priceUnitLabel() }} *</span>
+        @else
+          <span class="price-amount">Prix sur demande</span>
+        @endif
+      </div>
     </div>
-    @if($listing->price_amount)
-      <div class="price-conditions">* consulter les tarifs et conditions auprès de l'hôte</div>
-    @endif
+    <button type="button" class="btn-contact" id="btn-contact-open">
+      Contacter directement
+    </button>
   </div>
-  <button type="button" class="btn-contact" id="btn-contact-open">
-    Contacter directement
-  </button>
+  @if($listing->price_amount)
+    <div class="price-conditions">* consulter les tarifs et conditions auprès de l'hôte</div>
+  @endif
 </div>
 
 <x-listings.contact-bottom-sheet :listing="$listing" />
@@ -37,16 +39,21 @@
         padding: 0.75rem 1.25rem;
         display: flex;
         flex-direction: column;
-        align-items: stretch;
-        gap: 0.65rem;
+        gap: 0.5rem;
         z-index: 100;
         box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+      }
+
+      .contact-bar-top {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.65rem;
       }
 
       .contact-price-wrapper {
         display: flex;
         flex-direction: column;
-        gap: 0.15rem;
         flex: 1;
         min-width: 0;
       }
@@ -60,13 +67,13 @@
       }
 
       .price-prefix {
-        font-size: 0.75rem;
+        font-size: 0.8rem;
         color: var(--clr-text-medium);
         font-weight: 400;
       }
 
       .price-amount {
-        font-size: 1.05rem;
+        font-size: 1.rem;
         font-weight: 700;
         color: var(--clr-text-dark);
       }
@@ -82,6 +89,7 @@
         color: var(--clr-text-light);
         line-height: 1.2;
         margin-top: 0.1rem;
+        text-align: center;
       }
 
       .btn-contact {
@@ -106,10 +114,12 @@
 
       @media (min-width: 380px) {
         .contact-bar {
+          padding: 0.75rem 1rem;
+        }
+        .contact-bar-top {
           flex-direction: row;
           align-items: center;
           justify-content: space-between;
-          padding: 0.75rem 1rem;
           gap: 0.5rem;
         }
         .btn-contact {
@@ -122,6 +132,8 @@
       @media (min-width: 480px) {
         .contact-bar {
           padding: 1rem 1.5rem;
+        }
+        .contact-bar-top {
           gap: 1rem;
         }
         .price-prefix {

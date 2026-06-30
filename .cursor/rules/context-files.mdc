@@ -1,0 +1,45 @@
+---
+description: Keep project context files in sync after relevant code changes
+alwaysApply: true
+---
+
+# Context Files Maintenance
+
+Applies to all AI agents working on this repo (Cursor, Claude, Gemini, Composer, DeepSeek, etc.).
+
+After completing a task, or before ending the session if work is left in a coherent state, check whether project context files need updating. Do this **proactively**; the user should not have to ask.
+
+## Files To Maintain
+
+| File | Update when… |
+|------|----------------|
+| `AGENTS.md` | Routes, domain model, architecture, product scope, or **Current Implementation State** changed |
+| `todo.md` | A TODO was completed, deferred, reprioritized, or a new gap was discovered |
+| `.claude/rules/coding.md` | A new coding convention or invariant should be enforced going forward |
+| `.claude/rules/design.md` | A new UI/UX pattern or design constraint was established |
+| `README.md` | Documentation index or dev commands changed |
+
+## When To Update
+
+Update when the change would mislead a future agent reading context files, for example:
+
+- New or removed routes, controllers, models, or API endpoints
+- New listing-creation steps, filters, or domain fields
+- Features moved from planned → implemented (or the reverse)
+- Completed or obsolete TODO items
+- New conventions worth enforcing repo-wide
+
+## When To Skip
+
+Do **not** update for:
+
+- Typo fixes, refactors, or bug fixes that don't change behavior or architecture
+- Purely visual tweaks with no new pattern
+- Work-in-progress that isn't yet stable enough to document
+
+## How To Update
+
+- Keep edits **minimal and accurate**: only sections affected by your work.
+- Remove stale statements; don't append contradictory notes.
+- Match the tone and structure already used in each file.
+- Mention context-file updates briefly in your final reply when you made them.

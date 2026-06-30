@@ -61,9 +61,18 @@ Owners can publish listings instantly in the MVP. There is no pre-publication ap
 Minimum trust and safety requirements are still open and should be refined along the way. Do not overbuild this early, but keep the architecture flexible enough to add requirements such as verified contact details, required photos, profile completion, moderation, or reporting later.
 
 ## Business Model
-The MVP is free. The intended business model is a monthly or yearly owner subscription.
+The MVP is free during development. The intended business model is an owner subscription.
 
 The concept is a digital version of the old mail-order catalog model: owners pay or subscribe to appear, choose a simple plan, and then run their own business directly with visitors. Morgates should not take transaction fees or booking commissions. The product direction is deliberately simple: cut intermediaries and fees.
+
+### Subscription Plan
+There is currently **one plan** ("Plan Découverte"). Owners choose a billing cycle:
+- **Monthly** (`monthly`)
+- **Yearly** (`yearly`) — intended to be ~20% cheaper than monthly
+
+The plan allows owners to have up to **10 active listings simultaneously** (`publication_limit = 10`).
+
+The `billing_cycle` field (`monthly` | `yearly`) is stored per subscription. The subscriptions page (`/mon-espace/abonnements`) lets owners view their current plan and switch cycle. Payments are not wired yet (out of MVP scope).
 
 ## MVP Scope
 Currently out of scope for the MVP:
@@ -184,13 +193,13 @@ Tags are defined in `config/tags.php` under three keys: `common`, `stays`, and `
 - Account subscriptions page (`/mon-espace/abonnements`) exists with placeholder plan data.
 - Legal pages (privacy, terms, about) and a contact page exist with placeholder content.
 - Listing creation is a fully functional seven-step Blade flow that persists data to the database:
-  1. **Type** — listing type (`boats`/`stays`) and title; stored to session. Changing type clears prior session data.
-  2. **Location** — country, region, city, address, coordinates, `show_exact_address`, map URL; stored to session. City autocomplete uses `https://geo.api.gouv.fr/communes` (FR only). Address autocomplete uses `https://api-adresse.data.gouv.fr/search/` scoped to the selected city via INSEE `citycode`. Both APIs are free, keyless, and only active for FR. For other countries, both fields are free text. Map preview uses a Google Maps embed URL built from coordinates/address (no Google Maps API key required).
-  3. **Basics** — price, price unit (type-dependent options), capacity, min/max duration (days); stored to session
-  4. **Details** — tags only; stored to session
-  5. **Contact** — contact channels (email, phone, WhatsApp, website, Instagram, Messenger), `preferred_contact`, FR/ES phone validation; at least one channel required; stored to session
-  6. **Description** — free-text description; stored to session
-  7. **Photos** — placeholder UI; submitting creates the `Listing` record from session data, optionally auto-creates a `Destination` record, clears the session, redirects to account
+  1. **Type**: listing type (`boats`/`stays`) and title; stored to session. Changing type clears prior session data.
+  2. **Location**: country, region, city, address, coordinates, `show_exact_address`, map URL; stored to session. City autocomplete uses `https://geo.api.gouv.fr/communes` (FR only). Address autocomplete uses `https://api-adresse.data.gouv.fr/search/` scoped to the selected city via INSEE `citycode`. Both APIs are free, keyless, and only active for FR. For other countries, both fields are free text. Map preview uses a Google Maps embed URL built from coordinates/address (no Google Maps API key required).
+  3. **Basics**: price, price unit (type-dependent options), capacity, min/max duration (days); stored to session
+  4. **Details**: tags only; stored to session
+  5. **Contact**: contact channels (email, phone, WhatsApp, website, Instagram, Messenger), `preferred_contact`, FR/ES phone validation; at least one channel required; stored to session
+  6. **Description**: free-text description; stored to session
+  7. **Photos**: placeholder UI; submitting creates the `Listing` record from session data, optionally auto-creates a `Destination` record, clears the session, redirects to account
 - Photo upload in step 7 is not yet implemented (placeholder only; listings are published without photos).
 - Feature tests exist for city/nearby search (`ListingSearchTest`) and destination caching/API (`ListingDestinationCacheTest`).
 
@@ -217,6 +226,24 @@ Tags are defined in `config/tags.php` under three keys: `common`, `stays`, and `
 - `tests/Feature/ListingSearchTest.php`: city filter and nearby search tests.
 - `tests/Feature/ListingDestinationCacheTest.php`: destination caching and cities API tests.
 
+## Context Files Maintenance
+
+All AI agents (Claude, Gemini, Composer, DeepSeek, Cursor, etc.) must **proactively keep context files accurate** when their work makes them stale. The user should not have to ask.
+
+After completing a task, review and update relevant files:
+
+| File | Update when… |
+|------|----------------|
+| `AGENTS.md` | Routes, domain model, architecture, product scope, or **Current Implementation State** changed |
+| `todo.md` | A TODO was completed, deferred, reprioritized, or a new gap was discovered |
+| `.claude/rules/coding.md` | A new coding convention or invariant should be enforced going forward |
+| `.claude/rules/design.md` | A new UI/UX pattern or design constraint was established |
+| `README.md` | Documentation index or dev commands changed |
+
+Skip updates for trivial fixes (typos, refactors, cosmetic tweaks) that don't change behavior, architecture, or what future agents need to know. Keep edits minimal: only the sections affected by your work.
+
+Cursor picks this up via `.cursor/rules/context-files.mdc`.
+
 ## Conventions
 Coding conventions are in `.claude/rules/coding.md`.
 Frontend and design rules are in `.claude/rules/design.md`.
@@ -231,7 +258,7 @@ Frontend and design rules are in `.claude/rules/design.md`.
 See `todo.md` for the full prioritized list. Highlights:
 - Implement production-ready image upload/storage for listing photos (evaluate Cloudinary).
 - Wire the account listing edit save endpoint and add photo display/management there.
-- Add basic admin dashboard for Loïs (users, listings, basic KPIs) — custom Blade area, no third-party admin package.
+- Add basic admin dashboard for Loïs (users, listings, basic KPIs): custom Blade area, no third-party admin package.
 - Add owner trust fields: confirmation email, required contact details before publishing.
 - Track key MVP metrics: listing views, contact clicks by channel, owner signups, published listings.
 - Refine legal page content (privacy, terms).

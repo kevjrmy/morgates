@@ -1,6 +1,6 @@
 @extends('layouts.auth')
 
-@section('title', 'Inscription — Morgates')
+@section('title', 'Inscription - Morgates')
 @section('description', 'Créez votre compte Morgates.')
 
 @section('content')

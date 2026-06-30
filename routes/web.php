@@ -4,6 +4,7 @@ use Illuminate\Http\Client\Pool;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ListingController;
@@ -236,6 +237,11 @@ Route::middleware('guest')->group(function () {
 
   Route::view('/inscription', 'auth.register')->name('register');
   Route::post('/inscription', [AuthController::class, 'register'])->middleware('throttle:5,1');
+
+  Route::get('/mot-de-passe-oublie', [PasswordResetController::class, 'requestForm'])->name('password.request');
+  Route::post('/mot-de-passe-oublie', [PasswordResetController::class, 'sendResetLink'])->name('password.email')->middleware('throttle:5,1');
+  Route::get('/reinitialiser/{token}', [PasswordResetController::class, 'resetForm'])->name('password.reset');
+  Route::post('/reinitialiser', [PasswordResetController::class, 'reset'])->name('password.update');
 });
 
 Route::post('/deconnexion', [AuthController::class, 'logout'])->name('logout')->middleware('auth');

@@ -7,7 +7,7 @@
 - Keep visible UI text in **French**.
 - Do not add large dependencies without a clear reason.
 - Do not add features, abstractions, error handling, or validation beyond what the task requires.
-- Preserve uncommitted user work — treat it as in-progress unless the current task clearly generated it.
+- Preserve uncommitted user work: treat it as in-progress unless the current task clearly generated it.
 
 ## Comments
 - Write no comments by default.
@@ -20,13 +20,14 @@
 - Route key for `Listing` is `slug` (defined via `getRouteKeyName()`).
 - Listing types are `boats` and `stays` (DB enum values). UI labels: `Bateau`, `Hébergement`.
 - Price units depend on listing type: boats allow `hour`, `half-day`, `day`, `week`, `month`, `contact`; stays allow `day`, `week`, `month`, `contact`.
-- Duration fields (`min_duration`, `max_duration`) are always in **days** — there is no `duration_unit` column.
+- Duration fields (`min_duration`, `max_duration`) are always in **days**: there is no `duration_unit` column.
 - The `Listing` model auto-generates its slug on save via the `booted()` hook. Do not set slugs manually in controllers unless handling creation uniqueness explicitly.
 - Listings have a `preferred_contact` field and `contact_social_links` JSON (`instagram`, `messenger`). `primaryContactUrl()` respects the preferred channel.
 - The `Destination` model is auto-populated from listing location data when `city` + `latitude` are present. It is not a user-facing entity.
 - Tags live in `config/tags.php` under `common`, `stays`, and `boats` keys. Step 4 merges `common` + type-specific tags.
 - Listing creation is a 7-step session flow (`ListingController::$totalSteps = 7`): type → location → basics → details (tags) → contact → description → photos.
 - `User` has `account_type` (`individual`/`company`) and display name accessors (`display_host_name`, `greeting_name`, `full_name`, `isCompany()`).
+- There is **one subscription plan** ("Plan Découverte") with two billing cycles: `monthly` and `yearly` (yearly ≈ 20% cheaper). The plan allows up to **10 simultaneous active listings** (`publication_limit = 10`). The `billing_cycle` field is `monthly` | `yearly`. Payments are not wired yet — subscription data is mocked in `AccountController::subscriptions()`.
 
 ## JavaScript
 - No semicolons.
@@ -42,5 +43,6 @@
 - Start by checking `git status --short`.
 - Read the relevant route, controller, model, Blade view, and CSS files before editing.
 - Run `php artisan test` for backend changes when feasible.
-- Kevin usually has the Vite dev server/build watcher running — do **not** run `npm run build` unless explicitly requested or needed.
+- Kevin usually has the Vite dev server/build watcher running: do **not** run `npm run build` unless explicitly requested or needed.
 - If tests or builds cannot be run, report that clearly.
+- Before finishing, check whether context files need updating (`AGENTS.md`, `todo.md`, this file, `design.md`, `README.md`). Update them proactively when your changes affect routes, domain model, implementation state, TODOs, or repo-wide conventions. See **Context Files Maintenance** in `AGENTS.md`.

@@ -1,6 +1,6 @@
 @extends('layouts.account')
 
-@section('title', 'Mon espace — Morgates')
+@section('title', 'Mon espace - Morgates')
 
 @section('content')
   @php
